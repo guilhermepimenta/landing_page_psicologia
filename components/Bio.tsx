@@ -2,6 +2,8 @@
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
 
+import profileImage from '../assets/image.png';
+
 export const Bio: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 md:mb-32">
@@ -10,7 +12,7 @@ export const Bio: React.FC = () => {
         <div className="md:w-1/3 bg-[#F0EFEB] p-8 flex flex-col items-center justify-center">
           <div className="relative group">
             <img
-              src="./assets/image.png"
+              src={profileImage}
               alt="Fernanda Abreu Mangia"
               className="w-full h-auto rounded-2xl shadow-lg transition-transform duration-500 group-hover:scale-[1.02]"
             />
