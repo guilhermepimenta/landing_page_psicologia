@@ -58,9 +58,9 @@ export const Services: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-serif text-[#4A5D4A] mb-4">Serviços</h2>
-        <div className="h-0.5 w-12 bg-[#B4C2B4] mx-auto mb-6"></div>
-        <p className="text-gray-500 max-w-2xl mx-auto">
+        <h2 className="text-4xl font-serif text-white mb-4">Serviços</h2>
+        <div className="h-0.5 w-12 bg-white/30 mx-auto mb-6"></div>
+        <p className="text-white/80 max-w-2xl mx-auto">
           Ofereço atendimento psicológico individualizado, online e presencial, focado nas suas necessidades. Conheça alguns dos temas abordados:
         </p>
       </div>
@@ -87,7 +87,7 @@ export const Services: React.FC = () => {
         ))}
       </div>
 
-      <p className="text-center mt-12 text-gray-400 italic text-sm">
+      <p className="text-center mt-12 text-white/60 italic text-sm">
         Entre em contato para saber mais sobre como posso te ajudar!
       </p>
     </div>
