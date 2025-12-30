@@ -33,7 +33,7 @@ export const LandingPage: React.FC = () => {
                     <Bio />
                 </section>
 
-                <section id="servicos" className="bg-[#F7F5F2] py-20 scroll-mt-[15px]">
+                <section id="servicos" className="bg-[#F0EFEB] py-20 scroll-mt-[15px]">
                     <Services />
                 </section>
 

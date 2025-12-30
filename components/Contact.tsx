@@ -86,6 +86,13 @@ export const Contact: React.FC = () => {
     const message = `Olá Dra. Fernanda, meu nome é ${formData.name}. ${formData.message} (Contato: ${formData.phone})`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/5521993718343?text=${encodedMessage}`, '_blank');
+
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      message: ''
+    });
   };
 
   return (
