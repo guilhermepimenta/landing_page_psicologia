@@ -1,0 +1,9 @@
+
+{
+  "name": "Fernanda Abreu Mangia - Psicologia",
+  "description": "Professional landing page for Fernanda Abreu Mangia, a clinical psychologist specializing in Cognitive Behavioral Therapy and Schema Therapy.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
