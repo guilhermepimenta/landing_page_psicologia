@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User, Activity, Brain, Heart, Wind, Target, Share2 } from 'lucide-react';
+import { User, Activity, Brain, Heart, Wind, ClipboardCheck, Share2 } from 'lucide-react';
 
 const serviceList = [
   {
@@ -29,9 +29,9 @@ const serviceList = [
     icon: <Brain />
   },
   {
-    title: 'Desenvolvimento',
-    desc: 'Orientações para alcançar metas, superar desafios e promover o crescimento pessoal e profissional.',
-    icon: <Target />
+    title: 'Avaliação Neuropsicológica',
+    desc: 'Investigação detalhada das funções cognitivas, auxiliando no diagnóstico e compreensão do funcionamento cerebral.',
+    icon: <ClipboardCheck />
   }
 ];
 
