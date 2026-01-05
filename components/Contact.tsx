@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Send, AlertCircle, Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { sendGAEvent } from '../utils/analytics';
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -85,6 +86,10 @@ export const Contact: React.FC = () => {
     // In a real scenario, this would handle form submission
     const message = `Olá Dra. Fernanda, meu nome é ${formData.name}. ${formData.message} (Contato: ${formData.phone})`;
     const encodedMessage = encodeURIComponent(message);
+
+    // Track conversion
+    sendGAEvent('generate_lead', 'contact', 'whatsapp_submit');
+
     window.open(`https://wa.me/5521993718343?text=${encodedMessage}`, '_blank');
 
     setFormData({

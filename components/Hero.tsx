@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { sendGAEvent } from '../utils/analytics';
 
 export const Hero: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ export const Hero: React.FC = () => {
           </a> */}
           <a
             href="#servicos"
+            onClick={() => sendGAEvent('cta_click', 'hero', 'conhecer_servicos')}
             className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             Conhecer Serviços

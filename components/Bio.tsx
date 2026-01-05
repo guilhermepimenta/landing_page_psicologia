@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import { sendGAEvent } from '../utils/analytics';
 
 export const Bio: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ export const Bio: React.FC = () => {
             href="https://www.doctoralia.com.br/fernanda-abreu-mangia/psicologo/niteroi"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => sendGAEvent('outbound_click', 'bio', 'doctoralia_profile')}
             className="mt-10 bg-gray-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors inline-block"
           >
             Ver perfil no Doctoralia

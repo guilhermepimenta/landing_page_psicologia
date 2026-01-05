@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { sendGAEvent } from '../utils/analytics';
 
 interface NavbarProps {
   isScrolled: boolean;
@@ -37,7 +38,9 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
               <a
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-bold tracking-wide transition-all duration-300 relative group py-1 ${isScrolled ? 'text-gray-500 hover:text-[#4A5D4A]' : 'text-white/80 hover:text-white'}`}
+                onClick={() => sendGAEvent('menu_click', 'navigation', link.name)}
+                className={`text-sm font-medium transition-colors hover:text-[#4A5D4A] relative group py-1 ${isScrolled ? 'text-gray-700' : 'text-white/80 hover:text-white'
+                  }`}
               >
                 {link.name}
                 <span className={`absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isScrolled ? 'bg-[#4A5D4A]' : 'bg-white'}`}></span>
@@ -65,7 +68,10 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
               <a
                 key={link.name}
                 href={link.href}
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  sendGAEvent('menu_click', 'navigation', link.name);
+                }}
                 className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-[#4A5D4A] transition-all"
               >
                 {link.name}
