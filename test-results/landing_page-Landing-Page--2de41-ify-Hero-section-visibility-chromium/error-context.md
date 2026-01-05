@@ -1,0 +1,229 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e6]:
+      - link "Psicóloga Fernanda Abreu Mangia" [ref=e8] [cursor=pointer]:
+        - /url: "#inicio"
+        - heading "Psicóloga Fernanda Abreu Mangia" [level=1] [ref=e9]
+      - generic [ref=e10]:
+        - link "Início" [ref=e11] [cursor=pointer]:
+          - /url: "#inicio"
+          - text: Início
+        - link "Sobre Mim" [ref=e12] [cursor=pointer]:
+          - /url: "#sobre"
+          - text: Sobre Mim
+        - link "Serviços" [ref=e13] [cursor=pointer]:
+          - /url: "#servicos"
+          - text: Serviços
+        - link "Blog" [ref=e14] [cursor=pointer]:
+          - /url: "#blog"
+          - text: Blog
+        - link "Contato" [ref=e15] [cursor=pointer]:
+          - /url: "#contato"
+          - text: Contato
+        - link "Depoimentos" [ref=e16] [cursor=pointer]:
+          - /url: "#depoimentos"
+          - text: Depoimentos
+  - main [ref=e17]:
+    - generic [ref=e22]:
+      - heading "Cuidado e bem-estar para uma vida mais leve" [level=2] [ref=e23]
+      - paragraph [ref=e25]: Apoio especializado para ajudar você a navegar pelas complexidades da mente e encontrar o equilíbrio emocional necessário.
+      - link "Conhecer Serviços" [ref=e27] [cursor=pointer]:
+        - /url: "#servicos"
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - img "Fernanda Abreu Mangia" [ref=e33]
+        - link "Ver perfil no Doctoralia" [ref=e35] [cursor=pointer]:
+          - /url: https://www.doctoralia.com.br/fernanda-abreu-mangia/psicologo/niteroi
+      - generic [ref=e36]:
+        - paragraph [ref=e37]: Olá, sou psicóloga clínica, com mestrado em Saúde Coletiva pela UFF, especialista em Psicologia Clínica e em Psicologia da Saúde.
+        - paragraph [ref=e38]: Atualmente trabalho com a Terapia Cognitivo-Comportamental e Terapia do Esquema, buscando uma abordagem integral desde a infância até os momentos atuais, de acordo com a demanda de cada um.
+        - paragraph [ref=e39]: Tenho experiência no atendimento a crianças, adolescentes, adultos e idosos. Realizo Orientação Vocacional/Profissional e Avaliação Neuropsicológica.
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - img [ref=e42]
+            - generic [ref=e45]: Atendimentos online e presencial.
+          - generic [ref=e46]:
+            - img [ref=e47]
+            - generic [ref=e50]: Agenda de segunda à sexta, aos sábados à combinar.
+        - paragraph [ref=e51]: "\"Entre em contato, será um prazer apresentar o meu trabalho!\""
+    - generic [ref=e55]:
+      - generic [ref=e56]:
+        - heading "Serviços" [level=2] [ref=e57]
+        - paragraph [ref=e59]: "Ofereço atendimento psicológico individualizado, online e presencial, focado nas suas necessidades. Conheça alguns dos temas abordados:"
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - button "Compartilhar" [ref=e62] [cursor=pointer]:
+            - img [ref=e63]
+          - img [ref=e70]
+          - heading "Terapia Individual" [level=3] [ref=e73]
+          - paragraph [ref=e74]: Atendimento focado em adolescentes e adultos, buscando sempre o autoconhecimento e desenvolvimento.
+        - generic [ref=e75]:
+          - button "Compartilhar" [ref=e76] [cursor=pointer]:
+            - img [ref=e77]
+          - img [ref=e84]
+          - heading "Ansiedade e Estresse" [level=3] [ref=e86]
+          - paragraph [ref=e87]: Desenvolvimento de estratégias e ferramentas práticas para lidar com a ansiedade no dia a dia.
+        - generic [ref=e88]:
+          - button "Compartilhar" [ref=e89] [cursor=pointer]:
+            - img [ref=e90]
+          - img [ref=e97]
+          - heading "Depressão" [level=3] [ref=e101]
+          - paragraph [ref=e102]: Apoio especializado para compreender e tratar os sintomas de depressão e transtornos de humor.
+        - generic [ref=e103]:
+          - button "Compartilhar" [ref=e104] [cursor=pointer]:
+            - img [ref=e105]
+          - img [ref=e112]
+          - heading "Autoestima" [level=3] [ref=e114]
+          - paragraph [ref=e115]: Jornada para fortalecer a autoestima, confiança e o olhar de acolhimento sobre si mesmo.
+        - generic [ref=e116]:
+          - button "Compartilhar" [ref=e117] [cursor=pointer]:
+            - img [ref=e118]
+          - img [ref=e125]
+          - heading "Luto e Perdas" [level=3] [ref=e133]
+          - paragraph [ref=e134]: Acolhimento e suporte para vivenciar processos de luto e perdas significativas de forma saudável.
+        - generic [ref=e135]:
+          - button "Compartilhar" [ref=e136] [cursor=pointer]:
+            - img [ref=e137]
+          - img [ref=e144]
+          - heading "Avaliação Neuropsicológica" [level=3] [ref=e148]
+          - paragraph [ref=e149]: Investigação detalhada das funções cognitivas, auxiliando no diagnóstico e compreensão do funcionamento cerebral.
+      - paragraph [ref=e150]: Entre em contato para saber mais sobre como posso te ajudar!
+    - generic [ref=e152]:
+      - heading "Blog" [level=2] [ref=e154]
+      - generic [ref=e156]:
+        - button [ref=e157] [cursor=pointer]:
+          - img [ref=e158]
+        - button [ref=e160] [cursor=pointer]:
+          - img [ref=e161]
+        - generic [ref=e163]:
+          - generic [ref=e164]:
+            - img "Como lidar com a ansiedade" [ref=e166]
+            - generic [ref=e167]:
+              - heading "Como lidar com a ansiedade" [level=3] [ref=e168]
+              - paragraph [ref=e169]: Descubra estratégias práticas para gerenciar a ansiedade no seu dia a dia e ter mais qualidade de vida.
+              - generic [ref=e170]:
+                - button "Leia Mais" [ref=e171] [cursor=pointer]
+                - button "Compartilhar postagem" [ref=e172] [cursor=pointer]:
+                  - img [ref=e173]
+          - generic [ref=e179]:
+            - img "A importância do autocuidado" [ref=e181]
+            - generic [ref=e182]:
+              - heading "A importância do autocuidado" [level=3] [ref=e183]
+              - paragraph [ref=e184]: Cuidar de si não é luxo, é necessidade. Entenda como pequenos hábitos mudam sua saúde mental.
+              - generic [ref=e185]:
+                - button "Leia Mais" [ref=e186] [cursor=pointer]
+                - button "Compartilhar postagem" [ref=e187] [cursor=pointer]:
+                  - img [ref=e188]
+          - generic [ref=e194]:
+            - img "Entendendo a TCC" [ref=e196]
+            - generic [ref=e197]:
+              - heading "Entendendo a TCC" [level=3] [ref=e198]
+              - paragraph [ref=e199]: Conheça uma das abordagens mais eficazes da psicologia moderna e como ela pode te ajudar.
+              - generic [ref=e200]:
+                - button "Leia Mais" [ref=e201] [cursor=pointer]
+                - button "Compartilhar postagem" [ref=e202] [cursor=pointer]:
+                  - img [ref=e203]
+        - generic [ref=e209]:
+          - button [ref=e210] [cursor=pointer]
+          - button [ref=e211] [cursor=pointer]
+          - button [ref=e212] [cursor=pointer]
+          - button [ref=e213] [cursor=pointer]
+    - generic [ref=e216]:
+      - generic [ref=e220]:
+        - heading "Entre em Contato" [level=2] [ref=e221]
+        - paragraph [ref=e223]: Estou aqui para acolher você. Fique à vontade para agendar uma consulta ou tirar suas dúvidas sobre o tratamento.
+        - generic [ref=e224]:
+          - generic [ref=e225]:
+            - img [ref=e227]
+            - generic [ref=e230]: contato@fernandaabreu.com.br
+          - generic [ref=e231]:
+            - img [ref=e233]
+            - generic [ref=e236]: Icaraí, Niterói - RJ
+      - generic [ref=e242]:
+        - heading "Envie sua mensagem" [level=3] [ref=e243]:
+          - img [ref=e244]
+          - text: Envie sua mensagem
+        - generic [ref=e246]:
+          - generic [ref=e247]:
+            - generic [ref=e248]:
+              - text: Nome Completo
+              - textbox "Nome Completo" [ref=e249]:
+                - /placeholder: "Ex: Maria Silva"
+            - generic [ref=e250]:
+              - text: E-mail
+              - textbox "E-mail" [ref=e251]:
+                - /placeholder: "Ex: maria@email.com"
+          - generic [ref=e252]:
+            - text: Telefone / WhatsApp
+            - textbox "Telefone / WhatsApp" [ref=e253]:
+              - /placeholder: "Ex: (21) 98888-7777"
+          - generic [ref=e254]:
+            - text: Sua Mensagem
+            - textbox "Sua Mensagem" [ref=e255]:
+              - /placeholder: Como posso te ajudar hoje?
+          - button "Enviar Mensagem" [ref=e257] [cursor=pointer]:
+            - img [ref=e258]
+            - text: Enviar Mensagem
+          - paragraph [ref=e261]: Seus dados estão protegidos. Retorno em até 24h.
+    - generic [ref=e265]:
+      - heading "O que dizem os pacientes" [level=2] [ref=e267]
+      - generic [ref=e272]:
+        - button [ref=e273] [cursor=pointer]:
+          - img [ref=e274]
+        - generic [ref=e276]:
+          - img "Alexandre Soldão" [ref=e278]
+          - generic [ref=e279]:
+            - img [ref=e280]
+            - img [ref=e282]
+            - img [ref=e284]
+            - img [ref=e286]
+            - img [ref=e288]
+          - paragraph [ref=e290]: "\"Comecei a me tratar com a Fernanda durante um período muito ruim, há cerca de 1 ano e 6 meses. Hoje me sinto bem melhor, entretanto continuo com o tratamento...\""
+          - heading "Alexandre Soldão" [level=4] [ref=e291]
+          - text: VIA GOOGLE
+        - button [ref=e292] [cursor=pointer]:
+          - img [ref=e293]
+  - contentinfo [ref=e295]:
+    - generic [ref=e296]:
+      - generic [ref=e297]:
+        - heading "Psicóloga Fernanda Abreu Mangia" [level=2] [ref=e298]
+        - paragraph [ref=e299]: © 2024-2025. Todos os direitos reservados.
+        - paragraph [ref=e300]: Desenvolvido com carinho para o seu bem estar.
+        - generic [ref=e301]:
+          - link "Instagram" [ref=e302] [cursor=pointer]:
+            - /url: https://www.instagram.com/
+            - img [ref=e303]
+          - link "LinkedIn" [ref=e306] [cursor=pointer]:
+            - /url: https://www.linkedin.com/
+            - img [ref=e307]
+          - link "d" [ref=e311] [cursor=pointer]:
+            - /url: "#"
+            - generic [ref=e312]: d
+      - generic [ref=e314]:
+        - heading "Consultórios" [level=3] [ref=e317]
+        - generic [ref=e318]:
+          - generic [ref=e319]:
+            - img [ref=e321]
+            - generic [ref=e324]:
+              - heading "Niterói" [level=4] [ref=e325]
+              - paragraph [ref=e326]:
+                - text: Rua Mem de Sá, 34 - Icaraí
+                - text: Niterói - RJ
+          - generic [ref=e327]:
+            - img [ref=e329]
+            - generic [ref=e332]:
+              - heading "Nova Friburgo" [level=4] [ref=e333]
+              - paragraph [ref=e334]:
+                - text: Rua Dr. Ernesto Brasilio, 51 - Centro
+                - text: Nova Friburgo - RJ
+    - paragraph [ref=e336]: Psicóloga 05/31299
+  - button "Posso te ajudar?" [ref=e338] [cursor=pointer]:
+    - img [ref=e339]
+    - generic [ref=e341]: Posso te ajudar?
+  - link "Falar no WhatsApp" [ref=e342] [cursor=pointer]:
+    - /url: https://wa.me/5500000000000
+    - img [ref=e343]
+```
