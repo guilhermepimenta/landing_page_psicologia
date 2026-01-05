@@ -28,9 +28,9 @@ export const Bio: React.FC = () => {
 
         {/* Text Column */}
         <div className="md:w-2/3 p-8 md:p-12 lg:p-16">
-          <h3 className="text-gray-800 text-lg mb-6 leading-relaxed">
+          <p className="text-gray-600 mb-6 leading-relaxed">
             Olá, sou psicóloga clínica, com mestrado em Saúde Coletiva pela UFF, <span className="font-bold">especialista em Psicologia Clínica e em Psicologia da Saúde.</span>
-          </h3>
+          </p>
 
           <p className="text-gray-600 mb-6 leading-relaxed">
             Atualmente trabalho com a <span className="text-[#4A5D4A] font-semibold">Terapia Cognitivo-Comportamental</span> e <span className="text-[#4A5D4A] font-semibold">Terapia do Esquema</span>, buscando uma abordagem integral desde a infância até os momentos atuais, de acordo com a demanda de cada um.
@@ -47,7 +47,7 @@ export const Bio: React.FC = () => {
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <CheckCircle2 className="text-[#B4C2B4]" size={20} />
-              <span>Agenda aos sábados.</span>
+              <span>Agenda de segunda à sexta, aos sábados à combinar.</span>
             </div>
           </div>
 
