@@ -34,8 +34,11 @@ export const LandingPage: React.FC = () => {
                     <Bio />
                 </section>
 
-                <section id="servicos" className="bg-[#4A5D4A] py-20 scroll-mt-[15px]">
-                    <Services />
+                <section id="servicos" className="relative scroll-mt-[15px] bg-[#F9F8F6]">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#4A5D4A]/80 to-black/30" />
+                    <div className="relative z-10 py-20">
+                        <Services />
+                    </div>
                 </section>
 
                 <section id="blog" className="bg-white py-20 scroll-mt-[15px]">
@@ -46,8 +49,11 @@ export const LandingPage: React.FC = () => {
                     <Contact />
                 </section>
 
-                <section id="depoimentos" className="py-24 bg-[#4A5D4A] scroll-mt-[15px]">
-                    <Testimonials />
+                <section id="depoimentos" className="relative scroll-mt-[15px] bg-[#F9F8F6]">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#4A5D4A]/80 to-black/30" />
+                    <div className="relative z-10 py-24">
+                        <Testimonials />
+                    </div>
                 </section>
             </main>
 
