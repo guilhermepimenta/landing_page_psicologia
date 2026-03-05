@@ -23,7 +23,7 @@ export const Bio: React.FC = () => {
             href="https://www.doctoralia.com.br/fernanda-abreu-mangia/psicologo/niteroi"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => sendGAEvent('outbound_click', 'bio', 'doctoralia_profile')}
+            onClick={() => sendGAEvent('ver_perfil_doctoralia', 'bio', 'outbound')}
             className="mt-10 bg-gray-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors inline-block"
           >
             Ver perfil no Doctoralia

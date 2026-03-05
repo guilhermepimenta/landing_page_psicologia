@@ -45,17 +45,17 @@ export const Scheduling: React.FC = () => {
 
   const handleTabClick = (tab: Tab) => {
     setActiveTab(tab);
-    sendGAEvent('tab_click', 'agendamento', tab);
+    sendGAEvent('selecionar_cidade_agendamento', 'agendamento', tab);
   };
 
   const handleScheduleClick = () => {
     const msg = encodeURIComponent(content.whatsappMsg);
-    sendGAEvent('cta_click', 'agendamento', `whatsapp_${activeTab}`);
+    sendGAEvent(`agendar_whatsapp_${activeTab}`, 'agendamento', 'whatsapp');
     window.open(`https://wa.me/5521971318289?text=${msg}`, '_blank');
   };
 
   const handleDoctoraliaClick = () => {
-    sendGAEvent('cta_click', 'agendamento', `doctoralia_${activeTab}`);
+    sendGAEvent('agendar_doctoralia_niteroi', 'agendamento', 'doctoralia');
   };
 
   return (
@@ -152,7 +152,7 @@ export const Scheduling: React.FC = () => {
                 href={`https://wa.me/5521971318289?text=${encodeURIComponent('Olá Dra. Fernanda, gostaria de informações sobre a Avaliação Neuropsicológica ' + (activeTab === 'online' ? 'online.' : activeTab === 'nova-friburgo' ? 'em Nova Friburgo.' : 'em Niterói.'))}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => sendGAEvent('cta_click', 'agendamento', `avaliacao_neuropsicologica_${activeTab}`)}
+                onClick={() => sendGAEvent(`agendar_avaliacao_neuropsicologica_${activeTab}`, 'agendamento', 'whatsapp')}
                 className="flex items-center justify-center gap-2 bg-white border-2 border-[#4A5D4A] text-[#4A5D4A] hover:bg-[#4A5D4A] hover:text-white font-bold px-7 py-3.5 rounded-2xl transition-all text-sm active:scale-95"
               >
                 Avaliação Neuropsicológica

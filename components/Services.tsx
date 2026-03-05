@@ -94,7 +94,7 @@ export const Services: React.FC = () => {
                 href="https://wa.me/5521971318289?text=Olá%20Dra.%20Fernanda%2C%20gostaria%20de%20agendar%20uma%20Avaliação%20Neuropsicológica."
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => sendGAEvent('cta_click', 'servicos', 'agendar_avaliacao_neuropsicologica')}
+                onClick={() => sendGAEvent('agendar_avaliacao_neuropsicologica', 'servicos', 'whatsapp')}
                 className="mt-6 inline-block bg-[#4A5D4A] hover:bg-[#3A4A3A] text-white text-sm font-bold px-6 py-2.5 rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
               >
                 Agendar Avaliação

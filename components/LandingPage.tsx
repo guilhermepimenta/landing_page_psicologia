@@ -72,7 +72,7 @@ export const LandingPage: React.FC = () => {
                 href="https://wa.me/5521971318289"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => sendGAEvent('cta_click', 'floating', 'whatsapp_button')}
+                onClick={() => sendGAEvent('whatsapp_flutuante', 'floating', 'whatsapp')}
                 className="fixed bottom-24 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center"
                 aria-label="Falar no WhatsApp"
             >

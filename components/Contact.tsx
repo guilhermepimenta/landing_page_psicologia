@@ -88,7 +88,7 @@ export const Contact: React.FC = () => {
     const encodedMessage = encodeURIComponent(message);
 
     // Track conversion
-    sendGAEvent('generate_lead', 'contact', 'whatsapp_submit');
+    sendGAEvent('envio_formulario_contato', 'contato', 'whatsapp');
 
     window.open(`https://wa.me/5521971318289?text=${encodedMessage}`, '_blank');
 

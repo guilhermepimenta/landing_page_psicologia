@@ -26,14 +26,14 @@ export const Hero: React.FC = () => {
             href="https://wa.me/5521971318289"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => sendGAEvent('cta_click', 'hero', 'agendar_consulta')}
+            onClick={() => sendGAEvent('agendar_consulta_hero', 'hero', 'whatsapp')}
             className="w-full sm:w-auto bg-[#B4C2B4] hover:bg-[#9BAB9B] text-white px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
           >
             Agendar Consulta
           </a>
           <a
             href="#servicos"
-            onClick={() => sendGAEvent('cta_click', 'hero', 'conhecer_servicos')}
+            onClick={() => sendGAEvent('ver_servicos', 'hero', 'link_ancora')}
             className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             Conhecer Serviços
