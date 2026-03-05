@@ -6,26 +6,26 @@ const testimonials = [
   {
     id: 1,
     name: 'Alexandre Soldão',
+    initials: 'AS',
     source: 'VIA GOOGLE',
     text: '"Comecei a me tratar com a Fernanda durante um período muito ruim, há cerca de 1 ano e 6 meses. Hoje me sinto bem melhor, entretanto continuo com o tratamento..."',
-    stars: 5,
-    avatar: 'https://picsum.photos/id/65/100/100'
+    stars: 5
   },
   {
     id: 2,
     name: 'Juliana Mendes',
+    initials: 'JM',
     source: 'DOCTORALIA',
     text: '"Uma profissional incrível, atenciosa e muito competente. Me ajudou a passar por um momento de luto com muita humanidade."',
-    stars: 5,
-    avatar: 'https://picsum.photos/id/66/100/100'
+    stars: 5
   },
   {
     id: 3,
     name: 'Roberto Carlos',
+    initials: 'RC',
     source: 'VIA GOOGLE',
     text: '"A terapia com a Dra. Fernanda mudou minha forma de encarar os desafios no trabalho. Recomendo muito!"',
-    stars: 5,
-    avatar: 'https://picsum.photos/id/67/100/100'
+    stars: 5
   }
 ];
 
@@ -52,18 +52,20 @@ export const Testimonials: React.FC = () => {
       <div className="relative">
         <button
           onClick={prev}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 p-2 text-white/60 hover:text-white transition-colors"
+          className="absolute left-0 top-1/2 -translate-y-1/2 translate-x-1 md:-translate-x-12 p-3 bg-white/10 rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-colors"
+          aria-label="Depoimento anterior"
         >
-          <ChevronLeft size={32} />
+          <ChevronLeft size={28} />
         </button>
 
         <div className="bg-white p-10 md:p-16 rounded-[40px] shadow-2xl border border-white/10 text-center animate-fadeIn">
           <div className="flex justify-center mb-8">
-            <img
-              src={testimonials[current].avatar}
-              alt={testimonials[current].name}
-              className="w-20 h-20 rounded-full border-4 border-white shadow-md"
-            />
+            <div
+              className="w-20 h-20 rounded-full border-4 border-white shadow-md bg-[#4A5D4A] flex items-center justify-center"
+              aria-label={testimonials[current].name}
+            >
+              <span className="text-white text-xl font-bold">{testimonials[current].initials}</span>
+            </div>
           </div>
 
           <div className="flex justify-center gap-1 mb-6 text-yellow-400">
@@ -84,9 +86,10 @@ export const Testimonials: React.FC = () => {
 
         <button
           onClick={next}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 p-2 text-white/60 hover:text-white transition-colors"
+          className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1 md:translate-x-12 p-3 bg-white/10 rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-colors"
+          aria-label="Próximo depoimento"
         >
-          <ChevronRight size={32} />
+          <ChevronRight size={28} />
         </button>
       </div>
     </div>

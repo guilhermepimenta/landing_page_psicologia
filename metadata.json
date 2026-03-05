@@ -1,7 +1,30 @@
 
 {
-  "name": "Fernanda Abreu Mangia - Psicologia",
-  "description": "Professional landing page for Fernanda Abreu Mangia, a clinical psychologist specializing in Cognitive Behavioral Therapy and Schema Therapy.",
+  "name": "Psicóloga Fernanda Abreu Mangia",
+  "description": "Psicoterapia individual online e presencial em Niterói (Icaraí) e Nova Friburgo. Especialista em TCC, Terapia do Esquema, avaliação psicológica, avaliação neuropsicológica, ansiedade, depressão e autoestima.",
+  "url": "https://fernandamangiapsi.com.br",
+  "locale": "pt_BR",
+  "author": "Fernanda Abreu Mangia",
+  "keywords": [
+    "psicóloga Niterói",
+    "psicóloga Nova Friburgo",
+    "psicoterapia online",
+    "terapia cognitivo comportamental",
+    "TCC",
+    "avaliação psicológica",
+    "avaliação neuropsicológica",
+    "ansiedade",
+    "depressão",
+    "saúde mental",
+    "Icaraí",
+    "orientação vocacional"
+  ],
+  "social": {
+    "instagram": "https://www.instagram.com/fernandamangiapsi/",
+    "linkedin": "https://www.linkedin.com/in/fernanda-abreu-mangia-a4b68849/",
+    "doctoralia": "https://www.doctoralia.com.br/fernanda-abreu-mangia/psicologo/niteroi",
+    "whatsapp": "5521971318289"
+  },
   "requestFramePermissions": [
     "camera",
     "microphone"

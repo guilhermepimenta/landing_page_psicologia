@@ -6,6 +6,12 @@ import { ShareModal } from './ShareModal';
 
 const posts = [
   {
+    id: 'avaliacao-neuropsicologica',
+    title: 'O que é a Avaliação Neuropsicológica?',
+    image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    excerpt: 'Entenda como a avaliação neuropsicológica funciona, para quem é indicada e como ela pode ajudar no diagnóstico de TDAH, dificuldades de aprendizagem e muito mais.'
+  },
+  {
     id: 'ansiedade',
     title: 'Como lidar com a ansiedade',
     image: 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
@@ -122,6 +128,7 @@ export const Blog: React.FC = () => {
                 <img
                   src={post.image}
                   alt={post.title}
+                  loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               </div>

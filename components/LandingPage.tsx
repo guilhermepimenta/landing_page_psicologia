@@ -4,6 +4,7 @@ import { Navbar } from './Navbar';
 import { Hero } from './Hero';
 import { Bio } from './Bio';
 import { Services } from './Services';
+import { Scheduling } from './Scheduling';
 import { Blog } from './Blog';
 import { Contact } from './Contact';
 import { Testimonials } from './Testimonials';
@@ -26,30 +27,34 @@ export const LandingPage: React.FC = () => {
             <Navbar isScrolled={isScrolled} />
 
             <main>
-                <section id="inicio" className="scroll-mt-[15px]">
+                <section id="inicio" aria-label="Início — Psicóloga Fernanda Abreu Mangia" className="scroll-mt-20">
                     <Hero />
                 </section>
 
-                <section id="sobre" className="pt-20 pb-20 bg-white scroll-mt-[15px]">
+                <section id="sobre" aria-label="Sobre a Psicóloga" className="pt-20 pb-20 bg-white scroll-mt-20">
                     <Bio />
                 </section>
 
-                <section id="servicos" className="relative scroll-mt-[15px] bg-[#F9F8F6]">
+                <section id="servicos" aria-label="Serviços de Psicologia" className="relative scroll-mt-20 bg-[#F9F8F6]">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#4A5D4A]/80 to-black/30" />
                     <div className="relative z-10 py-20">
                         <Services />
                     </div>
                 </section>
 
-                <section id="blog" className="bg-white py-20 scroll-mt-[15px]">
+                <section id="agendamento" aria-label="Agendamento de Consulta" className="py-20 bg-white scroll-mt-20">
+                    <Scheduling />
+                </section>
+
+                <section id="blog" aria-label="Blog de Psicologia" className="bg-[#F9F8F6] py-20 scroll-mt-20">
                     <Blog />
                 </section>
 
-                <section id="contato" className="py-20 bg-[#F7F5F2] scroll-mt-[15px]">
+                <section id="contato" aria-label="Formulário de Contato" className="py-20 bg-[#F7F5F2] scroll-mt-20">
                     <Contact />
                 </section>
 
-                <section id="depoimentos" className="relative scroll-mt-[15px] bg-[#F9F8F6]">
+                <section id="depoimentos" aria-label="Depoimentos de Pacientes" className="relative scroll-mt-20 bg-[#F9F8F6]">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#4A5D4A]/80 to-black/30" />
                     <div className="relative z-10 py-24">
                         <Testimonials />
@@ -64,11 +69,11 @@ export const LandingPage: React.FC = () => {
 
             {/* Fixed WhatsApp Button */}
             <a
-                href="https://wa.me/5500000000000"
+                href="https://wa.me/5521971318289"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => sendGAEvent('cta_click', 'floating', 'whatsapp_button')}
-                className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center"
+                className="fixed bottom-24 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center"
                 aria-label="Falar no WhatsApp"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">

@@ -7,6 +7,38 @@ import { ArrowLeft, Clock, Calendar, Share2 } from 'lucide-react';
 import { ShareModal } from './ShareModal';
 
 const blogPosts = {
+    'avaliacao-neuropsicologica': {
+        title: 'O que é a Avaliação Neuropsicológica?',
+        category: 'Avaliação Psicológica',
+        date: '04 Mar 2026',
+        readTime: '7 min de leitura',
+        image: 'https://images.unsplash.com/photo-1559757175-5700dde675bc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+        content: `
+      <p class="mb-6">A Avaliação Neuropsicológica é um processo científico e individualizado que investiga o funcionamento do cérebro por meio do comportamento. Ela examina funções como <strong>atenção, memória, linguagem, raciocínio, planejamento e controle emocional</strong> — fornecendo um mapa detalhado das capacidades cognitivas e emocionais da pessoa avaliada.</p>
+
+      <h3 class="text-2xl font-serif text-[#4A5D4A] mb-4 mt-8">Para quem é indicada?</h3>
+      <p class="mb-4">A avaliação é recomendada para pessoas de todas as idades que apresentam:</p>
+      <ul class="list-disc pl-6 mb-6 space-y-2">
+        <li>Suspeita ou diagnóstico de <strong>TDAH</strong> (Transtorno do Déficit de Atenção com Hiperatividade)</li>
+        <li><strong>Dificuldades de aprendizagem</strong> (dislexia, discalculia, disgrafia)</li>
+        <li>Queda no desempenho escolar ou profissional</li>
+        <li>Problemas de memória ou concentração</li>
+        <li>Acompanhamento de tratamentos neurológicos ou psiquiátricos</li>
+        <li>Orientação para reabilitação cognitiva em idosos</li>
+      </ul>
+
+      <h3 class="text-2xl font-serif text-[#4A5D4A] mb-4 mt-8">Como é feita a avaliação?</h3>
+      <p class="mb-6">O processo é conduzido por uma psicóloga especializada e envolve múltiplas sessões. Durante os encontros, são aplicados <strong>testes padronizados e internacionalmente validados</strong>, entrevistas e observações clínicas. Ao final, o profissional elabora um laudo detalhado com os resultados e orientações terapêuticas personalizadas.</p>
+
+      <h3 class="text-2xl font-serif text-[#4A5D4A] mb-4 mt-8">Qual a diferença entre Avaliação Psicológica e Neuropsicológica?</h3>
+      <p class="mb-6">A <strong>Avaliação Psicológica</strong> é mais ampla e inclui aspectos emocionais, de personalidade e comportamento. Já a <strong>Avaliação Neuropsicológica</strong> foca especificamente nas funções cognitivas e sua relação com o funcionamento cerebral. Muitas vezes, ambas se complementam para um diagnóstico completo.</p>
+
+      <h3 class="text-2xl font-serif text-[#4A5D4A] mb-4 mt-8">Onde é realizada em Niterói e Nova Friburgo?</h3>
+      <p class="mb-6">A Dra. Fernanda Abreu Mangia realiza avaliações psicológicas e neuropsicológicas de forma <strong>presencial em Niterói (Icaraí)</strong> e em <strong>Nova Friburgo</strong>, além de modalidade online para todo o Brasil. O processo é acolhedor, reservado e totalmente adaptado à faixa etária e às necessidades de cada pessoa.</p>
+
+      <p class="italic text-gray-500 mt-8">Se você tem dúvidas se precisa de uma avaliação, entre em contato — uma conversa inicial pode esclarecer tudo.</p>
+    `
+    },
     'ansiedade': {
         title: 'Como lidar com a ansiedade',
         category: 'Bem-estar',
@@ -115,7 +147,66 @@ export const BlogPost: React.FC = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, []);
+        if (post) {
+            const pageUrl = `https://fernandamangiapsi.com.br/blog/${id}`;
+
+            // Dynamic title and meta description per blog post
+            document.title = `${post.title} | Fernanda Abreu Mangia — Psicóloga`;
+
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.setAttribute('content', `${post.title} — ${post.category}. Artigo da psicóloga Fernanda Abreu Mangia. Leia em nosso blog.`);
+
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.setAttribute('content', `${post.title} | Fernanda Abreu Mangia`);
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.setAttribute('content', `${post.title} — artigo da psicóloga Fernanda Abreu Mangia.`);
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            if (ogUrl) ogUrl.setAttribute('content', pageUrl);
+            const ogImage = document.querySelector('meta[property="og:image"]');
+            if (ogImage) ogImage.setAttribute('content', post.image);
+
+            // Dynamic canonical link
+            let canonical = document.querySelector('link[rel="canonical"]');
+            if (!canonical) {
+                canonical = document.createElement('link');
+                canonical.setAttribute('rel', 'canonical');
+                document.head.appendChild(canonical);
+            }
+            canonical.setAttribute('href', pageUrl);
+
+            // Article JSON-LD schema
+            const script = document.createElement('script');
+            script.id = 'article-schema';
+            script.type = 'application/ld+json';
+            script.text = JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'Article',
+                headline: post.title,
+                image: post.image,
+                datePublished: post.date,
+                author: { '@type': 'Person', name: 'Fernanda Abreu Mangia', url: 'https://fernandamangiapsi.com.br' },
+                publisher: {
+                    '@type': 'Organization',
+                    name: 'Psicóloga Fernanda Abreu Mangia',
+                    logo: { '@type': 'ImageObject', url: 'https://fernandamangiapsi.com.br/assets/image.png' }
+                },
+                mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+                articleSection: post.category,
+            });
+            document.head.appendChild(script);
+        }
+        return () => {
+            // Restore defaults when leaving the blog post
+            document.title = 'Psicóloga Fernanda Abreu Mangia | Avaliação Psicológica, TCC em Niterói, Nova Friburgo e Online';
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.setAttribute('content', 'Psicóloga clínica em Niterói e Nova Friburgo, atendimento online. Especialista em TCC, avaliação psicológica, ansiedade, depressão e autoestima. Agende sua consulta.');
+            const canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical) canonical.setAttribute('href', 'https://fernandamangiapsi.com.br/');
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            if (ogUrl) ogUrl.setAttribute('content', 'https://fernandamangiapsi.com.br/');
+            document.getElementById('article-schema')?.remove();
+        };
+    }, [post, id]);
 
     const handleOpenShare = () => {
         setShareModalOpen(true);
@@ -210,7 +301,7 @@ export const BlogPost: React.FC = () => {
                         Se você se identificou com este conteúdo e sente que precisa de apoio, estou aqui para ajudar.
                     </p>
                     <a
-                        href="https://wa.me/5500000000000"
+                        href="https://wa.me/5521971318289"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-block bg-[#128C7E] text-white px-8 py-4 rounded-full font-bold hover:scale-105 transition-transform shadow-lg hover:shadow-xl hover:bg-[#075E54] flex items-center justify-center gap-2 max-w-xs mx-auto"
@@ -228,7 +319,7 @@ export const BlogPost: React.FC = () => {
 
             {/* WhatsApp Button */}
             <a
-                href="https://wa.me/5500000000000"
+                href="https://wa.me/5521971318289"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center"

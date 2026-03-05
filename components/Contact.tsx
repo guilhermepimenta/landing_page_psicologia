@@ -90,7 +90,7 @@ export const Contact: React.FC = () => {
     // Track conversion
     sendGAEvent('generate_lead', 'contact', 'whatsapp_submit');
 
-    window.open(`https://wa.me/5521993718343?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/5521971318289?text=${encodedMessage}`, '_blank');
 
     setFormData({
       name: '',

@@ -14,7 +14,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
     { name: 'Início', href: '#inicio' },
     { name: 'Sobre Mim', href: '#sobre' },
     { name: 'Serviços', href: '#servicos' },
-
+    { name: 'Agendamento', href: '#agendamento' },
     { name: 'Blog', href: '#blog' },
     { name: 'Contato', href: '#contato' },
     { name: 'Depoimentos', href: '#depoimentos' },
@@ -26,9 +26,9 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0">
             <a href="#inicio" className="block">
-              <h1 className={`text-xl font-serif tracking-wide transition-colors duration-300 ${isScrolled ? 'text-[#4A5D4A]' : 'text-white'}`}>
+              <span className={`text-xl font-serif tracking-wide transition-colors duration-300 ${isScrolled ? 'text-[#4A5D4A]' : 'text-white'}`}>
                 Psicóloga <span className="font-bold">Fernanda Abreu Mangia</span>
-              </h1>
+              </span>
             </a>
           </div>
 
