@@ -38,7 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
               <a
                 key={link.name}
                 href={link.href}
-                onClick={() => sendGAEvent('menu_click', 'navigation', link.name)}
+                onClick={() => sendGAEvent('clique_menu_navegacao', 'navegacao', link.name)}
                 className={`text-sm font-medium transition-colors hover:text-[#4A5D4A] relative group py-1 ${isScrolled ? 'text-gray-700' : 'text-white/80 hover:text-white'
                   }`}
               >
@@ -70,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
                 href={link.href}
                 onClick={() => {
                   setIsOpen(false);
-                  sendGAEvent('menu_click', 'navigation', link.name);
+                  sendGAEvent('clique_menu_mobile', 'navegacao', link.name);
                 }}
                 className="block px-4 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-[#4A5D4A] transition-all"
               >
