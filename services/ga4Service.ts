@@ -29,15 +29,24 @@ export interface GA4Response {
   summaryMetrics: MetricRow[];
 }
 
-// Em desenvolvimento (sem Vercel), podemos chamar a função via Vercel CLI (vercel dev)
-// ou usar os dados fallback. Em produção, /api/analytics é resolvido automaticamente.
 const API_URL = '/api/analytics';
 
+// Em desenvolvimento local (Vite dev server), a Vercel Function não existe.
+// Só chamamos a API em produção (Vercel) ou quando explicitamente forçado.
+export const isDevMode = import.meta.env.DEV;
+
 export async function getGA4Data(): Promise<GA4Response> {
+  if (isDevMode) {
+    throw new Error('__dev_mode__');
+  }
   const res = await fetch(API_URL);
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body?.error ?? `HTTP ${res.status}`);
   }
-  return res.json() as Promise<GA4Response>;
+  try {
+    return await res.json() as Promise<GA4Response>;
+  } catch {
+    throw new Error('Resposta inválida da API — verifique o deploy no Vercel');
+  }
 }

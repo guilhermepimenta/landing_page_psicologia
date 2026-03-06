@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   AreaChart, Area, PieChart, Pie, Cell, Legend,
 } from 'recharts';
-import { getGA4Data, WeeklyRow, MonthlyRow, MetricRow } from '../services/ga4Service';
+import { getGA4Data, isDevMode, WeeklyRow, MonthlyRow, MetricRow } from '../services/ga4Service';
 
 interface AnalyticsPanelProps {
   metrics: { channel: string; value: number; change: number; icon: string }[];
@@ -123,24 +123,30 @@ const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ metrics }) => {
     <div className="space-y-6">
       {/* Banner de status */}
       {usingMock ? (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-          <span className="text-xl flex-shrink-0">📋</span>
+        <div className={`border rounded-xl p-4 flex items-start gap-3 ${isDevMode && fetchError === '__dev_mode__' ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
+          <span className="text-xl flex-shrink-0">{isDevMode && fetchError === '__dev_mode__' ? '🖥️' : '📋'}</span>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-amber-800">
-              {fetchError
-                ? `Erro ao conectar com GA4: ${fetchError}`
-                : 'Exibindo dados de demonstração'}
+            <p className={`text-sm font-semibold ${isDevMode && fetchError === '__dev_mode__' ? 'text-blue-800' : 'text-amber-800'}`}>
+              {isDevMode && fetchError === '__dev_mode__'
+                ? 'Ambiente de desenvolvimento — exibindo dados de demonstração'
+                : fetchError && fetchError !== '__dev_mode__'
+                  ? `Erro ao conectar com GA4: ${fetchError}`
+                  : 'Exibindo dados de demonstração'}
             </p>
-            <p className="text-xs text-amber-700 mt-1">
-              Configure as variáveis GA4_PROPERTY_ID, GA4_CLIENT_EMAIL e GA4_PRIVATE_KEY no Vercel Dashboard para exibir dados reais.
+            <p className={`text-xs mt-1 ${isDevMode && fetchError === '__dev_mode__' ? 'text-blue-700' : 'text-amber-700'}`}>
+              {isDevMode && fetchError === '__dev_mode__'
+                ? 'Em produção (Vercel), os dados reais do GA4 serão carregados automaticamente.'
+                : 'Configure as variáveis GA4_PROPERTY_ID, GA4_CLIENT_EMAIL e GA4_PRIVATE_KEY no Vercel Dashboard.'}
             </p>
           </div>
-          <button
-            onClick={loadGA4Data}
-            className="text-xs text-amber-700 underline hover:text-amber-900 flex-shrink-0"
-          >
-            Tentar novamente
-          </button>
+          {(!isDevMode || fetchError !== '__dev_mode__') && (
+            <button
+              onClick={loadGA4Data}
+              className="text-xs text-amber-700 underline hover:text-amber-900 flex-shrink-0"
+            >
+              Tentar novamente
+            </button>
+          )}
         </div>
       ) : (
         <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2">
