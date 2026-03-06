@@ -18,3 +18,18 @@ Especialista em estratégias de marketing digital para o site da psicóloga Fern
 - Integração com redes sociais: botões de compartilhamento via `ShareModal.tsx`
 - Rastreamento de conversões: usar `utils/analytics.ts` para medir cliques em CTAs e agendamentos
 - Campanhas: garantir que landing page esteja alinhada com anúncios (Google Ads, Instagram)
+
+## Recursos
+
+### Google Ads - Campanhas de Leads
+Para campanhas específicas de captura de leads para avaliação neuropsicológica em Niterói e Nova Friburgo, consulte:
+- [Guia completo: google-ads-neuro-leads.md](google-ads-neuro-leads.md)
+
+**Inclui:**
+- Estrutura de campanhas e grupos de anúncios
+- Palavras-chave segmentadas por intenção
+- Textos de anúncios otimizados (RSAs)
+- Extensões e landing page requirements
+- Rastreamento de conversões e KPIs
+- Estratégias de otimização contínua
+- Compliance com CFP e LGPD
