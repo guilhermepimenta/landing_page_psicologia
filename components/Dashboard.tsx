@@ -2,18 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import { useAuth } from '../contexts/AuthContext';
-import { postsService, metricsService, analyticsService } from '../services/firebaseService';
+import { postsService, metricsService, analyticsService, Post as FirebasePost } from '../services/firebaseService';
 import AIContentModal from './AIContentModal';
 import AnalyticsPanel from './AnalyticsPanel';
-
-interface Post {
-  id: string;
-  title: string;
-  channel: 'Instagram' | 'GMB' | 'Blog' | 'Email';
-  status: 'published' | 'scheduled' | 'draft' | 'idea';
-  date: string;
-  engagement?: number;
-}
+import PostsManager from './PostsManager';
+import ContentCalendar from './ContentCalendar';
+import IdeasBank from './IdeasBank';
+import ProfileSettings from './ProfileSettings';
+import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
 
 interface Metric {
   channel: string;
@@ -39,53 +35,47 @@ const DEFAULT_METRICS: Metric[] = [
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'google' | 'settings'>('overview');
   const [showAIModal, setShowAIModal] = useState(false);
   const [metrics, setMetrics] = useState<Metric[]>(DEFAULT_METRICS);
-  const [recentPosts, setRecentPosts] = useState<Post[]>([]);
+  const [recentPosts, setRecentPosts] = useState<FirebasePost[]>([]);
   const [weeklySummary, setWeeklySummary] = useState<WeeklySummary>({ totalPosts: 0, totalEngagement: 0, newLeads: 0, conversions: 0 });
   const [loadingData, setLoadingData] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoadingData(true);
-      try {
-        const [postsResult, metricsResult, summaryResult] = await Promise.all([
-          postsService.getRecent(10),
-          metricsService.getLatest(),
-          analyticsService.getWeeklySummary(),
-        ]);
-        if (postsResult.success && postsResult.data.length > 0) {
-          setRecentPosts(postsResult.data.map(p => ({
-            id: p.id ?? '',
-            title: p.title,
-            channel: p.channel,
-            status: p.status,
-            date: p.date.toISOString().split('T')[0],
-            engagement: p.engagement,
-          })));
-        }
-        if (metricsResult.success && metricsResult.data.length > 0) {
-          setMetrics(metricsResult.data.map(m => ({
-            channel: m.channel,
-            value: m.value,
-            change: m.change,
-            icon: m.icon,
-          })));
-        }
-        if (summaryResult.success) {
-          setWeeklySummary(summaryResult.data);
-        }
-      } catch (err) {
-        console.error('Erro ao carregar dados:', err);
-      } finally {
-        setLoadingData(false);
+  const fetchDashboardData = async () => {
+    setLoadingData(true);
+    try {
+      const [postsResult, metricsResult, summaryResult] = await Promise.all([
+        postsService.getRecent(10),
+        metricsService.getLatest(),
+        analyticsService.getWeeklySummary(),
+      ]);
+      if (postsResult.success && postsResult.data) {
+        setRecentPosts(postsResult.data as FirebasePost[]);
       }
-    };
-    fetchData();
+      if (metricsResult.success && metricsResult.data.length > 0) {
+        setMetrics(metricsResult.data.map(m => ({
+          channel: m.channel,
+          value: m.value,
+          change: m.change,
+          icon: m.icon,
+        })));
+      }
+      if (summaryResult.success) {
+        setWeeklySummary(summaryResult.data);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar dados:', err);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
   }, []);
 
-  const getStatusBadge = (status: Post['status']) => {
+  const getStatusBadge = (status: FirebasePost['status'] | 'idea') => {
     const badges = {
       published: 'bg-green-100 text-green-800',
       scheduled: 'bg-blue-100 text-blue-800',
@@ -127,6 +117,8 @@ const Dashboard: React.FC = () => {
             { id: 'calendar', label: 'Calendário', icon: '📅' },
             { id: 'ideas', label: 'Banco de Ideias', icon: '💡' },
             { id: 'analytics', label: 'Analytics', icon: '📈' },
+            { id: 'google', label: 'Google', icon: '🔍' },
+            { id: 'settings', label: 'Configurações', icon: '⚙️' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -404,65 +396,19 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'posts' && (
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Gerenciar Posts</h2>
-            <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium">
-              + Novo Post
-            </button>
-          </div>
-          <div className="text-center py-12 text-gray-500">
-            <div className="text-6xl mb-4">📱</div>
-            <p className="text-lg">Funcionalidade em desenvolvimento</p>
-            <p className="text-sm mt-2">Em breve você poderá criar e gerenciar posts aqui!</p>
-          </div>
-        </div>
-      )}
+      {activeTab === 'posts' && <PostsManager />}
 
-      {activeTab === 'calendar' && (
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Calendário Editorial</h2>
-          <div className="text-center py-12 text-gray-500">
-            <div className="text-6xl mb-4">📅</div>
-            <p className="text-lg">Calendário em desenvolvimento</p>
-            <p className="text-sm mt-2">Visualize e planeje seu conteúdo mensal!</p>
-          </div>
-        </div>
-      )}
+      {activeTab === 'calendar' && <ContentCalendar />}
 
-      {activeTab === 'ideas' && (
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Banco de Ideias</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { category: 'TDAH', count: 25, color: 'bg-purple-100 text-purple-800' },
-              { category: 'Avaliação Neuropsicológica', count: 20, color: 'bg-blue-100 text-blue-800' },
-              { category: 'Memória', count: 20, color: 'bg-green-100 text-green-800' },
-              { category: 'Ansiedade', count: 15, color: 'bg-yellow-100 text-yellow-800' },
-              { category: 'Saúde Mental no Trabalho', count: 15, color: 'bg-pink-100 text-pink-800' },
-              { category: 'Conteúdo Sazonal', count: 30, color: 'bg-indigo-100 text-indigo-800' },
-            ].map((category) => (
-              <div key={category.category} className="p-4 border-2 border-gray-200 rounded-lg hover:border-purple-300 transition-colors cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-gray-900">{category.category}</h3>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${category.color}`}>
-                    {category.count} ideias
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
-            <p className="text-sm text-purple-800">
-              💡 <strong>Total: 142+ ideias de conteúdo</strong> prontas para usar!
-            </p>
-          </div>
-        </div>
-      )}
+      {activeTab === 'ideas' && <IdeasBank />}
+
       {activeTab === 'analytics' && (
         <AnalyticsPanel metrics={metrics} />
       )}
+
+      {activeTab === 'google' && <SearchConsoleGMBPanel />}
+
+      {activeTab === 'settings' && <ProfileSettings />}
 
       {showAIModal && <AIContentModal onClose={() => setShowAIModal(false)} />}
     </DashboardLayout>

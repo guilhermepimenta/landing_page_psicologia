@@ -2,6 +2,8 @@ import {
   collection, 
   addDoc, 
   getDocs, 
+  getDoc,
+  setDoc,
   query, 
   orderBy, 
   limit,
@@ -39,8 +41,18 @@ export interface Idea {
   id?: string;
   category: string;
   title: string;
+  description?: string;
   used: boolean;
   createdAt?: Date;
+}
+
+export interface Profile {
+  name: string;
+  specialty: string;
+  crp: string;
+  photoURL?: string;
+  bio?: string;
+  updatedAt?: Date;
 }
 
 // Posts Service
@@ -88,6 +100,36 @@ export const postsService = {
       return { success: true, data: posts };
     } catch (error) {
       console.error('Erro ao buscar posts:', error);
+      return { success: false, error, data: [] };
+    }
+  },
+
+  // Buscar todos os posts
+  async getAll() {
+    try {
+      const q = query(
+        collection(db, 'posts'),
+        orderBy('date', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      const posts: Post[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        posts.push({
+          id: doc.id,
+          title: data.title,
+          channel: data.channel,
+          status: data.status,
+          date: data.date.toDate(),
+          content: data.content,
+          engagement: data.engagement,
+          createdAt: data.createdAt?.toDate(),
+          updatedAt: data.updatedAt?.toDate(),
+        });
+      });
+      return { success: true, data: posts };
+    } catch (error) {
+      console.error('Erro ao buscar todos os posts:', error);
       return { success: false, error, data: [] };
     }
   },
@@ -247,6 +289,29 @@ export const ideasService = {
     }
   },
 
+  // Desmarcar ideia (voltar para não usada)
+  async unmarkAsUsed(id: string) {
+    try {
+      const ideaRef = doc(db, 'ideas', id);
+      await updateDoc(ideaRef, { used: false });
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao desmarcar ideia:', error);
+      return { success: false, error };
+    }
+  },
+
+  // Deletar ideia
+  async delete(id: string) {
+    try {
+      await deleteDoc(doc(db, 'ideas', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao deletar ideia:', error);
+      return { success: false, error };
+    }
+  },
+
   // Buscar todas as ideias
   async getAll() {
     try {
@@ -306,6 +371,48 @@ export const analyticsService = {
         error,
         data: { totalPosts: 0, totalEngagement: 0, newLeads: 0, conversions: 0 }
       };
+    }
+  },
+};
+
+// Profile Service
+export const profileService = {
+  async get() {
+    try {
+      const docRef = doc(db, 'settings', 'profile');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        return {
+          success: true,
+          data: {
+            name: data.name || '',
+            specialty: data.specialty || '',
+            crp: data.crp || '',
+            photoURL: data.photoURL || '',
+            bio: data.bio || '',
+            updatedAt: data.updatedAt?.toDate(),
+          } as Profile,
+        };
+      }
+      return { success: true, data: null };
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
+      return { success: false, error, data: null };
+    }
+  },
+
+  async save(profile: Omit<Profile, 'updatedAt'>) {
+    try {
+      const docRef = doc(db, 'settings', 'profile');
+      await setDoc(docRef, {
+        ...profile,
+        updatedAt: Timestamp.now(),
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao salvar perfil:', error);
+      return { success: false, error };
     }
   },
 };
