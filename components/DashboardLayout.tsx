@@ -1,22 +1,24 @@
 import React, { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+type TabId = 'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'google' | 'settings';
 
 interface DashboardLayoutProps {
   children: ReactNode;
   onLogout: () => void;
+  activeTab?: TabId;
+  onTabChange?: (tab: TabId) => void;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout }) => {
-  const navigate = useNavigate();
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout, activeTab, onTabChange }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
-  const menuItems = [
-    { icon: '📊', label: 'Dashboard', path: '/dashboard' },
-    { icon: '📱', label: 'Conteúdo', path: '/dashboard/content' },
-    { icon: '📅', label: 'Calendário', path: '/dashboard/calendar' },
-    { icon: '💡', label: 'Ideias', path: '/dashboard/ideas' },
-    { icon: '📈', label: 'Analytics', path: '/dashboard/analytics' },
-    { icon: '⚙️', label: 'Configurações', path: '/dashboard/settings' },
+  const menuItems: { icon: string; label: string; tab: TabId }[] = [
+    { icon: '📊', label: 'Dashboard', tab: 'overview' },
+    { icon: '📱', label: 'Conteúdo', tab: 'posts' },
+    { icon: '📅', label: 'Calendário', tab: 'calendar' },
+    { icon: '💡', label: 'Ideias', tab: 'ideas' },
+    { icon: '📈', label: 'Analytics', tab: 'analytics' },
+    { icon: '⚙️', label: 'Configurações', tab: 'settings' },
   ];
 
   return (
@@ -41,9 +43,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout })
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
             {menuItems.map((item) => (
               <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors group"
+                key={item.tab}
+                onClick={() => onTabChange?.(item.tab)}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors group ${
+                  activeTab === item.tab
+                    ? 'bg-purple-100 text-purple-700 font-semibold'
+                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
+                }`}
               >
                 <span className="text-xl">{item.icon}</span>
                 <span className="text-sm font-medium">{item.label}</span>
@@ -115,12 +121,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout })
               <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                 {menuItems.map((item) => (
                   <button
-                    key={item.path}
+                    key={item.tab}
                     onClick={() => {
-                      navigate(item.path);
+                      onTabChange?.(item.tab);
                       setSidebarOpen(false);
                     }}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors"
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      activeTab === item.tab
+                        ? 'bg-purple-100 text-purple-700 font-semibold'
+                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
+                    }`}
                   >
                     <span className="text-xl">{item.icon}</span>
                     <span className="text-sm font-medium">{item.label}</span>

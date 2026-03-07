@@ -101,7 +101,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <DashboardLayout onLogout={handleLogout}>
+    <DashboardLayout onLogout={handleLogout} activeTab={activeTab} onTabChange={setActiveTab}>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard de Marketing</h1>
