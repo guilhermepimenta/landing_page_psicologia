@@ -24,6 +24,43 @@ export const LandingPage: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Tempo na página — dispara aos 30s, 60s, 120s e 300s
+    useEffect(() => {
+        const milestones = [30, 60, 120, 300];
+        const timers = milestones.map((seconds) =>
+            setTimeout(() => {
+                sendGAEvent(`tempo_na_pagina_${seconds}s`, 'engajamento', `${seconds} segundos`);
+            }, seconds * 1000)
+        );
+        return () => timers.forEach(clearTimeout);
+    }, []);
+
+    // Visualização de seção — dispara uma vez por seção quando entra na tela
+    useEffect(() => {
+        const sections = ['inicio', 'sobre', 'conteudo', 'servicos', 'agendamento', 'blog', 'contato', 'depoimentos'];
+        const seen = new Set<string>();
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    const id = entry.target.id;
+                    if (entry.isIntersecting && !seen.has(id)) {
+                        seen.add(id);
+                        sendGAEvent('visualizacao_secao', 'navegacao', id);
+                    }
+                });
+            },
+            { threshold: 0.3 }
+        );
+
+        sections.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
     return (
         <div className="min-h-screen bg-[#FDFCFB] text-gray-800 selection:bg-[#B4C2B4] selection:text-white">
             <Navbar isScrolled={isScrolled} />
