@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Send, AlertCircle, Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { Send, AlertCircle, MapPin, MessageCircle } from 'lucide-react';
 import { sendGAEvent } from '../utils/analytics';
 
 export const Contact: React.FC = () => {
@@ -118,13 +118,6 @@ export const Contact: React.FC = () => {
 
             <div className="space-y-6">
               {/* Phone number removed as requested */}
-
-              <div className="flex items-center gap-4 text-white/90">
-                <div className="p-3 bg-white/10 rounded-xl">
-                  <Mail size={20} />
-                </div>
-                <span className="font-medium tracking-wide">contato@fernandaabreu.com.br</span>
-              </div>
 
               <div className="flex items-center gap-4 text-white/90">
                 <div className="p-3 bg-white/10 rounded-xl">
