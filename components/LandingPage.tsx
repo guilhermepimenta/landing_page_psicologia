@@ -10,6 +10,8 @@ import { Contact } from './Contact';
 import { Testimonials } from './Testimonials';
 import { Footer } from './Footer';
 import { AIChatAssistant } from './AIChatAssistant';
+import { AuthorityBar } from './AuthorityBar';
+import { MediaContent } from './MediaContent';
 
 export const LandingPage: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -29,10 +31,15 @@ export const LandingPage: React.FC = () => {
             <main>
                 <section id="inicio" aria-label="Início — Psicóloga Fernanda Abreu Mangia" className="scroll-mt-20">
                     <Hero />
+                    <AuthorityBar />
                 </section>
 
-                <section id="sobre" aria-label="Sobre a Psicóloga" className="pt-20 pb-20 bg-white scroll-mt-20">
+                <section id="sobre" aria-label="Sobre a Psicóloga" className="pt-20 pb-20 bg-white scroll-mt-48">
                     <Bio />
+                </section>
+
+                <section id="conteudo" aria-label="Conteúdos e participações" className="py-20 bg-[#F9F8F6] scroll-mt-20">
+                    <MediaContent />
                 </section>
 
                 <section id="servicos" aria-label="Serviços de Psicologia" className="relative scroll-mt-20 bg-[#F9F8F6]">

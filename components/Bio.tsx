@@ -5,7 +5,7 @@ import { sendGAEvent } from '../utils/analytics';
 
 export const Bio: React.FC = () => {
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 md:mb-32">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row -mt-16 md:-mt-24 relative z-20 border border-gray-100">
         {/* Photo Column */}
         <div className="md:w-1/3 bg-[#F0EFEB] p-8 flex flex-col items-center justify-center">
