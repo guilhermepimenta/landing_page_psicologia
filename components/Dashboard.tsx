@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import { useAuth } from '../contexts/AuthContext';
-import { postsService, metricsService, analyticsService, Post as FirebasePost } from '../services/firebaseService';
+import { postsService, metricsService, analyticsService, messagesService, Post as FirebasePost } from '../services/firebaseService';
 import AIContentModal from './AIContentModal';
 import AnalyticsPanel from './AnalyticsPanel';
 import PostsManager from './PostsManager';
@@ -10,6 +10,7 @@ import ContentCalendar from './ContentCalendar';
 import IdeasBank from './IdeasBank';
 import ProfileSettings from './ProfileSettings';
 import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
+import MessagesInbox from './MessagesInbox';
 
 interface Metric {
   channel: string;
@@ -35,7 +36,8 @@ const DEFAULT_METRICS: Metric[] = [
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'google' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'google' | 'messages' | 'settings'>('overview');
+  const [unreadCount, setUnreadCount] = useState(0);
   const [showAIModal, setShowAIModal] = useState(false);
   const [metrics, setMetrics] = useState<Metric[]>(DEFAULT_METRICS);
   const [recentPosts, setRecentPosts] = useState<FirebasePost[]>([]);
@@ -73,6 +75,9 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
+    messagesService.getAll().then((r) => {
+      if (r.success) setUnreadCount(r.data.filter((m) => m.status === 'nova').length);
+    });
   }, []);
 
   const getStatusBadge = (status: FirebasePost['status'] | 'idea') => {
@@ -118,19 +123,25 @@ const Dashboard: React.FC = () => {
             { id: 'ideas', label: 'Banco de Ideias', icon: '💡' },
             { id: 'analytics', label: 'Analytics', icon: '📈' },
             { id: 'google', label: 'Google', icon: '🔍' },
+            { id: 'messages', label: 'Mensagens', icon: '✉️' },
             { id: 'settings', label: 'Configurações', icon: '⚙️' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-1 ${
                 activeTab === tab.id
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <span className="mr-2">{tab.icon}</span>
+              <span className="mr-1">{tab.icon}</span>
               {tab.label}
+              {tab.id === 'messages' && unreadCount > 0 && (
+                <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
+                  {unreadCount}
+                </span>
+              )}
             </button>
           ))}
         </nav>
@@ -407,6 +418,10 @@ const Dashboard: React.FC = () => {
       )}
 
       {activeTab === 'google' && <SearchConsoleGMBPanel />}
+
+      {activeTab === 'messages' && (
+        <MessagesInbox />
+      )}
 
       {activeTab === 'settings' && <ProfileSettings />}
 

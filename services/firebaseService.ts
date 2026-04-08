@@ -375,6 +375,77 @@ export const analyticsService = {
   },
 };
 
+// Messages Service
+export interface Message {
+  id?: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  status: 'nova' | 'lida' | 'respondida';
+  createdAt?: Date;
+}
+
+export const messagesService = {
+  async create(msg: Omit<Message, 'id' | 'status' | 'createdAt'>) {
+    try {
+      const docRef = await addDoc(collection(db, 'mensagens'), {
+        ...msg,
+        status: 'nova',
+        createdAt: Timestamp.now(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Erro ao salvar mensagem:', error);
+      return { success: false, error };
+    }
+  },
+
+  async getAll() {
+    try {
+      const q = query(collection(db, 'mensagens'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      const msgs: Message[] = [];
+      snapshot.forEach((d) => {
+        const data = d.data();
+        msgs.push({
+          id: d.id,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: data.message,
+          status: data.status,
+          createdAt: data.createdAt?.toDate(),
+        });
+      });
+      return { success: true, data: msgs };
+    } catch (error) {
+      console.error('Erro ao buscar mensagens:', error);
+      return { success: false, error, data: [] as Message[] };
+    }
+  },
+
+  async updateStatus(id: string, status: Message['status']) {
+    try {
+      await updateDoc(doc(db, 'mensagens', id), { status });
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      return { success: false, error };
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      await deleteDoc(doc(db, 'mensagens', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao deletar mensagem:', error);
+      return { success: false, error };
+    }
+  },
+};
+
 // Profile Service
 export const profileService = {
   async get() {

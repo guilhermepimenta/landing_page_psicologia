@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Apenas usuários autenticados podem acessar o banco de dados
+    // Como é uma aplicação de usuário único (Fernanda), qualquer usuário
+    // autenticado tem acesso total às coleções.
+
+    match /posts/{postId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /metrics/{metricId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /ideas/{ideaId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /settings/{document} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Mensagens: qualquer visitante pode criar (landing page), somente autenticado lê/edita/exclui
+    match /mensagens/{msgId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // Bloquear qualquer outra coleção não listada
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

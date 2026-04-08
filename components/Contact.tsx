@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { Send, AlertCircle, MapPin, MessageCircle } from 'lucide-react';
+import { Send, AlertCircle, MapPin, MessageCircle, CheckCircle } from 'lucide-react';
 import { sendGAEvent } from '../utils/analytics';
+import { messagesService } from '../services/firebaseService';
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ export const Contact: React.FC = () => {
     email: '',
     phone: ''
   });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,7 +65,7 @@ export const Contact: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     let newErrors = { email: '', phone: '' };
@@ -83,21 +86,23 @@ export const Contact: React.FC = () => {
       return;
     }
 
-    // In a real scenario, this would handle form submission
-    const message = `Olá Dra. Fernanda, meu nome é ${formData.name}. ${formData.message} (Contato: ${formData.phone})`;
-    const encodedMessage = encodeURIComponent(message);
-
-    // Track conversion
-    sendGAEvent('envio_formulario_contato', 'contato', 'whatsapp');
-
-    window.open(`https://wa.me/5521971318289?text=${encodedMessage}`, '_blank');
-
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      message: ''
-    });
+    setSending(true);
+    try {
+      await messagesService.create({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
+      });
+      sendGAEvent('envio_formulario_contato', 'contato', 'dashboard');
+      setSent(true);
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      setTimeout(() => setSent(false), 5000);
+    } catch (err) {
+      console.error('Erro ao enviar mensagem:', err);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -210,13 +215,21 @@ export const Contact: React.FC = () => {
             </div>
 
             <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full bg-[#4A5D4A] hover:bg-[#3A4A3A] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-3"
-              >
-                <Send size={20} />
-                Enviar Mensagem
-              </button>
+              {sent ? (
+                <div className="w-full bg-green-50 border border-green-200 text-green-700 px-8 py-4 rounded-2xl font-medium text-base flex items-center justify-center gap-3">
+                  <CheckCircle size={20} />
+                  Mensagem recebida! Retornaremos em breve.
+                </div>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="w-full bg-[#4A5D4A] hover:bg-[#3A4A3A] disabled:opacity-60 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-3"
+                >
+                  <Send size={20} />
+                  {sending ? 'Enviando...' : 'Enviar Mensagem'}
+                </button>
+              )}
             </div>
 
             <p className="text-center text-xs text-gray-400 mt-4">
