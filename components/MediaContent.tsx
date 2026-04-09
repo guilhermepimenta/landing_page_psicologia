@@ -6,11 +6,11 @@ export const MediaContent: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-14">
-        <span className="text-xs font-bold text-[#4A5D4A] uppercase tracking-widest">Dicas Práticas</span>
-        <h2 className="text-4xl font-serif text-gray-800 mt-2 mb-4">Dicas da Fernanda</h2>
+        <span className="text-xs font-bold text-[#4A5D4A] uppercase tracking-widest">Guia Prático</span>
+        <h2 className="text-4xl font-serif text-gray-800 mt-2 mb-4">Insights da Fernanda</h2>
         <div className="h-0.5 w-12 bg-[#B4C2B4] mx-auto mb-6"></div>
         <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
-          Além do consultório, compartilho dicas práticas sobre saúde mental, relacionamentos e desenvolvimento emocional.
+          Além do consultório, compartilho orientações práticas sobre saúde mental, relacionamentos e desenvolvimento emocional.
         </p>
       </div>
 
@@ -45,10 +45,10 @@ export const MediaContent: React.FC = () => {
               <span className="text-xs font-bold text-red-600 uppercase tracking-widest">YouTube</span>
             </div>
             <h3 className="text-xl md:text-2xl font-serif text-gray-800 mb-3 leading-snug">
-              3 Dicas Para um Bom Relacionamento com seu Filho
+              3 Passos Para Fortalecer o Vínculo com seu Filho
             </h3>
             <p className="text-gray-500 text-sm leading-relaxed">
-              Orientações práticas para fortalecer o vínculo entre pais e filhos, desenvolvidas a partir da vivência clínica e do cuidado com o desenvolvimento emocional das crianças.
+              Estratégias acessíveis para construir uma conexão genuína entre pais e filhos, desenvolvidas a partir da vivência clínica e do cuidado com o desenvolvimento emocional das crianças.
             </p>
           </div>
 
