@@ -96,11 +96,13 @@ Abra `.env` e cole as credenciais do Firebase Console:
 VITE_FIREBASE_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXX
 VITE_FIREBASE_AUTH_DOMAIN=fernanda-psicologia.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=fernanda-psicologia
-VITE_FIREBASE_STORAGE_BUCKET=fernanda-psicologia.appspot.com
+VITE_FIREBASE_STORAGE_BUCKET=fernanda-psicologia.firebasestorage.app
 VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
 VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
 VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
+
+> Dica: confirme o valor exato do bucket no Firebase Console em **Project settings > General > Your apps > Storage bucket**.
 
 ⚠️ **IMPORTANTE**: Adicione `.env` ao `.gitignore` para não expor suas credenciais!
 

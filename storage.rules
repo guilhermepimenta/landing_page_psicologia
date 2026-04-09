@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Upload de imagens dos posts do dashboard (usuário autenticado)
+    match /posts/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Bloquear qualquer outro caminho por padrão
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

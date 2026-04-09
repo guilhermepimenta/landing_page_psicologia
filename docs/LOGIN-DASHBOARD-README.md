@@ -36,12 +36,15 @@ Sistema completo de autenticação e dashboard administrativo integrado à landi
 **Opção 2: URL Direta**
 - Acesse: `http://localhost:5173/login`
 
-### 2. Credenciais Demo
+### 2. Credenciais de acesso
 
-```
-Email: admin@fernandapsicologia.com
-Senha: demo123
-```
+O login usa Firebase Authentication. Em ambientes novos, crie um usuário no Firebase Console:
+
+1. Acesse **Authentication > Users**
+2. Clique em **Add user**
+3. Cadastre email e senha
+
+Depois, use essas credenciais na tela de login.
 
 ### 3. Navegação no Dashboard
 

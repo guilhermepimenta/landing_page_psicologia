@@ -180,10 +180,28 @@ const PostsManager: React.FC = () => {
                 {filteredPosts.map((post) => (
                   <tr key={post.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-4">
-                      <div className="text-sm font-medium text-gray-900 max-w-xs truncate">{post.title}</div>
-                      {post.content && (
-                        <div className="text-xs text-gray-400 mt-0.5 max-w-xs truncate">{post.content.slice(0, 60)}...</div>
-                      )}
+                      <div className="flex items-center gap-3 max-w-xs">
+                        {post.imageUrls?.[0] ? (
+                          <img
+                            src={post.imageUrls[0]}
+                            alt={post.title}
+                            className="w-12 h-12 rounded-lg object-cover border border-gray-200 flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 flex-shrink-0">
+                            🖼️
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">{post.title}</div>
+                          {post.content && (
+                            <div className="text-xs text-gray-400 mt-0.5 truncate">{post.content.slice(0, 60)}...</div>
+                          )}
+                          {post.imageUrls && post.imageUrls.length > 1 && (
+                            <div className="text-xs text-purple-600 mt-1">{post.imageUrls.length} imagens</div>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">

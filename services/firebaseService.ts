@@ -24,9 +24,23 @@ export interface Post {
   date: Date;
   content?: string;
   engagement?: number;
+  imageUrls?: string[];
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+const mapPost = (id: string, data: any): Post => ({
+  id,
+  title: data.title,
+  channel: data.channel,
+  status: data.status,
+  date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
+  content: data.content,
+  engagement: data.engagement,
+  imageUrls: Array.isArray(data.imageUrls) ? data.imageUrls : [],
+  createdAt: data.createdAt?.toDate?.(),
+  updatedAt: data.updatedAt?.toDate?.(),
+});
 
 export interface Metric {
   id?: string;
@@ -84,18 +98,7 @@ export const postsService = {
       const querySnapshot = await getDocs(q);
       const posts: Post[] = [];
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        posts.push({
-          id: doc.id,
-          title: data.title,
-          channel: data.channel,
-          status: data.status,
-          date: data.date.toDate(),
-          content: data.content,
-          engagement: data.engagement,
-          createdAt: data.createdAt?.toDate(),
-          updatedAt: data.updatedAt?.toDate(),
-        });
+        posts.push(mapPost(doc.id, doc.data()));
       });
       return { success: true, data: posts };
     } catch (error) {
@@ -114,18 +117,7 @@ export const postsService = {
       const querySnapshot = await getDocs(q);
       const posts: Post[] = [];
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        posts.push({
-          id: doc.id,
-          title: data.title,
-          channel: data.channel,
-          status: data.status,
-          date: data.date.toDate(),
-          content: data.content,
-          engagement: data.engagement,
-          createdAt: data.createdAt?.toDate(),
-          updatedAt: data.updatedAt?.toDate(),
-        });
+        posts.push(mapPost(doc.id, doc.data()));
       });
       return { success: true, data: posts };
     } catch (error) {
@@ -145,15 +137,7 @@ export const postsService = {
       const querySnapshot = await getDocs(q);
       const posts: Post[] = [];
       querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        posts.push({
-          id: doc.id,
-          title: data.title,
-          channel: data.channel,
-          status: data.status,
-          date: data.date.toDate(),
-          content: data.content,
-        });
+        posts.push(mapPost(doc.id, doc.data()));
       });
       return { success: true, data: posts };
     } catch (error) {
@@ -166,9 +150,17 @@ export const postsService = {
   async update(id: string, updates: Partial<Post>) {
     try {
       const postRef = doc(db, 'posts', id);
-      await updateDoc(postRef, {
+      const payload: Record<string, unknown> = {
         ...updates,
         updatedAt: Timestamp.now(),
+      };
+
+      if (updates.date) {
+        payload.date = Timestamp.fromDate(updates.date);
+      }
+
+      await updateDoc(postRef, {
+        ...payload,
       });
       return { success: true };
     } catch (error) {

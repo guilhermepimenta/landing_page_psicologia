@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { postsService, Post } from '../services/firebaseService';
+import { imageService } from '../services/imageService';
+import ImageUploader from './ImageUploader';
 
 interface PostFormModalProps {
   onClose: () => void;
@@ -26,8 +28,15 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
       : new Date().toISOString().slice(0, 16)
   );
   const [content, setContent] = useState(postToEdit?.content || '');
+  const [existingImageUrls, setExistingImageUrls] = useState<string[]>(postToEdit?.imageUrls || []);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setExistingImageUrls(postToEdit?.imageUrls || []);
+    setPendingFiles([]);
+  }, [postToEdit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +49,10 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
     setError(null);
 
     try {
+      const uploadedUrls = pendingFiles.length > 0
+        ? await imageService.uploadMultipleImages(pendingFiles)
+        : [];
+
       const postData: Omit<Post, 'id' | 'createdAt' | 'updatedAt'> = {
         title,
         channel,
@@ -47,6 +60,7 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
         date: new Date(date),
         content,
         engagement: postToEdit?.engagement || 0,
+        imageUrls: [...existingImageUrls, ...uploadedUrls],
       };
 
       if (postToEdit?.id) {
@@ -154,6 +168,20 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                 rows={8}
                 placeholder="Escreva o conteúdo do post ou a legenda aqui..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all resize-none"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <ImageUploader
+                existingUrls={existingImageUrls}
+                pendingFiles={pendingFiles}
+                onFilesAdded={(files) => setPendingFiles((current) => [...current, ...files])}
+                onRemoveExisting={(index) => {
+                  setExistingImageUrls((current) => current.filter((_, currentIndex) => currentIndex !== index));
+                }}
+                onRemovePending={(index) => {
+                  setPendingFiles((current) => current.filter((_, currentIndex) => currentIndex !== index));
+                }}
               />
             </div>
           </div>
