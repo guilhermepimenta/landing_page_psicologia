@@ -12,20 +12,20 @@ const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 const PSICOMANAGER_URL = 'https://app2.psicomanager.com/agendamentos-online/Fernandamangia';
+const DOCTORALIA_URL = 'https://www.doctoralia.com.br/fernanda-abreu-mangia/psicologo/niteroi';
 
 const tabContent: Record<Tab, {
   address: string;
   schedule: string;
   services: string[];
   whatsappMsg: string;
-  doctoralia?: string;
+  psicomanager?: boolean;
 }> = {
   'niteroi': {
     address: 'Rua Mem de Sá, 34 — Icaraí, Niterói - RJ',
     schedule: 'Segunda a sexta · Sábados a combinar',
     services: ['Terapia Individual', 'Avaliação Psicológica e Neuropsicológica', 'Orientação Vocacional'],
     whatsappMsg: 'Olá Dra. Fernanda, gostaria de agendar uma consulta presencial em Niterói.',
-    doctoralia: 'https://www.doctoralia.com.br/fernanda-abreu-mangia/psicologo/niteroi',
   },
   'nova-friburgo': {
     address: 'Rua Dr. Ernesto Brasilio, 51 — Centro, Nova Friburgo - RJ',
@@ -38,6 +38,7 @@ const tabContent: Record<Tab, {
     schedule: 'Segunda a sexta · Sábados a combinar',
     services: ['Terapia Individual', 'Orientação Vocacional', 'Avaliação Psicológica'],
     whatsappMsg: 'Olá Dra. Fernanda, gostaria de agendar uma consulta online.',
+    psicomanager: true,
   },
 };
 
@@ -57,7 +58,7 @@ export const Scheduling: React.FC = () => {
   };
 
   const handleDoctoraliaClick = () => {
-    sendGAEvent('agendar_doctoralia_niteroi', 'agendamento', 'doctoralia');
+    sendGAEvent(`agendar_doctoralia_${activeTab}`, 'agendamento', 'doctoralia');
   };
 
   const handlePsicomanagerClick = () => {
@@ -141,27 +142,27 @@ export const Scheduling: React.FC = () => {
                 Agendar pelo WhatsApp
               </button>
 
-              {content.doctoralia && (
-                <a
-                  href={content.doctoralia}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={handleDoctoraliaClick}
-                  className="flex items-center justify-center gap-2 bg-[#4A90E2] hover:bg-[#357ABD] text-white font-bold px-7 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg active:scale-95 text-sm"
-                >
-                  Agendar no Doctoralia
-                </a>
-              )}
-
               <a
-                href={PSICOMANAGER_URL}
+                href={DOCTORALIA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={handlePsicomanagerClick}
-                className="flex items-center justify-center gap-2 bg-[#6C63FF] hover:bg-[#574fd6] text-white font-bold px-7 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg active:scale-95 text-sm"
+                onClick={handleDoctoraliaClick}
+                className="flex items-center justify-center gap-2 bg-[#4A90E2] hover:bg-[#357ABD] text-white font-bold px-7 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg active:scale-95 text-sm"
               >
-                Agendar pelo PsicoManager
+                Agendar no Doctoralia
               </a>
+
+              {content.psicomanager && (
+                <a
+                  href={PSICOMANAGER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handlePsicomanagerClick}
+                  className="flex items-center justify-center gap-2 bg-[#6C63FF] hover:bg-[#574fd6] text-white font-bold px-7 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg active:scale-95 text-sm"
+                >
+                  Agendar pelo PsicoManager
+                </a>
+              )}
 
               {/* Avaliação destaque */}
               <a
