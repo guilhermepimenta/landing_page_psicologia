@@ -11,6 +11,8 @@ const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'online', label: 'Online', icon: <Monitor size={16} /> },
 ];
 
+const PSICOMANAGER_URL = 'https://app2.psicomanager.com/agendamentos-online/Fernandamangia';
+
 const tabContent: Record<Tab, {
   address: string;
   schedule: string;
@@ -56,6 +58,10 @@ export const Scheduling: React.FC = () => {
 
   const handleDoctoraliaClick = () => {
     sendGAEvent('agendar_doctoralia_niteroi', 'agendamento', 'doctoralia');
+  };
+
+  const handlePsicomanagerClick = () => {
+    sendGAEvent(`agendar_psicomanager_${activeTab}`, 'agendamento', 'psicomanager');
   };
 
   return (
@@ -146,6 +152,16 @@ export const Scheduling: React.FC = () => {
                   Agendar no Doctoralia
                 </a>
               )}
+
+              <a
+                href={PSICOMANAGER_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handlePsicomanagerClick}
+                className="flex items-center justify-center gap-2 bg-[#6C63FF] hover:bg-[#574fd6] text-white font-bold px-7 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg active:scale-95 text-sm"
+              >
+                Agendar pelo PsicoManager
+              </a>
 
               {/* Avaliação destaque */}
               <a
