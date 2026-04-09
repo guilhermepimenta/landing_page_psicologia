@@ -6,11 +6,11 @@ export const MediaContent: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-14">
-        <span className="text-xs font-bold text-[#4A5D4A] uppercase tracking-widest">Conteúdo Educativo</span>
-        <h2 className="text-4xl font-serif text-gray-800 mt-2 mb-4">Aprenda com a Fernanda</h2>
+        <span className="text-xs font-bold text-[#4A5D4A] uppercase tracking-widest">Dicas Práticas</span>
+        <h2 className="text-4xl font-serif text-gray-800 mt-2 mb-4">Dicas da Fernanda</h2>
         <div className="h-0.5 w-12 bg-[#B4C2B4] mx-auto mb-6"></div>
         <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
-          Além do consultório, compartilho orientações práticas sobre saúde mental, relações familiares e desenvolvimento emocional.
+          Além do consultório, compartilho dicas práticas sobre saúde mental, relacionamentos e desenvolvimento emocional.
         </p>
       </div>
 
