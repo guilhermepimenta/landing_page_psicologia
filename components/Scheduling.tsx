@@ -179,7 +179,8 @@ export const Scheduling: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-8 text-center text-xs text-gray-400">
+      <div className="mt-8 text-center text-xs text-gray-400 space-y-1">
+        <p className="text-gray-400">⚠ O agendamento online está sujeito à confirmação pela psicóloga.</p>
         <p>Dúvidas? Use o formulário de contato abaixo ou fale diretamente pelo WhatsApp.</p>
       </div>
     </div>
