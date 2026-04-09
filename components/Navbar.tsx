@@ -47,14 +47,6 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
                 <span className={`absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isScrolled ? 'bg-[#4A5D4A]' : 'bg-white'}`}></span>
               </a>
             ))}
-            {/* Admin Link */}
-            <a
-              href="/login"
-              className={`text-xs opacity-50 hover:opacity-100 transition-opacity ${isScrolled ? 'text-gray-500' : 'text-white'}`}
-              title="Acesso Admin"
-            >
-              🔐
-            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -86,13 +78,6 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
                 {link.name}
               </a>
             ))}
-            {/* Admin Link Mobile */}
-            <a
-              href="/login"
-              className="block px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-all text-center border-t mt-2"
-            >
-              🔐 Acesso Admin
-            </a>
           </div>
         </div>
       )}

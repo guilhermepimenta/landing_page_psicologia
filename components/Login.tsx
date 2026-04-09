@@ -145,12 +145,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </div>
         </div>
 
-        {/* Informação de Demo */}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
-            Demo: admin@fernandapsicologia.com / senha: demo123
-          </p>
-        </div>
       </div>
     </div>
   );
