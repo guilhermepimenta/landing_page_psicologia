@@ -121,14 +121,26 @@ export const Contact: React.FC = () => {
               Estou aqui para acolher você. Fique à vontade para agendar uma consulta ou tirar suas dúvidas sobre o tratamento.
             </p>
 
-            <div className="space-y-6">
-              {/* Phone number removed as requested */}
-
+            <div className="space-y-4">
               <div className="flex items-center gap-4 text-white/90">
-                <div className="p-3 bg-white/10 rounded-xl">
+                <div className="p-3 bg-white/10 rounded-xl shrink-0">
                   <MapPin size={20} />
                 </div>
-                <span className="font-medium tracking-wide">Icaraí, Niterói - RJ</span>
+                <div>
+                  <p className="text-xs text-white/50 uppercase tracking-widest mb-0.5">Presencial</p>
+                  <p className="font-medium">Icaraí, Niterói - RJ</p>
+                  <p className="font-medium">Nova Friburgo - RJ</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 text-white/90">
+                <div className="p-3 bg-white/10 rounded-xl shrink-0">
+                  <MessageCircle size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-white/50 uppercase tracking-widest mb-0.5">Online</p>
+                  <p className="font-medium">Para todo o Brasil</p>
+                </div>
               </div>
             </div>
           </div>
