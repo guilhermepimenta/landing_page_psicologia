@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { postsService, Post } from '../services/firebaseService';
 import { imageService } from '../services/imageService';
 import ImageUploader from './ImageUploader';
+import InstagramPreview from './InstagramPreview';
 
 interface PostFormModalProps {
   onClose: () => void;
@@ -32,6 +33,20 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const pendingPreviewUrls = useMemo(
+    () => pendingFiles.map((file) => URL.createObjectURL(file)),
+    [pendingFiles],
+  );
+
+  useEffect(() => {
+    return () => {
+      pendingPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [pendingPreviewUrls]);
+
+  const previewImages = [...existingImageUrls, ...pendingPreviewUrls];
+  const previewDate = new Date(date);
 
   useEffect(() => {
     setExistingImageUrls(postToEdit?.imageUrls || []);
@@ -81,7 +96,7 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-900">
@@ -105,9 +120,10 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Título */}
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Título */}
+              <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">Título do Post</label>
               <input
                 type="text"
@@ -117,10 +133,10 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                 className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 required
               />
-            </div>
+              </div>
 
-            {/* Canal */}
-            <div>
+              {/* Canal */}
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Canal</label>
               <select
                 value={channel}
@@ -131,10 +147,10 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                   <option key={ch} value={ch}>{ch}</option>
                 ))}
               </select>
-            </div>
+              </div>
 
-            {/* Status */}
-            <div>
+              {/* Status */}
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <select
                 value={status}
@@ -145,10 +161,10 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                   <option key={st} value={st}>{STATUS_LABELS[st]}</option>
                 ))}
               </select>
-            </div>
+              </div>
 
-            {/* Data e Hora */}
-            <div className="md:col-span-2">
+              {/* Data e Hora */}
+              <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">Data e Hora (Agendamento / Publicação)</label>
               <input
                 type="datetime-local"
@@ -157,10 +173,10 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                 className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 required
               />
-            </div>
+              </div>
 
-            {/* Conteúdo */}
-            <div className="md:col-span-2">
+              {/* Conteúdo */}
+              <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">Conteúdo do Post</label>
               <textarea
                 value={content}
@@ -169,9 +185,9 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                 placeholder="Escreva o conteúdo do post ou a legenda aqui..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all resize-none"
               />
-            </div>
+              </div>
 
-            <div className="md:col-span-2">
+              <div className="md:col-span-2">
               <ImageUploader
                 existingUrls={existingImageUrls}
                 pendingFiles={pendingFiles}
@@ -182,6 +198,17 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                 onRemovePending={(index) => {
                   setPendingFiles((current) => current.filter((_, currentIndex) => currentIndex !== index));
                 }}
+              />
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
+              <InstagramPreview
+                username="fernandamangiapsi"
+                displayName="Fernanda Mangia"
+                caption={content}
+                imageUrls={previewImages}
+                publishDate={Number.isNaN(previewDate.getTime()) ? new Date() : previewDate}
               />
             </div>
           </div>
