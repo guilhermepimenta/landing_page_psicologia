@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { postsService, Post } from '../services/firebaseService';
 import { imageService } from '../services/imageService';
+import { publishToInstagram } from '../services/instagramService';
 import ImageUploader from './ImageUploader';
 import InstagramPreview from './InstagramPreview';
 
@@ -32,6 +33,8 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>(postToEdit?.imageUrls || []);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [instagramSuccess, setInstagramSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const pendingPreviewUrls = useMemo(
@@ -53,6 +56,24 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
     setPendingFiles([]);
   }, [postToEdit]);
 
+  const uploadAndBuildData = async (): Promise<Omit<Post, 'id' | 'createdAt' | 'updatedAt'> & { instagramPostId?: string; instagramPermalink?: string }> => {
+    const uploadedUrls = pendingFiles.length > 0
+      ? await imageService.uploadMultipleImages(pendingFiles)
+      : [];
+
+    return {
+      title,
+      channel,
+      status,
+      date: new Date(date),
+      content,
+      engagement: postToEdit?.engagement || 0,
+      imageUrls: [...existingImageUrls, ...uploadedUrls],
+      instagramPostId: postToEdit?.instagramPostId,
+      instagramPermalink: postToEdit?.instagramPermalink,
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title) {
@@ -62,21 +83,10 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
 
     setIsSaving(true);
     setError(null);
+    setInstagramSuccess(null);
 
     try {
-      const uploadedUrls = pendingFiles.length > 0
-        ? await imageService.uploadMultipleImages(pendingFiles)
-        : [];
-
-      const postData: Omit<Post, 'id' | 'createdAt' | 'updatedAt'> = {
-        title,
-        channel,
-        status,
-        date: new Date(date),
-        content,
-        engagement: postToEdit?.engagement || 0,
-        imageUrls: [...existingImageUrls, ...uploadedUrls],
-      };
+      const postData = await uploadAndBuildData();
 
       if (postToEdit?.id) {
         const result = await postsService.update(postToEdit.id, postData);
@@ -91,6 +101,58 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
       setError(err?.message || 'Erro ao salvar post. Tente novamente.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handlePublishInstagram = async () => {
+    if (!title) {
+      setError('O título é obrigatório antes de publicar.');
+      return;
+    }
+    const allImages = [...existingImageUrls, ...pendingFiles.map(() => '')];
+    if (allImages.length === 0) {
+      setError('Adicione ao menos uma imagem para publicar no Instagram.');
+      return;
+    }
+
+    setIsPublishing(true);
+    setError(null);
+    setInstagramSuccess(null);
+
+    try {
+      // 1. Fazer upload das imagens pendentes e montar os dados do post
+      const postData = await uploadAndBuildData();
+      const finalImageUrls = postData.imageUrls ?? [];
+
+      if (finalImageUrls.length === 0) {
+        throw new Error('Adicione ao menos uma imagem para publicar no Instagram.');
+      }
+
+      // 2. Publicar no Instagram via Graph API
+      const igResult = await publishToInstagram(finalImageUrls, content || title);
+
+      // 3. Salvar/atualizar post no Firestore com os IDs do Instagram
+      const dataWithIG = {
+        ...postData,
+        status: 'published' as Post['status'],
+        instagramPostId: igResult.instagramPostId,
+        instagramPermalink: igResult.instagramPermalink,
+      };
+
+      if (postToEdit?.id) {
+        const result = await postsService.update(postToEdit.id, dataWithIG);
+        if (!result.success) throw result.error;
+      } else {
+        const result = await postsService.create(dataWithIG);
+        if (!result.success) throw result.error;
+      }
+
+      setInstagramSuccess(igResult.instagramPermalink);
+      onSaved();
+    } catch (err: any) {
+      setError(err?.message || 'Erro ao publicar no Instagram. Tente novamente.');
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -215,28 +277,64 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
         </form>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-gray-100 flex gap-3 justify-end bg-gray-50 rounded-b-2xl">
-          <button
-            onClick={onClose}
-            type="button"
-            className="px-6 py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-100 font-medium transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSaving}
-            className="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            {isSaving ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Salvando...
-              </>
-            ) : (
-              'Salvar Post'
+        <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl space-y-3">
+          {instagramSuccess && (
+            <div className="flex items-center gap-2 p-3 bg-green-50 text-green-800 rounded-lg text-sm">
+              <span>✅</span>
+              <span>Publicado no Instagram com sucesso!</span>
+              <a
+                href={instagramSuccess}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto underline font-medium hover:text-green-900"
+              >
+                Ver post →
+              </a>
+            </div>
+          )}
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={onClose}
+              type="button"
+              className="px-6 py-2 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-100 font-medium transition-colors"
+            >
+              Cancelar
+            </button>
+            {channel === 'Instagram' && (
+              <button
+                onClick={handlePublishInstagram}
+                disabled={isPublishing || isSaving}
+                type="button"
+                className="px-6 py-2 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white rounded-xl hover:opacity-90 font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isPublishing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Publicando...
+                  </>
+                ) : (
+                  <>
+                    <span>📱</span>
+                    Publicar no Instagram
+                  </>
+                )}
+              </button>
             )}
-          </button>
+            <button
+              onClick={handleSubmit}
+              disabled={isSaving || isPublishing}
+              className="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isSaving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                'Salvar Post'
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

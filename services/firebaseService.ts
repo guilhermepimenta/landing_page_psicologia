@@ -25,6 +25,8 @@ export interface Post {
   content?: string;
   engagement?: number;
   imageUrls?: string[];
+  instagramPostId?: string;
+  instagramPermalink?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -38,6 +40,8 @@ const mapPost = (id: string, data: any): Post => ({
   content: data.content,
   engagement: data.engagement,
   imageUrls: Array.isArray(data.imageUrls) ? data.imageUrls : [],
+  instagramPostId: data.instagramPostId,
+  instagramPermalink: data.instagramPermalink,
   createdAt: data.createdAt?.toDate?.(),
   updatedAt: data.updatedAt?.toDate?.(),
 });

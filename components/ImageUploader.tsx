@@ -34,7 +34,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const totalImages = existingUrls.length + pendingFiles.length;
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(event.target.files || []);
+    const selectedFiles = Array.from(event.target.files ?? []) as File[];
     const imageFiles = selectedFiles.filter((file) => file.type.startsWith('image/'));
 
     if (!imageFiles.length) {
