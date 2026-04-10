@@ -209,9 +209,27 @@ const PostsManager: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_BADGE[post.status]}`}>
-                        {STATUS_LABELS[post.status]}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_BADGE[post.status]}`}>
+                          {STATUS_LABELS[post.status]}
+                        </span>
+                        {post.instagramPostId && (
+                          post.instagramPermalink ? (
+                            <a
+                              href={post.instagramPermalink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 hover:bg-pink-200 transition-colors"
+                            >
+                              📱 No Instagram →
+                            </a>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
+                              📱 No Instagram
+                            </span>
+                          )
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                       {post.date.toLocaleDateString('pt-BR')}
