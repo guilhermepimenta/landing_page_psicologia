@@ -1,5 +1,5 @@
 import { Timestamp } from 'firebase-admin/firestore';
-import { getAdminDb } from './firebaseAdmin';
+import { getAdminDb } from './firebaseAdmin.js';
 
 export type Channel = 'Instagram' | 'GMB' | 'Blog' | 'Email';
 
@@ -35,7 +35,7 @@ export interface RunSummary {
   error?: string;
 }
 
-const GRAPH_API = 'https://graph.facebook.com/v19.0';
+const GRAPH_API = 'https://graph.instagram.com/v21.0';
 
 function getInstagramCredentials() {
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
@@ -71,6 +71,16 @@ async function graphGet(path: string, params: Record<string, string>, accessToke
   return data;
 }
 
+async function waitForContainer(containerId: string, accessToken: string, maxAttempts = 10): Promise<void> {
+  for (let i = 0; i < maxAttempts; i++) {
+    const status = await graphGet(`/${containerId}`, { fields: 'status_code' }, accessToken);
+    if (status.status_code === 'FINISHED') return;
+    if (status.status_code === 'ERROR') throw new Error('Container de mídia falhou no processamento');
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  throw new Error('Timeout aguardando processamento do container de mídia');
+}
+
 async function publishSingle(
   userId: string,
   accessToken: string,
@@ -78,6 +88,7 @@ async function publishSingle(
   caption: string,
 ): Promise<{ instagramPostId: string; instagramPermalink: string }> {
   const container = await graphPost(`/${userId}/media`, { image_url: imageUrl, caption }, accessToken);
+  await waitForContainer(container.id, accessToken);
   const publish = await graphPost(`/${userId}/media_publish`, { creation_id: container.id }, accessToken);
   const post = await graphGet(`/${publish.id}`, { fields: 'permalink' }, accessToken);
   return {

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { runPublishScheduled } from '../lib/cronPublisher';
+import { runPublishScheduled } from '../lib/cronPublisher.js';
 
 /**
  * Endpoint de trigger manual para o cron de publicação agendada.

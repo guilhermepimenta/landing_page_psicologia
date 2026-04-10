@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { runPublishScheduled } from '../lib/cronPublisher';
+import { runPublishScheduled } from '../lib/cronPublisher.js';
 
 /**
  * Vercel Cron Function — disparada automaticamente a cada 15 minutos.

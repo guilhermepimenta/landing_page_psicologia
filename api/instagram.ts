@@ -15,7 +15,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * Retorna: { id, permalink, timestamp, media_type }
  */
 
-const GRAPH_API = 'https://graph.facebook.com/v19.0';
+const GRAPH_API = 'https://graph.instagram.com/v21.0';
 
 function getCredentials() {
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
