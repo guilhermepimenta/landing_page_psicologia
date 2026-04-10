@@ -216,9 +216,14 @@ const ContentCalendar: React.FC = () => {
                         <div
                           key={post.id}
                           className={`text-[10px] leading-tight px-1 py-0.5 rounded border truncate ${STATUS_COLOR[post.status]}`}
-                          title={`${post.title} (${post.channel})`}
+                          title={`${post.title} (${post.channel})${post.status === 'scheduled' && post.channel === 'Instagram' ? ' • Será publicado automaticamente' : ''}`}
                         >
                           {CHANNEL_ICON[post.channel]} {post.title}
+                          {post.status === 'scheduled' && post.channel === 'Instagram' && (
+                            <span className="ml-1" aria-label="Será publicado automaticamente" title="Será publicado automaticamente">
+                              ⏰
+                            </span>
+                          )}
                         </div>
                       ))}
                       {dayPosts.length > 3 && (
@@ -248,6 +253,10 @@ const ContentCalendar: React.FC = () => {
             <div className="w-3 h-3 rounded bg-yellow-200 border border-yellow-400" />
             Rascunho
           </div>
+          <div className="flex items-center gap-1.5 text-xs text-gray-600">
+            <span>⏰</span>
+            Será publicado automaticamente
+          </div>
         </div>
       </div>
 
@@ -272,6 +281,9 @@ const ContentCalendar: React.FC = () => {
                   <span className={`inline-block mt-1 px-2 py-0.5 text-xs rounded-full font-medium ${STATUS_COLOR[post.status]}`}>
                     {post.status === 'published' ? 'Publicado' : post.status === 'scheduled' ? 'Agendado' : 'Rascunho'}
                   </span>
+                  {post.status === 'scheduled' && post.channel === 'Instagram' && (
+                    <p className="text-xs text-blue-700 mt-1">⏰ Será publicado automaticamente</p>
+                  )}
                 </div>
                 <button
                   onClick={() => {
