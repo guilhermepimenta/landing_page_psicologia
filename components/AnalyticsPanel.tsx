@@ -4,6 +4,7 @@ import {
   AreaChart, Area, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import { getGA4Data, isDevMode, WeeklyRow, MonthlyRow, MetricRow } from '../services/ga4Service';
+import { alertsService, DashboardAlert } from '../services/firebaseService';
 
 interface AnalyticsPanelProps {
   metrics: { channel: string; value: number; change: number; icon: string }[];
@@ -67,6 +68,8 @@ const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ metrics }) => {
   const [loading, setLoading] = useState(true);
   const [usingMock, setUsingMock] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [activeAlerts, setActiveAlerts] = useState<DashboardAlert[]>([]);
+  const [alertsLoading, setAlertsLoading] = useState(true);
 
   const loadGA4Data = () => {
     setLoading(true);
@@ -87,6 +90,13 @@ const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ metrics }) => {
   };
 
   useEffect(() => { loadGA4Data(); }, []);
+
+  useEffect(() => {
+    alertsService.getActive()
+      .then(res => { if (res.success) setActiveAlerts(res.data); })
+      .catch(() => { /* silencioso — alertas são opcionais */ })
+      .finally(() => setAlertsLoading(false));
+  }, []);
 
   const kpis = KPI_CONFIG.map(k => {
     const row = summaryMetrics.find(m => m.metrica === k.key);
@@ -245,30 +255,49 @@ const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ metrics }) => {
       <div className="bg-white rounded-xl shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           🔔 Alertas e Insights Automáticos
+          {!alertsLoading && activeAlerts.length > 0 && (
+            <span className="ml-2 bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {activeAlerts.length}
+            </span>
+          )}
         </h3>
         <div className="space-y-3">
-          {[
-            { type: 'success', icon: '🚀', msg: 'Instagram cresceu 18% esta semana — mantenha a frequência de posts!' },
-            { type: 'warning', icon: '⚠️', msg: 'Blog sem publicação há 8 dias — recomendado postar pelo menos 1x/semana.' },
-            { type: 'info', icon: '💡', msg: 'Quinta-feira às 10h é o melhor horário para posts no Instagram (+34% alcance).' },
-            { type: 'success', icon: '✅', msg: 'Taxa de conversão acima da média do setor (35% vs 28% da média).' },
-          ].map((alert, i) => (
-            <div
-              key={i}
-              className={`flex items-start gap-3 p-4 rounded-lg border ${
-                alert.type === 'success' ? 'bg-green-50 border-green-200' :
-                alert.type === 'warning' ? 'bg-yellow-50 border-yellow-200' :
-                'bg-blue-50 border-blue-200'
-              }`}
-            >
-              <span className="text-xl flex-shrink-0">{alert.icon}</span>
-              <p className={`text-sm ${
-                alert.type === 'success' ? 'text-green-800' :
-                alert.type === 'warning' ? 'text-yellow-800' :
-                'text-blue-800'
-              }`}>{alert.msg}</p>
+          {alertsLoading ? (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600" />
+              Carregando alertas...
             </div>
-          ))}
+          ) : activeAlerts.length === 0 ? (
+            <div className="flex items-start gap-3 p-4 rounded-lg border bg-green-50 border-green-200">
+              <span className="text-xl flex-shrink-0">✅</span>
+              <p className="text-sm text-green-800">Nenhum alerta ativo no momento. Tudo certo!</p>
+            </div>
+          ) : (
+            activeAlerts.map((alert) => {
+              const styleMap = {
+                critical: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-800', icon: '🚨' },
+                warning:  { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-800', icon: '⚠️' },
+                info:     { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', icon: '💡' },
+              };
+              const s = styleMap[alert.severity] ?? styleMap.info;
+              return (
+                <div
+                  key={alert.id ?? alert.key}
+                  className={`flex items-start gap-3 p-4 rounded-lg border ${s.bg} ${s.border}`}
+                >
+                  <span className="text-xl flex-shrink-0">{s.icon}</span>
+                  <div className="flex-1">
+                    <p className={`text-sm ${s.text}`}>{alert.message}</p>
+                    {alert.createdAt && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(alert.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>

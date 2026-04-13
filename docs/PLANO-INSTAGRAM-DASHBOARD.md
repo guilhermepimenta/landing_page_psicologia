@@ -352,11 +352,11 @@ export const instagramService = {
 
 | Status | # | Tarefa | Tipo | Arquivo | Descrição |
 |---|---|---|---|---|---|
-| 🔴 | 6.1 | Vercel Function de métricas | Backend | `api/instagram.ts` | `GET /api/instagram/metrics` → seguidores, alcance, impressões (30 dias) |
-| 🔴 | 6.2 | Insights por post | Backend | `api/instagram.ts` | `GET /api/instagram/insights/:id` → likes, comments, saves, shares, reach |
-| 🔴 | 6.3 | Painel de métricas | Frontend | `components/InstagramMetrics.tsx` | Cards (seguidores, alcance, engajamento) + gráfico evolução (Recharts) |
-| 🔴 | 6.4 | Top Posts + Melhor Horário | Frontend | `components/InstagramMetrics.tsx` | Ranking melhores posts + heatmap de horários |
-| 🔴 | 6.5 | Integrar na aba Analytics | Frontend | `components/Dashboard.tsx` | Sub-tab "Instagram" na aba Analytics |
+| ✅ | 6.1 | Vercel Function de métricas | Backend | `api/instagram-metrics.ts` | `GET /api/instagram-metrics` com seguidores, alcance, impressões e fallback por insights de mídia |
+| ✅ | 6.2 | Insights por post | Backend | `api/instagram-metrics.ts` | `GET /api/instagram-metrics?mediaId=:id` para likes/comments/saves/reach/impressions |
+| ✅ | 6.3 | Painel de métricas | Frontend | `components/InstagramMetrics.tsx` | Cards (seguidores, alcance, engajamento) + gráfico evolução (Recharts) |
+| ✅ | 6.4 | Top Posts + Melhor Horário | Frontend | `components/InstagramMetrics.tsx` | Ranking melhores posts + análise por horário |
+| ✅ | 6.5 | Integrar na aba Analytics | Frontend | `components/Dashboard.tsx` | Aba dedicada "Instagram" no dashboard |
 
 ### Detalhes técnicos:
 
@@ -385,7 +385,7 @@ export const instagramService = {
 | Status | # | Tarefa | Tipo | Arquivo | Descrição |
 |---|---|---|---|---|---|
 | 🔴 | 7.1 | Sugestão inteligente | Serviço | `services/aiContentService.ts` | IA analisa métricas Instagram + GA4 → sugere próximo tema e horário ideal |
-| 🔴 | 7.2 | Alertas proativos | Backend | `api/cron/alerts.ts` | Cron diário: "5 dias sem post" ou "engajamento caiu 20%" → badge no dashboard |
+| 🟡 | 7.2 | Alertas proativos | Backend | `api/cron/alerts.ts` + `api/lib/alertsEngine.ts` | Engine criada (sem post 5d, queda de engajamento 20%), trigger manual e badge na aba Analytics |
 | 🔴 | 7.3 | Relatório semanal por email | Backend | `api/cron/weekly-report.ts` | Toda segunda: resumo por email (SendGrid/Resend) |
 
 ### Detalhes técnicos:

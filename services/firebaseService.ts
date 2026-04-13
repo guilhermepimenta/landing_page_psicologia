@@ -73,6 +73,17 @@ export interface Profile {
   updatedAt?: Date;
 }
 
+export interface DashboardAlert {
+  id?: string;
+  key: string;
+  severity: 'warning' | 'critical' | 'info';
+  status: 'active' | 'resolved';
+  message: string;
+  source?: string;
+  createdAt?: Date;
+  resolvedAt?: Date;
+}
+
 // Posts Service
 export const postsService = {
   // Criar novo post
@@ -368,6 +379,49 @@ export const analyticsService = {
         data: { totalPosts: 0, totalEngagement: 0, newLeads: 0, conversions: 0 }
       };
     }
+  },
+};
+
+// Alerts Service (Sprint 7)
+export const alertsService = {
+  async getLatest(limitCount: number = 30) {
+    try {
+      const q = query(
+        collection(db, 'alerts'),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount)
+      );
+      const snapshot = await getDocs(q);
+      const alerts: DashboardAlert[] = [];
+
+      snapshot.forEach((d) => {
+        const data = d.data();
+        alerts.push({
+          id: d.id,
+          key: String(data.key ?? ''),
+          severity: (data.severity ?? 'warning') as DashboardAlert['severity'],
+          status: (data.status ?? 'active') as DashboardAlert['status'],
+          message: String(data.message ?? ''),
+          source: data.source,
+          createdAt: data.createdAt?.toDate?.(),
+          resolvedAt: data.resolvedAt?.toDate?.(),
+        });
+      });
+
+      return { success: true, data: alerts };
+    } catch (error) {
+      console.error('Erro ao buscar alertas:', error);
+      return { success: false, error, data: [] as DashboardAlert[] };
+    }
+  },
+
+  async getActive(limitCount: number = 30) {
+    const latest = await this.getLatest(limitCount);
+    if (!latest.success) return latest;
+    return {
+      success: true,
+      data: latest.data.filter((a) => a.status === 'active'),
+    };
   },
 };
 

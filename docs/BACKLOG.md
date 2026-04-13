@@ -1,6 +1,6 @@
 # Backlog — Dashboard Marketing Fernanda Psicologia
 
-> Última atualização: 07/03/2026
+> Última atualização: 13/04/2026
 > Legenda: 🔴 Não iniciado · 🟡 Em progresso · ✅ Concluído
 
 ---
@@ -34,9 +34,9 @@
 
 | Status | ID | Funcionalidade | Descrição |
 |---|---|---|---|
-| 🔴 | 3.1 | **Instagram Graph API** | Seguidores, alcance, impressões, engajamento por post |
-| 🔴 | 3.2 | **Top Posts** | Ranking dos posts com melhor desempenho |
-| 🔴 | 3.3 | **Melhor Horário** | Análise de quando o público está mais ativo |
+| ✅ | 3.1 | **Instagram Graph API** | Seguidores, alcance, impressões, engajamento por post |
+| ✅ | 3.2 | **Top Posts** | Ranking dos posts com melhor desempenho |
+| ✅ | 3.3 | **Melhor Horário** | Análise de quando o público está mais ativo |
 
 ---
 
@@ -48,7 +48,7 @@
 | 🔴 | 4.1 | **Agendamento Automático** | Post criado no dashboard → publicado automaticamente no horário definido |
 | 🔴 | 4.2 | **Sugestão Inteligente por IA** | IA analisa GA4 + Instagram e sugere o próximo post ideal |
 | 🔴 | 4.3 | **Relatório Semanal Automático** | Email toda segunda com resumo de desempenho da semana |
-| 🔴 | 4.4 | **Alertas Proativos** | Notificação se engajamento cair >20% ou se ficou >5 dias sem post |
+| 🟡 | 4.4 | **Alertas Proativos** | Notificação se engajamento cair >20% ou se ficou >5 dias sem post |
 
 ---
 
@@ -73,6 +73,10 @@
 | 2.1 | Google Search Console — API Vercel Function + serviço frontend + painel com cliques, impressões, CTR, posição, top páginas e queries |
 | 2.2 | Google My Business API — API Vercel Function + serviço frontend + painel com visualizações, ligações, rotas, cliques no site |
 | 2.3 | Painel Unificado Google — aba "Google" no Dashboard com sub-tabs Search Console e GMB |
+| 3.1 | Instagram Graph API — endpoint de métricas + conta conectada em produção |
+| 3.2 | Top Posts — ranking por engajamento na aba Instagram |
+| 3.3 | Melhor Horário — análise de engajamento por hora na aba Instagram |
+| 4.4 | Alertas Proativos (início) — engine backend + collection `alerts` + badge na aba Analytics |
 
 ---
 

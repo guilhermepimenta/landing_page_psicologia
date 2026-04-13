@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import { useAuth } from '../contexts/AuthContext';
-import { postsService, metricsService, analyticsService, messagesService, Post as FirebasePost } from '../services/firebaseService';
+import { postsService, metricsService, analyticsService, messagesService, alertsService, Post as FirebasePost } from '../services/firebaseService';
 import AIContentModal from './AIContentModal';
 import AnalyticsPanel from './AnalyticsPanel';
 import PostsManager from './PostsManager';
@@ -39,6 +39,7 @@ const Dashboard: React.FC = () => {
   const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'instagram' | 'google' | 'messages' | 'settings'>('overview');
   const [unreadCount, setUnreadCount] = useState(0);
+  const [activeAlertsCount, setActiveAlertsCount] = useState(0);
   const [showAIModal, setShowAIModal] = useState(false);
   const [metrics, setMetrics] = useState<Metric[]>(DEFAULT_METRICS);
   const [recentPosts, setRecentPosts] = useState<FirebasePost[]>([]);
@@ -76,8 +77,16 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
-    messagesService.getAll().then((r) => {
-      if (r.success) setUnreadCount(r.data.filter((m) => m.status === 'nova').length);
+    Promise.all([
+      messagesService.getAll(),
+      alertsService.getActive(),
+    ]).then(([messagesResult, alertsResult]) => {
+      if (messagesResult.success) {
+        setUnreadCount(messagesResult.data.filter((m) => m.status === 'nova').length);
+      }
+      if (alertsResult.success) {
+        setActiveAlertsCount(alertsResult.data.length);
+      }
     });
   }, []);
 
@@ -139,6 +148,11 @@ const Dashboard: React.FC = () => {
             >
               <span className="mr-1">{tab.icon}</span>
               {tab.label}
+              {tab.id === 'analytics' && activeAlertsCount > 0 && (
+                <span className="bg-amber-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
+                  {activeAlertsCount}
+                </span>
+              )}
               {tab.id === 'messages' && unreadCount > 0 && (
                 <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
                   {unreadCount}

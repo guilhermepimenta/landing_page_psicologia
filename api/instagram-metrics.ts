@@ -10,7 +10,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  *   → Retorna: insights detalhados de um post específico
  */
 
-const GRAPH_API = 'https://graph.instagram.com/v21.0';
+const IG_GRAPH_API = 'https://graph.instagram.com/v21.0';
+const FB_GRAPH_API = 'https://graph.facebook.com/v21.0';
 
 function getCredentials() {
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
@@ -21,9 +22,14 @@ function getCredentials() {
   return { accessToken, userId };
 }
 
-async function graphGet(path: string, params: Record<string, string>, accessToken: string) {
+async function graphGet(
+  path: string,
+  params: Record<string, string>,
+  accessToken: string,
+  baseUrl: string = IG_GRAPH_API,
+) {
   const query = new URLSearchParams({ ...params, access_token: accessToken });
-  const response = await fetch(`${GRAPH_API}${path}?${query.toString()}`);
+  const response = await fetch(`${baseUrl}${path}?${query.toString()}`);
   const data = (await response.json()) as any;
   if (!response.ok || data.error) {
     throw new Error(data.error?.message || `Graph API error: ${response.status}`);
@@ -45,22 +51,40 @@ async function getAccountInsights(userId: string, accessToken: string) {
   const now = Math.floor(Date.now() / 1000);
   const thirtyDaysAgo = now - 30 * 24 * 60 * 60;
 
-  try {
-    const data = await graphGet(
-      `/${userId}/insights`,
-      {
-        metric: 'impressions,reach,profile_views',
-        period: 'day',
-        since: String(thirtyDaysAgo),
-        until: String(now),
-      },
-      accessToken,
-    );
-    return data.data ?? [];
-  } catch {
-    // Insights may not be available for all account types
-    return [];
+  const attempts = [
+    { metric: 'impressions,reach,profile_views', baseUrl: IG_GRAPH_API, source: 'ig:impressions' },
+    { metric: 'impressions,reach,profile_views', baseUrl: FB_GRAPH_API, source: 'fb:impressions' },
+    { metric: 'views,reach,profile_views', baseUrl: IG_GRAPH_API, source: 'ig:views' },
+    { metric: 'views,reach,profile_views', baseUrl: FB_GRAPH_API, source: 'fb:views' },
+  ] as const;
+
+  const errors: string[] = [];
+
+  for (const attempt of attempts) {
+    try {
+      const data = await graphGet(
+        `/${userId}/insights`,
+        {
+          metric: attempt.metric,
+          period: 'day',
+          since: String(thirtyDaysAgo),
+          until: String(now),
+        },
+        accessToken,
+        attempt.baseUrl,
+      );
+
+      const rows = Array.isArray(data.data) ? data.data : [];
+      if (rows.length > 0) {
+        return { data: rows, source: attempt.source, errors };
+      }
+    } catch (e: any) {
+      errors.push(`${attempt.source}: ${String(e?.message ?? e)}`);
+    }
   }
+
+  // Insights may be restricted by account/token. The caller can fallback to media insights.
+  return { data: [] as any[], source: 'none', errors };
 }
 
 /* ── Recent media ─────────────────────────────────────────────────── */
@@ -75,20 +99,34 @@ async function getRecentMedia(userId: string, accessToken: string, limit = 25) {
 
 /* ── Per-media insights ───────────────────────────────────────────── */
 async function getMediaInsights(mediaId: string, accessToken: string) {
-  try {
-    const data = await graphGet(
-      `/${mediaId}/insights`,
-      { metric: 'impressions,reach,total_interactions,saved' },
-      accessToken,
-    );
-    const result: Record<string, number> = {};
-    for (const m of data.data ?? []) {
-      result[m.name] = m.values?.[0]?.value ?? 0;
+  const attempts = [
+    { metric: 'impressions,reach,total_interactions,saved', baseUrl: IG_GRAPH_API },
+    { metric: 'impressions,reach,total_interactions,saved', baseUrl: FB_GRAPH_API },
+    { metric: 'views,reach,total_interactions,saved', baseUrl: IG_GRAPH_API },
+    { metric: 'views,reach,total_interactions,saved', baseUrl: FB_GRAPH_API },
+  ] as const;
+
+  for (const attempt of attempts) {
+    try {
+      const data = await graphGet(
+        `/${mediaId}/insights`,
+        { metric: attempt.metric },
+        accessToken,
+        attempt.baseUrl,
+      );
+      const result: Record<string, number> = {};
+      for (const m of data.data ?? []) {
+        result[m.name] = m.values?.[0]?.value ?? 0;
+      }
+      if (Object.keys(result).length > 0) {
+        return result;
+      }
+    } catch {
+      // Try next source/metric combination.
     }
-    return result;
-  } catch {
-    return null;
   }
+
+  return null;
 }
 
 /* ── Handler ──────────────────────────────────────────────────────── */
@@ -117,11 +155,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Full dashboard payload
-    const [account, insights, media] = await Promise.all([
+    const [account, accountInsightsResult, media] = await Promise.all([
       getAccountInfo(userId, accessToken),
       getAccountInsights(userId, accessToken),
       getRecentMedia(userId, accessToken, 25),
     ]);
+
+    const insights = accountInsightsResult.data;
 
     // Fetch insights for top 10 media (parallel, limited)
     const mediaWithInsights = await Promise.all(
@@ -148,7 +188,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
-    const dailyData = Object.values(dailyMetrics).sort((a, b) => a.date.localeCompare(b.date));
+    let dailyData = Object.values(dailyMetrics).sort((a, b) => a.date.localeCompare(b.date));
+
+    let usedMediaFallback = false;
+
+    // If account-level insights are not available, aggregate from media insights by post day.
+    if (dailyData.length === 0) {
+      const fallback: Record<string, { date: string; impressions: number; reach: number; profileViews: number }> = {};
+      for (const m of mediaWithInsights) {
+        if (!m.timestamp || !m.insights) continue;
+        const date = String(m.timestamp).split('T')[0];
+        if (!date) continue;
+        if (!fallback[date]) {
+          fallback[date] = { date, impressions: 0, reach: 0, profileViews: 0 };
+        }
+
+        const impressions = Number(m.insights.impressions ?? m.insights.views ?? 0);
+        const reach = Number(m.insights.reach ?? 0);
+
+        fallback[date].impressions += Number.isFinite(impressions) ? impressions : 0;
+        fallback[date].reach += Number.isFinite(reach) ? reach : 0;
+      }
+
+      dailyData = Object.values(fallback).sort((a, b) => a.date.localeCompare(b.date));
+      usedMediaFallback = dailyData.length > 0;
+    }
 
     // Compute summary
     const totalImpressions = dailyData.reduce((s, d) => s + d.impressions, 0);
@@ -162,9 +226,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const sumField = (arr: typeof dailyData, field: 'impressions' | 'reach' | 'profileViews') =>
       arr.reduce((s, d) => s + d[field], 0) || 1;
 
-    const impressionsChange = Math.round(((sumField(secondHalf, 'impressions') / sumField(firstHalf, 'impressions')) - 1) * 100);
-    const reachChange = Math.round(((sumField(secondHalf, 'reach') / sumField(firstHalf, 'reach')) - 1) * 100);
-    const profileViewsChange = Math.round(((sumField(secondHalf, 'profileViews') / sumField(firstHalf, 'profileViews')) - 1) * 100);
+    const calcChange = (current: number, previous: number) => {
+      if (previous <= 0) return current > 0 ? 100 : 0;
+      return Math.round(((current / previous) - 1) * 100);
+    };
+
+    const impressionsChange = calcChange(sumField(secondHalf, 'impressions'), sumField(firstHalf, 'impressions'));
+    const reachChange = calcChange(sumField(secondHalf, 'reach'), sumField(firstHalf, 'reach'));
+    const profileViewsChange = calcChange(sumField(secondHalf, 'profileViews'), sumField(firstHalf, 'profileViews'));
 
     // Top posts by engagement (likes + comments)
     const topPosts = [...mediaWithInsights]
@@ -209,6 +278,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         impressionsChange,
         reachChange,
         profileViewsChange,
+      },
+      diagnostics: {
+        accountInsightsSource: accountInsightsResult.source,
+        usedMediaFallback,
+        accountInsightsErrors: accountInsightsResult.errors.slice(0, 4),
       },
       dailyData,
       topPosts,
