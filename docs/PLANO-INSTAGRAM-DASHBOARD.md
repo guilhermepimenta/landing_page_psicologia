@@ -385,8 +385,8 @@ export const instagramService = {
 | Status | # | Tarefa | Tipo | Arquivo | Descrição |
 |---|---|---|---|---|---|
 | 🔴 | 7.1 | Sugestão inteligente | Serviço | `services/aiContentService.ts` | IA analisa métricas Instagram + GA4 → sugere próximo tema e horário ideal |
-| 🟡 | 7.2 | Alertas proativos | Backend | `api/cron/alerts.ts` + `api/lib/alertsEngine.ts` | Engine criada (sem post 5d, queda de engajamento 20%), trigger manual e badge na aba Analytics |
-| 🔴 | 7.3 | Relatório semanal por email | Backend | `api/cron/weekly-report.ts` | Toda segunda: resumo por email (SendGrid/Resend) |
+| ✅ | 7.2 | Alertas proativos | Backend | `api/cron/alerts.ts` + `api/lib/alertsEngine.ts` | Engine ativa em produção com trigger manual, cron diário, collection `alerts` e badge na aba Analytics |
+| ✅ | 7.3 | Relatório semanal por email | Backend | `api/cron/weekly-report.ts` | Toda segunda: resumo por email via Resend com logs em `weekly_reports_logs` |
 
 ### Detalhes técnicos:
 
@@ -450,6 +450,8 @@ vercel.json                      ← Sprint 5.2, 7.2
 | `OPENROUTER_API_KEY` ou `OPENAI_API_KEY` | 2 | Cadastro em openrouter.ai ou platform.openai.com |
 | `VITE_GEMINI_API_KEY` | — | ✅ Já configurada |
 | `RESEND_API_KEY` | 7 | resend.com (gratuito até 100 emails/dia) |
+| `REPORT_EMAIL_TO` | 7 | Email destinatário do resumo semanal |
+| `REPORT_EMAIL_FROM` | 7 | Remetente autorizado no Resend (opcional; default: `onboarding@resend.dev`) |
 
 ---
 

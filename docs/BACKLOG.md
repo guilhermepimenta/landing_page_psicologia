@@ -47,8 +47,8 @@
 |---|---|---|---|
 | 🔴 | 4.1 | **Agendamento Automático** | Post criado no dashboard → publicado automaticamente no horário definido |
 | 🔴 | 4.2 | **Sugestão Inteligente por IA** | IA analisa GA4 + Instagram e sugere o próximo post ideal |
-| 🔴 | 4.3 | **Relatório Semanal Automático** | Email toda segunda com resumo de desempenho da semana |
-| 🟡 | 4.4 | **Alertas Proativos** | Notificação se engajamento cair >20% ou se ficou >5 dias sem post |
+| ✅ | 4.3 | **Relatório Semanal Automático** | Email toda segunda com resumo de desempenho da semana via Resend |
+| ✅ | 4.4 | **Alertas Proativos** | Notificação se engajamento cair >20% ou se ficou >5 dias sem post |
 
 ---
 
@@ -76,7 +76,8 @@
 | 3.1 | Instagram Graph API — endpoint de métricas + conta conectada em produção |
 | 3.2 | Top Posts — ranking por engajamento na aba Instagram |
 | 3.3 | Melhor Horário — análise de engajamento por hora na aba Instagram |
-| 4.4 | Alertas Proativos (início) — engine backend + collection `alerts` + badge na aba Analytics |
+| 4.3 | Relatório Semanal Automático — cron semanal + envio por Resend + logs em `weekly_reports_logs` |
+| 4.4 | Alertas Proativos — engine backend + collection `alerts` + badge na aba Analytics |
 
 ---
 

@@ -41,6 +41,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Logs de envio dos relatórios semanais: somente autenticado lê
+    match /weekly_reports_logs/{logId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
     // Bloquear qualquer outra coleção não listada
     match /{document=**} {
       allow read, write: if false;
