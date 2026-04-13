@@ -10,6 +10,7 @@ import ContentCalendar from './ContentCalendar';
 import IdeasBank from './IdeasBank';
 import ProfileSettings from './ProfileSettings';
 import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
+import InstagramMetrics from './InstagramMetrics';
 import MessagesInbox from './MessagesInbox';
 
 interface Metric {
@@ -36,7 +37,7 @@ const DEFAULT_METRICS: Metric[] = [
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'google' | 'messages' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'instagram' | 'google' | 'messages' | 'settings'>('overview');
   const [unreadCount, setUnreadCount] = useState(0);
   const [showAIModal, setShowAIModal] = useState(false);
   const [metrics, setMetrics] = useState<Metric[]>(DEFAULT_METRICS);
@@ -122,6 +123,7 @@ const Dashboard: React.FC = () => {
             { id: 'calendar', label: 'Calendário', icon: '📅' },
             { id: 'ideas', label: 'Banco de Ideias', icon: '💡' },
             { id: 'analytics', label: 'Analytics', icon: '📈' },
+            { id: 'instagram', label: 'Instagram', icon: '📱' },
             { id: 'google', label: 'Google', icon: '🔍' },
             { id: 'messages', label: 'Mensagens', icon: '✉️' },
             { id: 'settings', label: 'Configurações', icon: '⚙️' },
@@ -416,6 +418,8 @@ const Dashboard: React.FC = () => {
       {activeTab === 'analytics' && (
         <AnalyticsPanel metrics={metrics} />
       )}
+
+      {activeTab === 'instagram' && <InstagramMetrics />}
 
       {activeTab === 'google' && <SearchConsoleGMBPanel />}
 
