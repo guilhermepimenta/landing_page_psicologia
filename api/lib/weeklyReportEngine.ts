@@ -378,10 +378,17 @@ function buildEmailContent(start: Date, end: Date, stats: WeeklyStats) {
   return { text: lines.join('\n'), html };
 }
 
-function getEmailConfig(options?: RunOptions) {
+async function getStoredReportEmail(): Promise<string> {
+  const db = getAdminDb();
+  const profileSnap = await db.collection('settings').doc('profile').get();
+  if (!profileSnap.exists) return '';
+  return String(profileSnap.get('reportEmail') ?? '').trim();
+}
+
+async function getEmailConfig(options?: RunOptions) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = options?.from || process.env.REPORT_EMAIL_FROM || 'onboarding@resend.dev';
-  const to = options?.to || process.env.REPORT_EMAIL_TO || '';
+  const to = options?.to || process.env.REPORT_EMAIL_TO || await getStoredReportEmail();
 
   if (!apiKey) {
     throw new Error('RESEND_API_KEY não configurado');
@@ -436,13 +443,14 @@ export async function runWeeklyReport(
     const subject = buildSubject(start, end);
     const { html, text } = buildEmailContent(start, end, stats);
     const highlights = buildHighlights(stats);
+    const storedReportEmail = await getStoredReportEmail();
 
-    let recipient: string | null = options?.to || process.env.REPORT_EMAIL_TO || null;
+    let recipient: string | null = options?.to || process.env.REPORT_EMAIL_TO || storedReportEmail || null;
     let sendId: string | undefined;
     let sent = false;
 
     if (!dryRun) {
-      const emailConfig = getEmailConfig(options);
+      const emailConfig = await getEmailConfig(options);
       recipient = emailConfig.to;
       sendId = await sendViaResend(emailConfig, subject, html, text);
       sent = true;

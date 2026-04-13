@@ -7,6 +7,7 @@ const ProfileSettings: React.FC = () => {
   const [crp, setCrp] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [bio, setBio] = useState('');
+  const [reportEmail, setReportEmail] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -23,6 +24,7 @@ const ProfileSettings: React.FC = () => {
           setCrp(result.data.crp);
           setPhotoURL(result.data.photoURL || '');
           setBio(result.data.bio || '');
+          setReportEmail(result.data.reportEmail || '');
         }
       } catch (err) {
         console.error('Erro ao carregar perfil:', err);
@@ -39,6 +41,10 @@ const ProfileSettings: React.FC = () => {
       setError('O nome é obrigatório.');
       return;
     }
+    if (reportEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(reportEmail.trim())) {
+      setError('Informe um email válido para receber o relatório semanal.');
+      return;
+    }
     setSaving(true);
     setError(null);
     setSaved(false);
@@ -49,6 +55,7 @@ const ProfileSettings: React.FC = () => {
         crp: crp.trim(),
         photoURL: photoURL.trim(),
         bio: bio.trim(),
+        reportEmail: reportEmail.trim(),
       });
       if (result.success) {
         setSaved(true);
@@ -178,6 +185,18 @@ const ProfileSettings: React.FC = () => {
             <p className="text-xs text-gray-400 mt-1">Esses dados serão usados pela IA ao gerar conteúdo personalizado.</p>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email para relatório semanal</label>
+            <input
+              type="email"
+              value={reportEmail}
+              onChange={(e) => setReportEmail(e.target.value)}
+              placeholder="Ex: admin@fernandapsicologia.com"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+            />
+            <p className="text-xs text-gray-400 mt-1">Esse email fica apenas no dashboard privado e será usado pelo resumo semanal automático.</p>
+          </div>
+
           {/* Save */}
           <div className="flex justify-end pt-4 border-t border-gray-100">
             <button
@@ -202,7 +221,7 @@ const ProfileSettings: React.FC = () => {
       <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
         <p className="text-sm text-blue-800">
           💡 <strong>Dica:</strong> As informações do perfil (nome, especialidade, CRP) são utilizadas pela IA para gerar conteúdo
-          personalizado e profissional para suas redes sociais.
+          personalizado e profissional para suas redes sociais. O email do relatório semanal não aparece na landing page pública.
         </p>
       </div>
     </div>

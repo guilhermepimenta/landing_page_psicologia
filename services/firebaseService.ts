@@ -70,6 +70,7 @@ export interface Profile {
   crp: string;
   photoURL?: string;
   bio?: string;
+  reportEmail?: string;
   updatedAt?: Date;
 }
 
@@ -512,6 +513,7 @@ export const profileService = {
             crp: data.crp || '',
             photoURL: data.photoURL || '',
             bio: data.bio || '',
+            reportEmail: data.reportEmail || '',
             updatedAt: data.updatedAt?.toDate(),
           } as Profile,
         };
@@ -528,6 +530,7 @@ export const profileService = {
       const docRef = doc(db, 'settings', 'profile');
       await setDoc(docRef, {
         ...profile,
+        reportEmail: profile.reportEmail || '',
         updatedAt: Timestamp.now(),
       });
       return { success: true };
