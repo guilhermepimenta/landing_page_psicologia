@@ -29,6 +29,18 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null;
     }
 
+    // Alertas proativos: somente autenticado lê; escrita apenas pelo backend (admin SDK ignora regras)
+    match /alerts/{alertId} {
+      allow read: if request.auth != null;
+      allow write: if false; // escrito exclusivamente pelo Firebase Admin SDK
+    }
+
+    // Logs de execução dos alertas: somente autenticado lê
+    match /alerts_logs/{logId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
     // Bloquear qualquer outra coleção não listada
     match /{document=**} {
       allow read, write: if false;
