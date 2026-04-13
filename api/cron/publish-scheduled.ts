@@ -17,14 +17,14 @@ import { runPublishScheduled } from '../lib/cronPublisher.js';
 
 function isAuthorized(req: VercelRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return true;
+  if (!cronSecret) return req.method === 'GET';
   return req.headers.authorization === `Bearer ${cronSecret}`;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Cache-Control', 'no-store');
 
-  if (req.method !== 'GET') {
+  if (req.method !== 'GET' && req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
@@ -32,6 +32,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ success: false, error: 'Unauthorized' });
   }
 
-  const summary = await runPublishScheduled('cron', false);
+  const dryRun = req.method === 'POST' ? req.body?.dryRun !== false : false;
+  const triggeredBy = req.method === 'POST' ? 'manual' : 'cron';
+  const summary = await runPublishScheduled(triggeredBy, dryRun);
   return res.status(summary.success ? 200 : 500).json(summary);
 }

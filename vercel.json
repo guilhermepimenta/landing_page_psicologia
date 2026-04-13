@@ -15,6 +15,18 @@
     ],
     "rewrites": [
         {
+            "source": "/api/cron/trigger",
+            "destination": "/api/cron/publish-scheduled"
+        },
+        {
+            "source": "/api/cron/alerts-trigger",
+            "destination": "/api/cron/alerts"
+        },
+        {
+            "source": "/api/cron/weekly-report-trigger",
+            "destination": "/api/cron/weekly-report"
+        },
+        {
             "source": "/api/(.*)",
             "destination": "/api/$1"
         },
