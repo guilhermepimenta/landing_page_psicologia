@@ -77,7 +77,7 @@
 | 3.2 | Top Posts — ranking por engajamento na aba Instagram |
 | 3.3 | Melhor Horário — análise de engajamento por hora na aba Instagram |
 | 4.1 | Agendamento Automático — cron de publicação + trigger manual + indicador visual no calendário |
-| 4.2 | Sugestão Inteligente por IA — endpoint `/api/ai-suggestion` + card com tema/canal/horário no dashboard |
+| 4.2 | Sugestão Inteligente por IA — endpoint `/api/analytics?mode=suggestion` + card com tema/canal/horário no dashboard |
 | 4.3 | Relatório Semanal Automático — cron semanal + envio por Resend + logs em `weekly_reports_logs` |
 | 4.4 | Alertas Proativos — engine backend + collection `alerts` + badge na aba Analytics |
 

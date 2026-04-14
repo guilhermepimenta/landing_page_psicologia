@@ -12,7 +12,7 @@ export interface AISuggestion {
 }
 
 export async function getAISuggestion(): Promise<AISuggestion> {
-  const res = await fetch('/api/ai-suggestion');
+  const res = await fetch('/api/analytics?mode=suggestion');
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body?.error ?? `HTTP ${res.status}`);
