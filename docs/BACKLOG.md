@@ -45,7 +45,7 @@
 
 | Status | ID | Funcionalidade | Descrição |
 |---|---|---|---|
-| 🔴 | 4.1 | **Agendamento Automático** | Post criado no dashboard → publicado automaticamente no horário definido |
+| 🟡 | 4.1 | **Agendamento Automático** | Post criado no dashboard → publicado automaticamente no horário definido |
 | 🔴 | 4.2 | **Sugestão Inteligente por IA** | IA analisa GA4 + Instagram e sugere o próximo post ideal |
 | ✅ | 4.3 | **Relatório Semanal Automático** | Email toda segunda com resumo de desempenho da semana via Resend |
 | ✅ | 4.4 | **Alertas Proativos** | Notificação se engajamento cair >20% ou se ficou >5 dias sem post |

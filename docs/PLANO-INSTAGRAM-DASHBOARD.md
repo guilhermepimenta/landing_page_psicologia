@@ -311,8 +311,8 @@ export const instagramService = {
 
 | Status | # | Tarefa | Tipo | Arquivo | Descrição |
 |---|---|---|---|---|---|
-| 🔴 | 5.1 | Vercel Cron Function | Backend | `api/cron/publish-scheduled.ts` | A cada 15 min: busca posts `scheduled` cuja data passou → publica → atualiza Firestore |
-| 🔴 | 5.2 | Configurar Cron no vercel.json | Config | `vercel.json` | `crons: [{ path, schedule }]` |
+| ✅ | 5.1 | Vercel Cron Function | Backend | `api/cron/publish-scheduled.ts` | A cada 15 min: busca posts `scheduled` cuja data passou → publica → atualiza Firestore |
+| ✅ | 5.2 | Configurar Cron no vercel.json | Config | `vercel.json` | `crons: [{ path, schedule }]` |
 | 🔴 | 5.3 | Indicador visual de auto-publicação | Frontend | `components/ContentCalendar.tsx` | Ícone de relógio + tooltip "Será publicado automaticamente" |
 
 ### Detalhes técnicos:
