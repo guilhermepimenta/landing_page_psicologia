@@ -12,6 +12,7 @@ import ProfileSettings from './ProfileSettings';
 import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
 import InstagramMetrics from './InstagramMetrics';
 import MessagesInbox from './MessagesInbox';
+import { getAISuggestion, AISuggestion } from '../services/aiSuggestionService';
 
 interface Metric {
   channel: string;
@@ -45,6 +46,9 @@ const Dashboard: React.FC = () => {
   const [recentPosts, setRecentPosts] = useState<FirebasePost[]>([]);
   const [weeklySummary, setWeeklySummary] = useState<WeeklySummary>({ totalPosts: 0, totalEngagement: 0, newLeads: 0, conversions: 0 });
   const [loadingData, setLoadingData] = useState(true);
+  const [aiSuggestion, setAiSuggestion] = useState<AISuggestion | null>(null);
+  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
+  const [suggestionError, setSuggestionError] = useState<string | null>(null);
 
   const fetchDashboardData = async () => {
     setLoadingData(true);
@@ -88,6 +92,15 @@ const Dashboard: React.FC = () => {
         setActiveAlertsCount(alertsResult.data.length);
       }
     });
+
+    setLoadingSuggestion(true);
+    getAISuggestion()
+      .then((data) => {
+        setAiSuggestion(data);
+        setSuggestionError(null);
+      })
+      .catch((err) => setSuggestionError(String(err?.message ?? 'Falha ao gerar sugestao')))
+      .finally(() => setLoadingSuggestion(false));
   }, []);
 
   const getStatusBadge = (status: FirebasePost['status'] | 'idea') => {
@@ -345,6 +358,71 @@ const Dashboard: React.FC = () => {
               <h3 className="font-bold text-xl mb-2">Ver Relatórios</h3>
               <p className="text-sm text-green-100">Analytics completo com insights acionáveis</p>
             </button>
+          </div>
+
+          {/* Sugestao inteligente */}
+          <div className="bg-white rounded-xl shadow-md p-6 border border-purple-100">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                <span className="mr-2">🤖</span>
+                Sugestao Inteligente da Semana
+              </h2>
+              <button
+                onClick={() => {
+                  setLoadingSuggestion(true);
+                  getAISuggestion()
+                    .then((data) => {
+                      setAiSuggestion(data);
+                      setSuggestionError(null);
+                    })
+                    .catch((err) => setSuggestionError(String(err?.message ?? 'Falha ao atualizar sugestao')))
+                    .finally(() => setLoadingSuggestion(false));
+                }}
+                className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+              >
+                Atualizar
+              </button>
+            </div>
+
+            {loadingSuggestion ? (
+              <p className="text-sm text-gray-500">Gerando sugestao com IA...</p>
+            ) : suggestionError ? (
+              <p className="text-sm text-red-600">{suggestionError}</p>
+            ) : aiSuggestion ? (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">{aiSuggestion.channel}</span>
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">{aiSuggestion.bestDay} {aiSuggestion.bestHour}</span>
+                  <span className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full font-medium">Confianca: {aiSuggestion.confidence}%</span>
+                  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full font-medium">
+                    Fonte: {aiSuggestion.source === 'ai' ? 'IA' : 'Heuristica'}
+                  </span>
+                </div>
+
+                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <p className="text-sm font-semibold text-purple-900">Tema sugerido</p>
+                  <p className="text-sm text-purple-800 mt-1">{aiSuggestion.topic}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-xs text-gray-500 font-medium uppercase">Formato</p>
+                    <p className="text-sm text-gray-800 mt-1">{aiSuggestion.postFormat}</p>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-xs text-gray-500 font-medium uppercase">CTA recomendado</p>
+                    <p className="text-sm text-gray-800 mt-1">{aiSuggestion.cta}</p>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                  <p className="text-xs text-amber-700 font-medium uppercase">Justificativa</p>
+                  <p className="text-sm text-amber-900 mt-1">{aiSuggestion.rationale}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Nenhuma sugestao gerada ainda.</p>
+            )}
           </div>
 
           {/* Performance por Tipo de Conteúdo */}

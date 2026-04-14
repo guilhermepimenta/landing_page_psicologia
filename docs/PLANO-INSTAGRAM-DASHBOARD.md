@@ -384,7 +384,7 @@ export const instagramService = {
 
 | Status | # | Tarefa | Tipo | Arquivo | Descrição |
 |---|---|---|---|---|---|
-| 🔴 | 7.1 | Sugestão inteligente | Serviço | `services/aiContentService.ts` | IA analisa métricas Instagram + GA4 → sugere próximo tema e horário ideal |
+| ✅ | 7.1 | Sugestão inteligente | Serviço | `api/ai-suggestion.ts` + `services/aiSuggestionService.ts` | IA analisa histórico de posts/métricas e sugere próximo tema, canal e horário ideal |
 | ✅ | 7.2 | Alertas proativos | Backend | `api/cron/alerts.ts` + `api/lib/alertsEngine.ts` | Engine ativa em produção com trigger manual, cron diário, collection `alerts` e badge na aba Analytics |
 | ✅ | 7.3 | Relatório semanal por email | Backend | `api/cron/weekly-report.ts` | Toda segunda: resumo por email via Resend com logs em `weekly_reports_logs` |
 
