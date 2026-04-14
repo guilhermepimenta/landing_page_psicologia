@@ -49,6 +49,7 @@
 | ✅ | 4.2 | **Sugestão Inteligente por IA** | IA analisa histórico de posts/métricas e sugere próximo tema, canal e melhor horário |
 | ✅ | 4.3 | **Relatório Semanal Automático** | Email toda segunda com resumo de desempenho da semana via Resend |
 | ✅ | 4.4 | **Alertas Proativos** | Notificação se engajamento cair >20% ou se ficou >5 dias sem post |
+| ✅ | 4.5 | **Preview Pré-Publicação (Post/Reel)** | Usuário visualiza e confirma o conteúdo final antes de publicar ou agendar no Instagram |
 
 ---
 
@@ -80,6 +81,7 @@
 | 4.2 | Sugestão Inteligente por IA — endpoint `/api/analytics?mode=suggestion` + card com tema/canal/horário no dashboard |
 | 4.3 | Relatório Semanal Automático — cron semanal + envio por Resend + logs em `weekly_reports_logs` |
 | 4.4 | Alertas Proativos — engine backend + collection `alerts` + badge na aba Analytics |
+| 4.5 | Preview Pré-Publicação (Post/Reel) — preview em tempo real + confirmação obrigatória antes de publicar/agendar |
 
 ---
 

@@ -5,6 +5,8 @@ interface InstagramPreviewProps {
   displayName: string;
   caption: string;
   imageUrls: string[];
+  format?: 'post' | 'reel';
+  videoUrl?: string;
   publishDate: Date;
 }
 
@@ -13,6 +15,8 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({
   displayName,
   caption,
   imageUrls,
+  format = 'post',
+  videoUrl,
   publishDate,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -21,15 +25,17 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({
     setActiveIndex(0);
   }, [imageUrls]);
 
+  const isReel = format === 'reel';
   const hasImages = imageUrls.length > 0;
+  const hasVideo = Boolean(videoUrl);
   const currentImage = imageUrls[activeIndex];
   const initials = useMemo(
     () => displayName.split(' ').filter(Boolean).slice(0, 2).map((word) => word[0]).join('').toUpperCase(),
     [displayName],
   );
 
-  const canGoPrev = activeIndex > 0;
-  const canGoNext = activeIndex < imageUrls.length - 1;
+  const canGoPrev = !isReel && activeIndex > 0;
+  const canGoNext = !isReel && activeIndex < imageUrls.length - 1;
 
   const goPrev = () => {
     if (canGoPrev) {
@@ -67,7 +73,35 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({
         </div>
 
         <div className="relative aspect-square bg-gray-100">
-          {hasImages ? (
+          {isReel ? (
+            hasVideo ? (
+              <video
+                src={videoUrl}
+                className="w-full h-full object-cover"
+                controls
+                muted
+                playsInline
+              />
+            ) : hasImages ? (
+              <>
+                <img
+                  src={currentImage}
+                  alt="Preview da capa do reel"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-14 h-14 rounded-full bg-black/55 text-white flex items-center justify-center text-2xl">
+                    ▶
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                <span className="text-4xl mb-2">🎬</span>
+                <p className="text-xs">Adicione URL do video para visualizar o Reel</p>
+              </div>
+            )
+          ) : hasImages ? (
             <img
               src={currentImage}
               alt={`Preview imagem ${activeIndex + 1}`}
@@ -80,7 +114,7 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({
             </div>
           )}
 
-          {imageUrls.length > 1 && (
+          {!isReel && imageUrls.length > 1 && (
             <>
               <button
                 type="button"
@@ -117,7 +151,7 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({
         </div>
 
         <div className="p-3 space-y-2">
-          {imageUrls.length > 1 && (
+          {!isReel && imageUrls.length > 1 && (
             <div className="flex justify-center gap-1">
               {imageUrls.map((_, index) => (
                 <span
@@ -131,6 +165,10 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({
           <p className="text-xs text-gray-800 leading-relaxed whitespace-pre-wrap break-words">
             <span className="font-semibold mr-1">{username}</span>
             {caption || 'A legenda aparecerá aqui conforme você digita o conteúdo do post.'}
+          </p>
+
+          <p className="text-[11px] text-gray-500">
+            {isReel ? 'Formato: Reel' : imageUrls.length > 1 ? 'Formato: Carrossel' : 'Formato: Post'}
           </p>
 
           <p className="text-[11px] text-gray-400 uppercase tracking-wide">
