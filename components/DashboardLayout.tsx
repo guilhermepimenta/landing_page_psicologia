@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-type TabId = 'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'google' | 'settings';
+type TabId = 'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'google' | 'instagram' | 'messages' | 'settings';
 
 interface DashboardLayoutProps {
   children: ReactNode;
