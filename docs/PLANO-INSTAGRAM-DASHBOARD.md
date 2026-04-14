@@ -250,12 +250,14 @@ export interface Post {
 
 | Status | # | Tarefa | Tipo | Arquivo | Descrição |
 |---|---|---|---|---|---|
-| 🔴 | 3.1 | Componente de preview | Frontend | `components/InstagramPreview.tsx` | Simula visual do feed (foto perfil, nome, imagem, legenda, hashtags) |
-| 🔴 | 3.2 | Integrar no PostFormModal | Frontend | `components/PostFormModal.tsx` | Aba/painel "Preview" ao lado do formulário, atualiza em tempo real |
-| 🔴 | 3.3 | Preview de carrossel | Frontend | `components/InstagramPreview.tsx` | Setas para navegar entre imagens, indicador de posição |
+| ✅ | 3.1 | Componente de preview | Frontend | `components/InstagramPreview.tsx` | Simula visual do feed (foto perfil, nome, imagem, legenda, hashtags) |
+| ✅ | 3.2 | Integrar no PostFormModal | Frontend | `components/PostFormModal.tsx` | Aba/painel "Preview" ao lado do formulário, atualiza em tempo real |
+| ✅ | 3.3 | Preview de carrossel | Frontend | `components/InstagramPreview.tsx` | Setas para navegar entre imagens, indicador de posição |
+| ✅ | 3.4 | Preview de Reel | Frontend | `components/InstagramPreview.tsx` + `components/PostFormModal.tsx` | Simula thumbnail/capa, legenda e CTA do Reel antes de publicar |
+| ✅ | 3.5 | Confirmação obrigatória pré-publicação | Frontend | `components/PostFormModal.tsx` | Exigir confirmação de preview final (Post/Reel) antes de publicar ou agendar |
 
 ### Entrega:
-> Fernanda vê exatamente como o post ficará no Instagram antes de publicar.
+> Fernanda vê exatamente como o Post ou Reel ficará no Instagram antes de publicar/agendar.
 
 ---
 
@@ -269,7 +271,7 @@ export interface Post {
 | 🔴 | 4.1 | Vercel Function de publicação | Backend | `api/instagram.ts` | `POST /api/instagram/publish` → Graph API (single image + carousel) |
 | 🔴 | 4.2 | Suporte a carrossel | Backend | `api/instagram.ts` | Múltiplas imagens → endpoint CAROUSEL da Graph API |
 | 🔴 | 4.3 | Serviço frontend Instagram | Serviço | `services/instagramService.ts` | `publishPost(imageUrls, caption) → { id, permalink }` |
-| 🔴 | 4.4 | Botão "Publicar no Instagram" | Frontend | `components/PostFormModal.tsx` + `PostsManager.tsx` | Confirmação com preview → publica → salva `instagramPostId` no Firestore |
+| 🔴 | 4.4 | Botão "Publicar no Instagram" | Frontend | `components/PostFormModal.tsx` + `PostsManager.tsx` | Confirmação com preview obrigatório (Post/Reel) → publica → salva `instagramPostId` no Firestore |
 | 🔴 | 4.5 | Status visual diferenciado | Frontend | `components/PostsManager.tsx` | "📱 Publicado no Instagram" vs "✏️ Rascunho local" |
 
 ### Detalhes técnicos:
@@ -311,7 +313,7 @@ export const instagramService = {
 
 | Status | # | Tarefa | Tipo | Arquivo | Descrição |
 |---|---|---|---|---|---|
-| ✅ | 5.1 | Vercel Cron Function | Backend | `api/cron/publish-scheduled.ts` | A cada 15 min: busca posts `scheduled` cuja data passou → publica → atualiza Firestore |
+| ✅ | 5.1 | Vercel Cron Function | Backend | `api/cron/publish-scheduled.ts` | Execução diária (Hobby): busca posts `scheduled` cuja data passou → publica → atualiza Firestore |
 | ✅ | 5.2 | Configurar Cron no vercel.json | Config | `vercel.json` | `crons: [{ path, schedule }]` |
 | ✅ | 5.3 | Indicador visual de auto-publicação | Frontend | `components/ContentCalendar.tsx` | Ícone de relógio + tooltip "Será publicado automaticamente" |
 
@@ -323,7 +325,7 @@ export const instagramService = {
   "crons": [
     {
       "path": "/api/cron/publish-scheduled",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 9 * * *"
     }
   ]
 }
@@ -384,7 +386,7 @@ export const instagramService = {
 
 | Status | # | Tarefa | Tipo | Arquivo | Descrição |
 |---|---|---|---|---|---|
-| ✅ | 7.1 | Sugestão inteligente | Serviço | `api/ai-suggestion.ts` + `services/aiSuggestionService.ts` | IA analisa histórico de posts/métricas e sugere próximo tema, canal e horário ideal |
+| ✅ | 7.1 | Sugestão inteligente | Serviço | `api/analytics.ts?mode=suggestion` + `services/aiSuggestionService.ts` | IA analisa histórico de posts/métricas e sugere próximo tema, canal e horário ideal |
 | ✅ | 7.2 | Alertas proativos | Backend | `api/cron/alerts.ts` + `api/lib/alertsEngine.ts` | Engine ativa em produção com trigger manual, cron diário, collection `alerts` e badge na aba Analytics |
 | ✅ | 7.3 | Relatório semanal por email | Backend | `api/cron/weekly-report.ts` | Toda segunda: resumo por email via Resend com logs em `weekly_reports_logs` |
 
@@ -394,7 +396,7 @@ export const instagramService = {
 ```json
 {
   "crons": [
-    { "path": "/api/cron/publish-scheduled", "schedule": "*/15 * * * *" },
+    { "path": "/api/cron/publish-scheduled", "schedule": "0 9 * * *" },
     { "path": "/api/cron/alerts", "schedule": "0 9 * * *" },
     { "path": "/api/cron/weekly-report", "schedule": "0 8 * * 1" }
   ]
