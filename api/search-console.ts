@@ -13,6 +13,42 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 import { google } from 'googleapis';
 
+function normalizeGSCError(error: any): string {
+  const raw = String(
+    error?.response?.data?.error?.message
+      ?? error?.message
+      ?? 'Erro ao consultar Search Console',
+  );
+  const lower = raw.toLowerCase();
+
+  if (
+    lower.includes('has not been used in project')
+    || lower.includes('accessnotconfigured')
+    || lower.includes('api has not been used')
+    || lower.includes('service_disabled')
+  ) {
+    return 'Google Search Console API nao habilitada no projeto GCP. Ative a API no Google Cloud Console e aguarde alguns minutos para propagacao.';
+  }
+
+  if (
+    lower.includes('insufficient permission')
+    || lower.includes('permission denied')
+    || lower.includes('forbidden')
+  ) {
+    return 'Permissao insuficiente no Search Console. Adicione o email da service account como proprietario/permissao total da propriedade e tente novamente.';
+  }
+
+  if (lower.includes('not found')) {
+    return 'Propriedade nao encontrada no Search Console. Verifique GSC_SITE_URL e confirme que a propriedade existe.';
+  }
+
+  if (lower.includes('private key')) {
+    return 'Chave privada invalida. Revise GSC_PRIVATE_KEY no Vercel (com quebras de linha corretas).';
+  }
+
+  return raw;
+}
+
 function getAuth() {
   const clientEmail = process.env.GSC_CLIENT_EMAIL || process.env.GA4_CLIENT_EMAIL;
   const privateKey = (process.env.GSC_PRIVATE_KEY || process.env.GA4_PRIVATE_KEY)?.replace(/\\n/g, '\n');
@@ -167,6 +203,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (error: any) {
     console.error('Search Console API error:', error);
-    return res.status(500).json({ error: error?.message ?? 'Erro ao consultar Search Console' });
+    return res.status(500).json({ error: normalizeGSCError(error) });
   }
 }

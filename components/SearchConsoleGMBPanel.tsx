@@ -51,6 +51,30 @@ const FALLBACK_GMB_SUMMARY: GMBSummary = {
   viewsChange: 14.2, clicksChange: 8.5, callsChange: -3.1, directionsChange: 22.0,
 };
 
+const EMPTY_GSC_SUMMARY: GSCSummary = {
+  clicks: 0,
+  impressions: 0,
+  ctr: 0,
+  position: 0,
+  clicksChange: 0,
+  impressionsChange: 0,
+  ctrChange: 0,
+  positionChange: 0,
+};
+
+const EMPTY_GMB_SUMMARY: GMBSummary = {
+  totalViews: 0,
+  searchViews: 0,
+  mapsViews: 0,
+  websiteClicks: 0,
+  callClicks: 0,
+  directionRequests: 0,
+  viewsChange: 0,
+  clicksChange: 0,
+  callsChange: 0,
+  directionsChange: 0,
+};
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const COLORS_GSC = ['#6366f1', '#0ea5e9', '#10b981', '#f59e0b'];
@@ -88,19 +112,19 @@ const SearchConsoleGMBPanel: React.FC = () => {
   const [subTab, setSubTab] = useState<SubTab>('search-console');
 
   // GSC state
-  const [gscDaily, setGscDaily] = useState<GSCDailyRow[]>(FALLBACK_GSC_DAILY);
-  const [gscPages, setGscPages] = useState<GSCPageRow[]>(FALLBACK_GSC_PAGES);
-  const [gscQueries, setGscQueries] = useState<GSCQueryRow[]>(FALLBACK_GSC_QUERIES);
-  const [gscSummary, setGscSummary] = useState<GSCSummary>(FALLBACK_GSC_SUMMARY);
-  const [gscMock, setGscMock] = useState(false);
+  const [gscDaily, setGscDaily] = useState<GSCDailyRow[]>([]);
+  const [gscPages, setGscPages] = useState<GSCPageRow[]>([]);
+  const [gscQueries, setGscQueries] = useState<GSCQueryRow[]>([]);
+  const [gscSummary, setGscSummary] = useState<GSCSummary>(EMPTY_GSC_SUMMARY);
+  const [gscMock, setGscMock] = useState(gscDevMode);
   const [gscLoading, setGscLoading] = useState(true);
   const [gscError, setGscError] = useState<string | null>(null);
 
   // GMB state
-  const [gmbDaily, setGmbDaily] = useState<GMBDailyView[]>(FALLBACK_GMB_DAILY);
-  const [gmbSummary, setGmbSummary] = useState<GMBSummary>(FALLBACK_GMB_SUMMARY);
+  const [gmbDaily, setGmbDaily] = useState<GMBDailyView[]>([]);
+  const [gmbSummary, setGmbSummary] = useState<GMBSummary>(EMPTY_GMB_SUMMARY);
   const [gmbLocationTitle, setGmbLocationTitle] = useState<string | null>(null);
-  const [gmbMock, setGmbMock] = useState(false);
+  const [gmbMock, setGmbMock] = useState(gmbDevMode);
   const [gmbLoading, setGmbLoading] = useState(true);
   const [gmbError, setGmbError] = useState<string | null>(null);
 
@@ -109,15 +133,28 @@ const SearchConsoleGMBPanel: React.FC = () => {
     setGscError(null);
     getGSCData()
       .then(data => {
-        if (data.dailyData.length) setGscDaily(data.dailyData);
-        if (data.topPages.length) setGscPages(data.topPages);
-        if (data.topQueries.length) setGscQueries(data.topQueries);
+        setGscDaily(data.dailyData);
+        setGscPages(data.topPages);
+        setGscQueries(data.topQueries);
         setGscSummary(data.summary);
         setGscMock(false);
       })
       .catch(err => {
-        setGscError(String(err?.message ?? 'Erro'));
-        setGscMock(true);
+        const message = String(err?.message ?? 'Erro');
+        setGscError(message);
+        if (message === '__dev_mode__') {
+          setGscDaily(FALLBACK_GSC_DAILY);
+          setGscPages(FALLBACK_GSC_PAGES);
+          setGscQueries(FALLBACK_GSC_QUERIES);
+          setGscSummary(FALLBACK_GSC_SUMMARY);
+          setGscMock(true);
+        } else {
+          setGscDaily([]);
+          setGscPages([]);
+          setGscQueries([]);
+          setGscSummary(EMPTY_GSC_SUMMARY);
+          setGscMock(false);
+        }
       })
       .finally(() => setGscLoading(false));
   };
@@ -127,15 +164,26 @@ const SearchConsoleGMBPanel: React.FC = () => {
     setGmbError(null);
     getGMBData()
       .then(data => {
-        if (data.dailyViews.length) setGmbDaily(data.dailyViews);
+        setGmbDaily(data.dailyViews);
         setGmbSummary(data.summary);
-        if (data.location?.title) setGmbLocationTitle(data.location.title);
+        setGmbLocationTitle(data.location?.title ?? null);
         setGmbMock(false);
         if (data.error) setGmbError(data.error);
       })
       .catch(err => {
-        setGmbError(String(err?.message ?? 'Erro'));
-        setGmbMock(true);
+        const message = String(err?.message ?? 'Erro');
+        setGmbError(message);
+        if (message === '__dev_mode__') {
+          setGmbDaily(FALLBACK_GMB_DAILY);
+          setGmbSummary(FALLBACK_GMB_SUMMARY);
+          setGmbLocationTitle('Dados de demonstracao');
+          setGmbMock(true);
+        } else {
+          setGmbDaily([]);
+          setGmbSummary(EMPTY_GMB_SUMMARY);
+          setGmbLocationTitle(null);
+          setGmbMock(false);
+        }
       })
       .finally(() => setGmbLoading(false));
   };
@@ -146,20 +194,20 @@ const SearchConsoleGMBPanel: React.FC = () => {
   const StatusBanner = ({ mock, error, devMode, onRetry, source }: {
     mock: boolean; error: string | null; devMode: boolean; onRetry: () => void; source: string;
   }) => {
-    if (!mock) return (
+    if (!error) return (
       <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2">
         <span>✅</span>
         <p className="text-sm text-green-800 font-medium">Dados reais do {source}</p>
         <button onClick={onRetry} className="ml-auto text-xs text-green-700 underline hover:text-green-900">Atualizar</button>
       </div>
     );
-    const isDev = devMode && error === '__dev_mode__';
+    const isDev = devMode && mock && error === '__dev_mode__';
     return (
       <div className={`border rounded-xl p-4 flex items-start gap-3 ${isDev ? 'bg-blue-50 border-blue-200' : 'bg-amber-50 border-amber-200'}`}>
         <span className="text-xl flex-shrink-0">{isDev ? '🖥️' : '📋'}</span>
         <div className="flex-1">
           <p className={`text-sm font-semibold ${isDev ? 'text-blue-800' : 'text-amber-800'}`}>
-            {isDev ? 'Ambiente de desenvolvimento — dados de demonstração' : `Erro ao conectar com ${source}: ${error}`}
+            {isDev ? 'Ambiente de desenvolvimento — dados de demonstracao' : `Erro ao conectar com ${source}: ${error}`}
           </p>
           <p className={`text-xs mt-1 ${isDev ? 'text-blue-700' : 'text-amber-700'}`}>
             {isDev ? `Em produção (Vercel), os dados reais do ${source} serão carregados.` : 'Verifique as variáveis de ambiente no Vercel Dashboard.'}
