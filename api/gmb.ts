@@ -14,6 +14,41 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 import { google } from 'googleapis';
 
+function normalizeGMBError(error: any): string {
+  const raw = String(
+    error?.response?.data?.error?.message
+      ?? error?.message
+      ?? 'Erro ao consultar Google Meu Negocio',
+  );
+  const lower = raw.toLowerCase();
+
+  if (
+    lower.includes('service_disabled')
+    || lower.includes('api has not been used')
+    || lower.includes('has not been used in project')
+  ) {
+    return 'Google Business Profile Performance API nao habilitada no projeto GCP. Ative a API no Google Cloud Console e aguarde alguns minutos para propagacao.';
+  }
+
+  if (
+    lower.includes('insufficient permission')
+    || lower.includes('permission denied')
+    || lower.includes('forbidden')
+  ) {
+    return 'Permissao insuficiente no Google Meu Negocio. Adicione a service account como gerente/proprietario do perfil e confira os escopos de acesso.';
+  }
+
+  if (lower.includes('not found')) {
+    return 'Conta ou localizacao nao encontrada. Verifique GMB_ACCOUNT_ID e GMB_LOCATION_ID no Vercel.';
+  }
+
+  if (lower.includes('private key')) {
+    return 'Chave privada invalida. Revise GMB_PRIVATE_KEY no Vercel (com quebras de linha corretas).';
+  }
+
+  return raw;
+}
+
 function getAuth() {
   const clientEmail = process.env.GMB_CLIENT_EMAIL || process.env.GA4_CLIENT_EMAIL;
   const privateKey = (process.env.GMB_PRIVATE_KEY || process.env.GA4_PRIVATE_KEY)?.replace(/\\n/g, '\n');
@@ -150,7 +185,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           directionsChange: 0,
         },
         dailyViews: [],
-        error: 'Performance API indisponível — verifique se a API está habilitada no Google Cloud Console.',
+        error: normalizeGMBError(perfErr),
       });
     }
 
@@ -238,6 +273,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (error: any) {
     console.error('GMB API error:', error);
-    return res.status(500).json({ error: error?.message ?? 'Erro ao consultar Google Meu Negócio' });
+    return res.status(500).json({ error: normalizeGMBError(error) });
   }
 }
