@@ -20,11 +20,13 @@ export interface Post {
   id?: string;
   title: string;
   channel: 'Instagram' | 'GMB' | 'Blog' | 'Email';
+  format?: 'post' | 'reel';
   status: 'published' | 'scheduled' | 'draft';
   date: Date;
   content?: string;
   engagement?: number;
   imageUrls?: string[];
+  videoUrl?: string;
   instagramPostId?: string;
   instagramPermalink?: string;
   createdAt?: Date;
@@ -35,11 +37,13 @@ const mapPost = (id: string, data: any): Post => ({
   id,
   title: data.title,
   channel: data.channel,
+  format: data.format ?? 'post',
   status: data.status,
   date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
   content: data.content,
   engagement: data.engagement,
   imageUrls: Array.isArray(data.imageUrls) ? data.imageUrls : [],
+  videoUrl: data.videoUrl,
   instagramPostId: data.instagramPostId,
   instagramPermalink: data.instagramPermalink,
   createdAt: data.createdAt?.toDate?.(),

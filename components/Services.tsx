@@ -85,7 +85,7 @@ export const Services: React.FC = () => {
               <Share2 size={18} />
             </button>
             <div className="mb-6 transform transition-transform duration-300 group-hover:scale-110 p-4 bg-[#4A5D4A]/5 rounded-full group-hover:bg-[#4A5D4A]/10">
-              {React.cloneElement(service.icon as React.ReactElement, { className: "text-[#4A5D4A]", size: 32 })}
+              {React.cloneElement(service.icon as React.ReactElement<{ className?: string; size?: number }>, { className: "text-[#4A5D4A]", size: 32 })}
             </div>
             <h3 className="text-xl font-serif text-[#4A5D4A] mb-4 group-hover:text-[#2C3E2C] transition-colors">{service.title}</h3>
             <p className="text-gray-500 text-sm leading-relaxed">{service.desc}</p>

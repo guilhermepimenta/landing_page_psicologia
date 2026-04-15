@@ -13,6 +13,7 @@ interface PostFormModalProps {
 
 const CHANNELS: Array<Post['channel']> = ['Instagram', 'GMB', 'Blog', 'Email'];
 const STATUSES: Array<Post['status']> = ['draft', 'scheduled', 'published'];
+const FORMATS: Array<'post' | 'reel'> = ['post', 'reel'];
 
 const STATUS_LABELS = {
   draft: 'Rascunho',
@@ -20,9 +21,15 @@ const STATUS_LABELS = {
   published: 'Publicado',
 };
 
+const FORMAT_LABELS = {
+  post: 'Post/Carrossel',
+  reel: 'Reel',
+};
+
 const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToEdit }) => {
   const [title, setTitle] = useState(postToEdit?.title || '');
   const [channel, setChannel] = useState<Post['channel']>(postToEdit?.channel || 'Instagram');
+  const [format, setFormat] = useState<'post' | 'reel'>(postToEdit?.format || 'post');
   const [status, setStatus] = useState<Post['status']>(postToEdit?.status || 'draft');
   const [date, setDate] = useState<string>(
     postToEdit?.date 
@@ -31,7 +38,9 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
   );
   const [content, setContent] = useState(postToEdit?.content || '');
   const [existingImageUrls, setExistingImageUrls] = useState<string[]>(postToEdit?.imageUrls || []);
+  const [videoUrl, setVideoUrl] = useState(postToEdit?.videoUrl || '');
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [isPreviewConfirmed, setIsPreviewConfirmed] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [instagramSuccess, setInstagramSuccess] = useState<string | null>(null);
@@ -50,11 +59,27 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
 
   const previewImages = [...existingImageUrls, ...pendingPreviewUrls];
   const previewDate = new Date(date);
+  const isInstagram = channel === 'Instagram';
+  const isReel = isInstagram && format === 'reel';
 
   useEffect(() => {
     setExistingImageUrls(postToEdit?.imageUrls || []);
+    setVideoUrl(postToEdit?.videoUrl || '');
+    setFormat(postToEdit?.format || 'post');
     setPendingFiles([]);
+    setIsPreviewConfirmed(false);
   }, [postToEdit]);
+
+  useEffect(() => {
+    if (channel !== 'Instagram') {
+      setFormat('post');
+      setIsPreviewConfirmed(false);
+    }
+  }, [channel]);
+
+  useEffect(() => {
+    setIsPreviewConfirmed(false);
+  }, [title, content, date, format, videoUrl, existingImageUrls, pendingFiles]);
 
   const uploadAndBuildData = async (): Promise<Omit<Post, 'id' | 'createdAt' | 'updatedAt'> & { instagramPostId?: string; instagramPermalink?: string }> => {
     const uploadedUrls = pendingFiles.length > 0
@@ -64,11 +89,13 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
     return {
       title,
       channel,
+      format,
       status,
       date: new Date(date),
       content,
       engagement: postToEdit?.engagement || 0,
       imageUrls: [...existingImageUrls, ...uploadedUrls],
+      videoUrl: videoUrl.trim() || undefined,
       instagramPostId: postToEdit?.instagramPostId,
       instagramPermalink: postToEdit?.instagramPermalink,
     };
@@ -79,6 +106,23 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
     if (!title) {
       setError('O título é obrigatório.');
       return;
+    }
+    if (isInstagram && status !== 'draft' && !isPreviewConfirmed) {
+      setError('Confirme o preview final antes de publicar ou agendar no Instagram.');
+      return;
+    }
+    if (isInstagram && status !== 'draft') {
+      if (isReel && !videoUrl.trim()) {
+        setError('Informe a URL do vídeo para publicar/agendar como Reel.');
+        return;
+      }
+      if (!isReel) {
+        const totalImages = existingImageUrls.length + pendingFiles.length;
+        if (totalImages === 0) {
+          setError('Adicione ao menos uma imagem para publicar/agendar no Instagram.');
+          return;
+        }
+      }
     }
 
     setIsSaving(true);
@@ -109,10 +153,20 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
       setError('O título é obrigatório antes de publicar.');
       return;
     }
-    const allImages = [...existingImageUrls, ...pendingFiles.map(() => '')];
-    if (allImages.length === 0) {
-      setError('Adicione ao menos uma imagem para publicar no Instagram.');
+    if (!isPreviewConfirmed) {
+      setError('Confirme o preview final antes de publicar no Instagram.');
       return;
+    }
+    if (isReel && !videoUrl.trim()) {
+      setError('Informe a URL do vídeo para visualizar e publicar como Reel.');
+      return;
+    }
+    if (!isReel) {
+      const allImages = [...existingImageUrls, ...pendingFiles.map(() => '')];
+      if (allImages.length === 0) {
+        setError('Adicione ao menos uma imagem para publicar no Instagram.');
+        return;
+      }
     }
 
     setIsPublishing(true);
@@ -123,6 +177,10 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
       // 1. Fazer upload das imagens pendentes e montar os dados do post
       const postData = await uploadAndBuildData();
       const finalImageUrls = postData.imageUrls ?? [];
+
+      if (isReel) {
+        throw new Error('Publicação automática de Reel será disponibilizada em seguida. O preview já está habilitado.');
+      }
 
       if (finalImageUrls.length === 0) {
         throw new Error('Adicione ao menos uma imagem para publicar no Instagram.');
@@ -211,6 +269,21 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
               </select>
               </div>
 
+              {isInstagram && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Formato Instagram</label>
+                  <select
+                    value={format}
+                    onChange={(e) => setFormat(e.target.value as 'post' | 'reel')}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all bg-white"
+                  >
+                    {FORMATS.map((item) => (
+                      <option key={item} value={item}>{FORMAT_LABELS[item]}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               {/* Status */}
               <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
@@ -249,6 +322,20 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
               />
               </div>
 
+              {isReel && (
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">URL do vídeo (Reel)</label>
+                  <input
+                    type="url"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    placeholder="https://.../video.mp4"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Use uma URL pública de vídeo para visualizar o reel antes de publicar.</p>
+                </div>
+              )}
+
               <div className="md:col-span-2">
               <ImageUploader
                 existingUrls={existingImageUrls}
@@ -270,8 +357,24 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                 displayName="Fernanda Mangia"
                 caption={content}
                 imageUrls={previewImages}
+                format={format}
+                videoUrl={videoUrl}
                 publishDate={Number.isNaN(previewDate.getTime()) ? new Date() : previewDate}
               />
+
+              {isInstagram && (
+                <label className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                  <input
+                    type="checkbox"
+                    checked={isPreviewConfirmed}
+                    onChange={(e) => setIsPreviewConfirmed(e.target.checked)}
+                    className="mt-0.5"
+                  />
+                  <span>
+                    Confirmo que revisei o preview final deste {isReel ? 'Reel' : 'Post'} antes de publicar ou agendar.
+                  </span>
+                </label>
+              )}
             </div>
           </div>
         </form>
