@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { MapPin, Monitor, Calendar } from 'lucide-react';
 import { sendGAEvent } from '../utils/analytics';
+import { buildWhatsAppUrl } from '../utils/useWhatsAppUrl';
 
 type Tab = 'niteroi' | 'nova-friburgo' | 'online';
 
@@ -18,26 +19,22 @@ const tabContent: Record<Tab, {
   address: string;
   schedule: string;
   services: string[];
-  whatsappMsg: string;
   psicomanager?: boolean;
 }> = {
   'niteroi': {
     address: 'Rua Mem de Sá, 34 — Icaraí, Niterói - RJ',
     schedule: 'Segunda a sexta · Sábados a combinar',
     services: ['Terapia Individual', 'Avaliação Psicológica e Neuropsicológica', 'Orientação Vocacional'],
-    whatsappMsg: '[Site - Agendamento Niterói] Olá Fernanda, gostaria de agendar uma consulta presencial em Niterói.',
   },
   'nova-friburgo': {
     address: 'Rua Dr. Ernesto Brasilio, 51 — Centro, Nova Friburgo - RJ',
     schedule: 'Dias e horários a confirmar',
     services: ['Terapia Individual', 'Avaliação Psicológica e Neuropsicológica', 'Orientação Vocacional'],
-    whatsappMsg: '[Site - Agendamento Nova Friburgo] Olá Fernanda, gostaria de agendar uma consulta presencial em Nova Friburgo.',
   },
   'online': {
     address: 'Atendimento para todo o Brasil via videoconferência',
     schedule: 'Segunda a sexta · Sábados a combinar',
     services: ['Terapia Individual', 'Orientação Vocacional', 'Avaliação Psicológica'],
-    whatsappMsg: '[Site - Agendamento Online] Olá Fernanda, gostaria de agendar uma consulta online.',
     psicomanager: true,
   },
 };
@@ -52,9 +49,19 @@ export const Scheduling: React.FC = () => {
   };
 
   const handleScheduleClick = () => {
-    const msg = encodeURIComponent(content.whatsappMsg);
+    const siteLabels: Record<Tab, string> = {
+      niteroi: 'Site - Agendamento Niterói',
+      'nova-friburgo': 'Site - Agendamento Nova Friburgo',
+      online: 'Site - Agendamento Online',
+    };
+    const messages: Record<Tab, string> = {
+      niteroi: 'Olá Fernanda, gostaria de agendar uma consulta presencial em Niterói.',
+      'nova-friburgo': 'Olá Fernanda, gostaria de agendar uma consulta presencial em Nova Friburgo.',
+      online: 'Olá Fernanda, gostaria de agendar uma consulta online.',
+    };
+    const url = buildWhatsAppUrl(siteLabels[activeTab], messages[activeTab]);
     sendGAEvent(`agendar_whatsapp_${activeTab}`, 'agendamento', 'whatsapp');
-    window.open(`https://wa.me/5521971318289?text=${msg}`, '_blank');
+    window.open(url, '_blank');
   };
 
   const handleDoctoraliaClick = () => {
