@@ -1,5 +1,5 @@
 import React from 'react';
-import { GraduationCap, Brain, ClipboardCheck, Monitor, MapPin } from 'lucide-react';
+import { GraduationCap, Brain, ClipboardCheck, Monitor, MapPin, ShieldCheck } from 'lucide-react';
 
 const credentials = [
   { icon: <GraduationCap size={16} />, text: 'Mestra em Saúde Coletiva · UFF' },
@@ -7,6 +7,7 @@ const credentials = [
   { icon: <ClipboardCheck size={16} />, text: 'Avaliação Psicológica e Neuropsicológica' },
   { icon: <Monitor size={16} />, text: 'Online e Presencial' },
   { icon: <MapPin size={16} />, text: 'Niterói · Nova Friburgo' },
+  { icon: <ShieldCheck size={16} />, text: 'CRP 05/31299' },
 ];
 
 export const AuthorityBar: React.FC = () => {
