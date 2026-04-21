@@ -15,72 +15,96 @@ export const Footer: React.FC = () => {
           <p className="text-gray-400 text-sm">
             Desenvolvido com carinho para o seu bem estar.
           </p>
-          <div className="flex gap-4 mt-8">
+          <a
+            href="https://www.doctoralia.com.br/fernanda-abreu-mangia/psicologo/niteroi"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-8 p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
+            title="Doctoralia"
+          >
+            <div className="w-5 h-5 flex items-center justify-center font-bold text-xs italic">d</div>
+          </a>
+        </div>
+
+        {/* Clinics Info */}
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-6 bg-[#B4C2B4]"></div>
+            <h3 className="text-lg font-bold tracking-wider">Consultórios</h3>
+          </div>
+
+          <div className="space-y-8">
+            <div className="flex gap-4 items-start">
+              <div className="mt-1 bg-white/5 p-2 rounded-lg text-[#B4C2B4]">
+                <MapPin size={18} />
+              </div>
+              <div>
+                <h4 className="font-bold text-[#B4C2B4] mb-1 uppercase text-[10px] tracking-[0.2em]">Niterói</h4>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Rua Mem de Sá, 34 - Icaraí<br />
+                  Niterói - RJ
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4 items-start">
+              <div className="mt-1 bg-white/5 p-2 rounded-lg text-[#B4C2B4]">
+                <MapPin size={18} />
+              </div>
+              <div>
+                <h4 className="font-bold text-[#B4C2B4] mb-1 uppercase text-[10px] tracking-[0.2em]">Nova Friburgo</h4>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Rua Dr. Ernesto Brasilio, 51 - Centro<br />
+                  Nova Friburgo - RJ
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Conteúdo & Redes */}
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-6 bg-[#B4C2B4]"></div>
+            <h3 className="text-lg font-bold tracking-wider">Conteúdo & Redes</h3>
+          </div>
+
+          <p className="text-gray-400 text-sm leading-relaxed mb-6">
+            Além do consultório, a Fernanda compartilha orientações práticas sobre saúde mental, desenvolvimento emocional e relacionamentos.
+          </p>
+
+          <div className="flex flex-col gap-3">
+            <a
+              href="https://www.youtube.com/watch?v=nLVA7YeejEI"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
+            >
+              <svg width="18" height="13" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M19.582 2.186A2.506 2.506 0 0 0 17.82.418C16.254 0 10 0 10 0S3.746 0 2.18.418A2.506 2.506 0 0 0 .418 2.186C0 3.755 0 7 0 7s0 3.245.418 4.814a2.506 2.506 0 0 0 1.762 1.768C3.746 14 10 14 10 14s6.254 0 7.82-.418a2.506 2.506 0 0 0 1.762-1.768C20 10.245 20 7 20 7s0-3.245-.418-4.814ZM7.991 9.999V4.001L13.182 7 7.99 9.999Z" fill="#FF0000" />
+              </svg>
+              3 Passos Para Fortalecer o Vínculo com seu Filho
+            </a>
+
             <a
               href="https://www.instagram.com/fernandamangiapsi/"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
-              title="Instagram"
+              className="flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
             >
-              <Instagram size={20} />
+              <Instagram size={18} className="text-pink-400 shrink-0" />
+              @fernandamangiapsi
             </a>
+
             <a
               href="https://www.linkedin.com/in/fernanda-abreu-mangia-a4b68849/"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
-              title="LinkedIn"
+              className="flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
             >
-              <Linkedin size={20} />
+              <Linkedin size={18} className="text-blue-400 shrink-0" />
+              LinkedIn — Fernanda Mangia
             </a>
-            <a
-              href="https://www.doctoralia.com.br/fernanda-abreu-mangia/psicologo/niteroi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
-              title="Doctoralia"
-            >
-              <div className="w-5 h-5 flex items-center justify-center font-bold text-xs italic">d</div>
-            </a>
-          </div>
-        </div>
-
-        {/* Clinics Info */}
-        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-8">
-          <div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-1 h-6 bg-[#B4C2B4]"></div>
-              <h3 className="text-lg font-bold tracking-wider">Consultórios</h3>
-            </div>
-
-            <div className="space-y-8">
-              <div className="flex gap-4 items-start">
-                <div className="mt-1 bg-white/5 p-2 rounded-lg text-[#B4C2B4]">
-                  <MapPin size={18} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-[#B4C2B4] mb-1 uppercase text-[10px] tracking-[0.2em]">Niterói</h4>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    Rua Mem de Sá, 34 - Icaraí<br />
-                    Niterói - RJ
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 items-start">
-                <div className="mt-1 bg-white/5 p-2 rounded-lg text-[#B4C2B4]">
-                  <MapPin size={18} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-[#B4C2B4] mb-1 uppercase text-[10px] tracking-[0.2em]">Nova Friburgo</h4>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    Rua Dr. Ernesto Brasilio, 51 - Centro<br />
-                    Nova Friburgo - RJ
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

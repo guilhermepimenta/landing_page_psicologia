@@ -11,7 +11,6 @@ import { Testimonials } from './Testimonials';
 import { Footer } from './Footer';
 import { AIChatAssistant } from './AIChatAssistant';
 import { AuthorityBar } from './AuthorityBar';
-import { MediaContent } from './MediaContent';
 import { HowItWorks } from './HowItWorks';
 
 export const LandingPage: React.FC = () => {
@@ -78,10 +77,6 @@ export const LandingPage: React.FC = () => {
 
                 <section id="como-funciona" aria-label="Como funciona a avaliação neuropsicológica" className="py-20 bg-white scroll-mt-20">
                     <HowItWorks />
-                </section>
-
-                <section id="conteudo" aria-label="Conteúdos e participações" className="py-20 bg-[#F9F8F6] scroll-mt-20">
-                    <MediaContent />
                 </section>
 
                 <section id="servicos" aria-label="Serviços de Psicologia" className="relative scroll-mt-20 bg-[#F9F8F6]">
