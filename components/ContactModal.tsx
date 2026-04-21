@@ -61,7 +61,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ onClose }) => {
     setSending(true);
     try {
       await messagesService.create(formData);
-      sendGAEvent('envio_formulario_contato', 'contato', 'modal');
+      sendGAEvent('envio_formulario_contato', 'contato', 'footer');
       setSent(true);
       setFormData({ name: '', email: '', phone: '', message: '' });
       setTimeout(() => { setSent(false); onClose(); }, 3000);

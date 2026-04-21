@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Instagram, Linkedin, MapPin, X, Mail } from 'lucide-react';
 import { ContactModal } from './ContactModal';
+import { sendGAEvent } from '../utils/analytics';
 
 const YouTubeModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   useEffect(() => {
@@ -121,7 +122,7 @@ export const Footer: React.FC = () => {
 
           <div className="flex flex-col gap-3">
             <button
-              onClick={() => setVideoOpen(true)}
+              onClick={() => { setVideoOpen(true); sendGAEvent('abrir_video_youtube', 'media', 'footer'); }}
               className="flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold px-4 py-3 rounded-xl transition-colors text-left w-full"
             >
               <svg width="18" height="13" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="shrink-0">
@@ -134,6 +135,7 @@ export const Footer: React.FC = () => {
               href="https://www.instagram.com/fernandamangiapsi/"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => sendGAEvent('ver_instagram', 'media', 'footer')}
               className="flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
             >
               <Instagram size={18} className="text-pink-400 shrink-0" />
@@ -159,7 +161,7 @@ export const Footer: React.FC = () => {
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <button
-            onClick={() => setContactOpen(true)}
+            onClick={() => { setContactOpen(true); sendGAEvent('abrir_modal_contato', 'contato', 'footer'); }}
             className="inline-flex items-center gap-2 border border-white/20 hover:border-white/40 text-white/70 hover:text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
           >
             <Mail size={15} />
