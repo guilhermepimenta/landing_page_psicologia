@@ -63,7 +63,7 @@ export const HowItWorks: React.FC = () => {
 
       <div className="mt-14 text-center">
         <a
-          href="https://wa.me/5521971318289"
+          href={`https://wa.me/5521971318289?text=${encodeURIComponent('[Site - Como Funciona] Olá Fernanda, vi como funciona a avaliação e gostaria de iniciar o processo.')}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block bg-[#4A5D4A] hover:bg-[#3A4A3A] text-white px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
