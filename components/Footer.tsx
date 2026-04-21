@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Instagram, Linkedin, MapPin, X, Mail } from 'lucide-react';
 import { ContactModal } from './ContactModal';
 import { sendGAEvent } from '../utils/analytics';
+import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 
 const YouTubeModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   useEffect(() => {
@@ -46,6 +47,7 @@ const YouTubeModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 export const Footer: React.FC = () => {
   const [videoOpen, setVideoOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const waUrl = useWhatsAppUrl('Site - Rodapé', 'Olá Fernanda, vim pelo site e gostaria de agendar uma consulta.');
 
   return (
     <>
@@ -168,7 +170,7 @@ export const Footer: React.FC = () => {
             Enviar uma mensagem
           </button>
           <a
-            href={`https://wa.me/5521971318289?text=${encodeURIComponent('[Site - Rodapé] Olá Fernanda, vim pelo site e gostaria de agendar uma consulta.')}`}
+            href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm font-bold px-5 py-2.5 rounded-full transition-colors shadow-md"

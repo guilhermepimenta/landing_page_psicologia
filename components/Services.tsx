@@ -2,6 +2,7 @@
 import React from 'react';
 import { User, Activity, Brain, Heart, Wind, ClipboardCheck, GraduationCap } from 'lucide-react';
 import { sendGAEvent } from '../utils/analytics';
+import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 
 const featuredService = {
   title: 'Avaliação Psicológica e Neuropsicológica',
@@ -44,6 +45,8 @@ const serviceList = [
 ];
 
 export const Services: React.FC = () => {
+  const waUrl = useWhatsAppUrl('Site - Avaliação', 'Olá Fernanda, vim pelo site e gostaria de saber mais sobre a Avaliação Neuropsicológica.');
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-16">
@@ -67,7 +70,7 @@ export const Services: React.FC = () => {
           <p className="text-gray-500 text-sm leading-relaxed">{featuredService.desc}</p>
         </div>
         <a
-          href={`https://wa.me/5521971318289?text=${encodeURIComponent('[Site - Avaliação] Olá Fernanda, vim pelo site e gostaria de saber mais sobre a Avaliação Neuropsicológica.')}`}
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => sendGAEvent('agendar_avaliacao_neuropsicologica', 'servicos', 'whatsapp')}

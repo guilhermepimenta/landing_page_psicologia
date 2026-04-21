@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { sendGAEvent } from '../utils/analytics';
+import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 import { Navbar } from './Navbar';
 import { Hero } from './Hero';
 import { Bio } from './Bio';
@@ -14,6 +15,7 @@ import { HowItWorks } from './HowItWorks';
 
 export const LandingPage: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
+    const waFloatingUrl = useWhatsAppUrl('Site - Botão Fixo', 'Olá Fernanda, vim pelo site e gostaria de agendar uma consulta.');
 
     useEffect(() => {
         const handleScroll = () => {
@@ -108,7 +110,7 @@ export const LandingPage: React.FC = () => {
 
             {/* Fixed WhatsApp Button */}
             <a
-                href={`https://wa.me/5521971318289?text=${encodeURIComponent('[Site - Botão Fixo] Olá Fernanda, vim pelo site e gostaria de agendar uma consulta.')}`}
+                href={waFloatingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => sendGAEvent('whatsapp_flutuante', 'floating', 'whatsapp')}
