@@ -1,9 +1,52 @@
 
-import React from 'react';
-import { Instagram, Linkedin, MapPin } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Instagram, Linkedin, MapPin, X } from 'lucide-react';
+
+const YouTubeModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-3xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute -top-10 right-0 text-white/70 hover:text-white transition-colors flex items-center gap-1 text-sm"
+          aria-label="Fechar vídeo"
+        >
+          <X size={18} /> Fechar
+        </button>
+        <div className="rounded-2xl overflow-hidden shadow-2xl aspect-video">
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/nLVA7YeejEI?autoplay=1"
+            title="3 Passos Para Fortalecer o Vínculo com seu Filho — Fernanda Mangia"
+            style={{ border: 'none' }}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const Footer: React.FC = () => {
+  const [videoOpen, setVideoOpen] = useState(false);
+
   return (
+    <>
+      {videoOpen && <YouTubeModal onClose={() => setVideoOpen(false)} />}
     <footer className="bg-[#1C1C1C] text-white pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
         {/* Branding */}
@@ -74,17 +117,15 @@ export const Footer: React.FC = () => {
           </p>
 
           <div className="flex flex-col gap-3">
-            <a
-              href="https://www.youtube.com/watch?v=nLVA7YeejEI"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold px-4 py-3 rounded-xl transition-colors"
+            <button
+              onClick={() => setVideoOpen(true)}
+              className="flex items-center gap-3 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold px-4 py-3 rounded-xl transition-colors text-left w-full"
             >
-              <svg width="18" height="13" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <svg width="18" height="13" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="shrink-0">
                 <path d="M19.582 2.186A2.506 2.506 0 0 0 17.82.418C16.254 0 10 0 10 0S3.746 0 2.18.418A2.506 2.506 0 0 0 .418 2.186C0 3.755 0 7 0 7s0 3.245.418 4.814a2.506 2.506 0 0 0 1.762 1.768C3.746 14 10 14 10 14s6.254 0 7.82-.418a2.506 2.506 0 0 0 1.762-1.768C20 10.245 20 7 20 7s0-3.245-.418-4.814ZM7.991 9.999V4.001L13.182 7 7.99 9.999Z" fill="#FF0000" />
               </svg>
               3 Passos Para Fortalecer o Vínculo com seu Filho
-            </a>
+            </button>
 
             <a
               href="https://www.instagram.com/fernandamangiapsi/"
@@ -124,5 +165,6 @@ export const Footer: React.FC = () => {
         </a>
       </div>
     </footer>
+    </>
   );
 };
