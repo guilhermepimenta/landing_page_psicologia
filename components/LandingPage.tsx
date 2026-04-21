@@ -12,6 +12,7 @@ import { Footer } from './Footer';
 import { AIChatAssistant } from './AIChatAssistant';
 import { AuthorityBar } from './AuthorityBar';
 import { MediaContent } from './MediaContent';
+import { HowItWorks } from './HowItWorks';
 
 export const LandingPage: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -73,6 +74,10 @@ export const LandingPage: React.FC = () => {
 
                 <section id="sobre" aria-label="Sobre a Psicóloga" className="pt-20 pb-20 bg-white scroll-mt-48">
                     <Bio />
+                </section>
+
+                <section id="como-funciona" aria-label="Como funciona a avaliação neuropsicológica" className="py-20 bg-white scroll-mt-20">
+                    <HowItWorks />
                 </section>
 
                 <section id="conteudo" aria-label="Conteúdos e participações" className="py-20 bg-[#F9F8F6] scroll-mt-20">
