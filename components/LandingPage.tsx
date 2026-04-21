@@ -108,7 +108,7 @@ export const LandingPage: React.FC = () => {
 
             {/* Fixed WhatsApp Button */}
             <a
-                href="https://wa.me/5521971318289"
+                href={`https://wa.me/5521971318289?text=${encodeURIComponent('[Site - Botão Fixo] Olá Fernanda, vim pelo site e gostaria de agendar uma consulta.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => sendGAEvent('whatsapp_flutuante', 'floating', 'whatsapp')}

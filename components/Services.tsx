@@ -67,7 +67,7 @@ export const Services: React.FC = () => {
           <p className="text-gray-500 text-sm leading-relaxed">{featuredService.desc}</p>
         </div>
         <a
-          href="https://wa.me/5521971318289?text=Olá%20Dra.%20Fernanda%2C%20gostaria%20de%20agendar%20uma%20Avaliação%20Neuropsicológica."
+          href={`https://wa.me/5521971318289?text=${encodeURIComponent('[Site - Avaliação] Olá Fernanda, vim pelo site e gostaria de saber mais sobre a Avaliação Neuropsicológica.')}`}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => sendGAEvent('agendar_avaliacao_neuropsicologica', 'servicos', 'whatsapp')}

@@ -29,7 +29,7 @@ export const Hero: React.FC = () => {
         </p>
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
           <a
-            href="https://wa.me/5521971318289"
+            href={`https://wa.me/5521971318289?text=${encodeURIComponent('[Site - Início] Olá Fernanda, vim pelo site e gostaria de agendar uma consulta.')}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => sendGAEvent('agendar_consulta_hero', 'hero', 'whatsapp')}

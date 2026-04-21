@@ -25,19 +25,19 @@ const tabContent: Record<Tab, {
     address: 'Rua Mem de Sá, 34 — Icaraí, Niterói - RJ',
     schedule: 'Segunda a sexta · Sábados a combinar',
     services: ['Terapia Individual', 'Avaliação Psicológica e Neuropsicológica', 'Orientação Vocacional'],
-    whatsappMsg: 'Olá Dra. Fernanda, gostaria de agendar uma consulta presencial em Niterói.',
+    whatsappMsg: '[Site - Agendamento Niterói] Olá Fernanda, gostaria de agendar uma consulta presencial em Niterói.',
   },
   'nova-friburgo': {
     address: 'Rua Dr. Ernesto Brasilio, 51 — Centro, Nova Friburgo - RJ',
     schedule: 'Dias e horários a confirmar',
     services: ['Terapia Individual', 'Avaliação Psicológica e Neuropsicológica', 'Orientação Vocacional'],
-    whatsappMsg: 'Olá Dra. Fernanda, gostaria de agendar uma consulta presencial em Nova Friburgo.',
+    whatsappMsg: '[Site - Agendamento Nova Friburgo] Olá Fernanda, gostaria de agendar uma consulta presencial em Nova Friburgo.',
   },
   'online': {
     address: 'Atendimento para todo o Brasil via videoconferência',
     schedule: 'Segunda a sexta · Sábados a combinar',
     services: ['Terapia Individual', 'Orientação Vocacional', 'Avaliação Psicológica'],
-    whatsappMsg: 'Olá Dra. Fernanda, gostaria de agendar uma consulta online.',
+    whatsappMsg: '[Site - Agendamento Online] Olá Fernanda, gostaria de agendar uma consulta online.',
     psicomanager: true,
   },
 };
