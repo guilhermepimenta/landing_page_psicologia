@@ -14,6 +14,12 @@ export const Hero: React.FC = () => {
       </div>
 
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-28 md:pt-56 pb-20">
+        <div className="flex justify-center mb-6">
+          <span className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/25 text-white text-sm font-semibold px-5 py-2 rounded-full shadow-md">
+            <span className="text-yellow-400 text-base leading-none">★★★★★</span>
+            4,8 · mais de 153 avaliações no Google
+          </span>
+        </div>
         <h1 className="text-4xl md:text-7xl text-white font-serif leading-tight mb-8 drop-shadow-xl animate-fadeIn">
           Você merece se sentir bem consigo mesmo
         </h1>
