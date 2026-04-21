@@ -95,9 +95,6 @@ export const Services: React.FC = () => {
         ))}
       </div>
 
-      <p className="text-center mt-10 text-white/60 italic text-sm">
-        Entre em contato para saber mais sobre como posso te ajudar!
-      </p>
     </div>
   );
 };

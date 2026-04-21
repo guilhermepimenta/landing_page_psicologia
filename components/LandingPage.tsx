@@ -6,7 +6,6 @@ import { Bio } from './Bio';
 import { Services } from './Services';
 import { Scheduling } from './Scheduling';
 import { Blog } from './Blog';
-import { Contact } from './Contact';
 import { Testimonials } from './Testimonials';
 import { Footer } from './Footer';
 import { AIChatAssistant } from './AIChatAssistant';
@@ -37,7 +36,7 @@ export const LandingPage: React.FC = () => {
 
     // Visualização de seção — dispara uma vez por seção quando entra na tela
     useEffect(() => {
-        const sections = ['inicio', 'sobre', 'conteudo', 'servicos', 'agendamento', 'blog', 'contato', 'depoimentos'];
+        const sections = ['inicio', 'sobre', 'como-funciona', 'servicos', 'agendamento', 'blog', 'depoimentos'];
         const seen = new Set<string>();
 
         const observer = new IntersectionObserver(
@@ -92,10 +91,6 @@ export const LandingPage: React.FC = () => {
 
                 <section id="blog" aria-label="Blog de Psicologia" className="bg-[#F9F8F6] py-20 scroll-mt-20">
                     <Blog />
-                </section>
-
-                <section id="contato" aria-label="Formulário de Contato" className="py-20 bg-[#F7F5F2] scroll-mt-20">
-                    <Contact />
                 </section>
 
                 <section id="depoimentos" aria-label="Depoimentos de Pacientes" className="relative scroll-mt-20 bg-[#F9F8F6]">

@@ -142,46 +142,35 @@ export const Scheduling: React.FC = () => {
                 Agendar pelo WhatsApp
               </button>
 
-              <a
-                href={DOCTORALIA_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleDoctoraliaClick}
-                className="flex items-center justify-center gap-2 bg-[#4A90E2] hover:bg-[#357ABD] text-white font-bold px-7 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg active:scale-95 text-sm"
-              >
-                Agendar no Doctoralia
-              </a>
-
-              {content.psicomanager && (
+              <div className="flex flex-col gap-1.5 pt-1">
                 <a
-                  href={PSICOMANAGER_URL}
+                  href={DOCTORALIA_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={handlePsicomanagerClick}
-                  className="flex items-center justify-center gap-2 bg-[#6C63FF] hover:bg-[#574fd6] text-white font-bold px-7 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg active:scale-95 text-sm"
+                  onClick={handleDoctoraliaClick}
+                  className="text-center text-xs text-gray-400 hover:text-[#4A5D4A] underline underline-offset-2 transition-colors"
                 >
-                  Agendar pelo PsicoManager
+                  Prefere agendar pelo Doctoralia?
                 </a>
-              )}
-
-              {/* Avaliação destaque */}
-              <a
-                href={`https://wa.me/5521971318289?text=${encodeURIComponent('Olá Dra. Fernanda, gostaria de informações sobre a Avaliação Neuropsicológica ' + (activeTab === 'online' ? 'online.' : activeTab === 'nova-friburgo' ? 'em Nova Friburgo.' : 'em Niterói.'))}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => sendGAEvent(`agendar_avaliacao_neuropsicologica_${activeTab}`, 'agendamento', 'whatsapp')}
-                className="flex items-center justify-center gap-2 bg-white border-2 border-[#4A5D4A] text-[#4A5D4A] hover:bg-[#4A5D4A] hover:text-white font-bold px-7 py-3.5 rounded-2xl transition-all text-sm active:scale-95"
-              >
-                Avaliação Neuropsicológica
-              </a>
+                {content.psicomanager && (
+                  <a
+                    href={PSICOMANAGER_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handlePsicomanagerClick}
+                    className="text-center text-xs text-gray-400 hover:text-[#4A5D4A] underline underline-offset-2 transition-colors"
+                  >
+                    Ou pelo PsicoManager?
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-8 text-center text-xs text-gray-400 space-y-1">
-        <p className="text-gray-400">⚠ O agendamento online está sujeito à confirmação pela psicóloga.</p>
-        <p>Dúvidas? Use o formulário de contato abaixo ou fale diretamente pelo WhatsApp.</p>
+      <div className="mt-8 text-center text-xs text-gray-400">
+        <p>⚠ O agendamento online está sujeito à confirmação pela psicóloga.</p>
       </div>
     </div>
   );
