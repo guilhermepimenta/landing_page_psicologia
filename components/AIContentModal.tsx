@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { generateContent, ContentChannel, InstagramFormat, ContentTone, GeneratedContent } from '../services/aiContentService';
 import { postsService } from '../services/firebaseService';
+import TrendScoutModal from './TrendScoutModal';
+import { TrendSuggestion } from '../services/trendScoutService';
 
 interface AIContentModalProps {
   onClose: () => void;
@@ -53,6 +55,16 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showScout, setShowScout] = useState(false);
+
+  const handleUseTrendTopic = (trendTopic: string, format: TrendSuggestion['format']) => {
+    setShowScout(false);
+    setChannel('Instagram');
+    setInstagramFormat(format);
+    setTopic('custom');
+    setCustomTopic(trendTopic);
+    setStep('options');
+  };
 
   const finalTopic = topic === 'custom' ? customTopic : topic;
 
@@ -154,20 +166,41 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
 
           {/* Step: Channel */}
           {step === 'channel' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {CHANNELS.map(c => (
-                <button
-                  key={c.value}
-                  onClick={() => handleSelectChannel(c.value)}
-                  className="flex items-center gap-4 p-5 rounded-xl border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50 transition-all text-left group"
-                >
-                  <span className="text-3xl">{c.icon}</span>
-                  <div>
-                    <p className="font-semibold text-gray-800 group-hover:text-purple-700">{c.label}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{c.description}</p>
-                  </div>
-                </button>
-              ))}
+            <div className="space-y-4">
+              {/* Trend Scout CTA */}
+              <button
+                onClick={() => setShowScout(true)}
+                className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-dashed border-blue-300 hover:border-blue-500 bg-blue-50/50 hover:bg-blue-50 transition-all text-left group"
+              >
+                <span className="text-3xl">🕵️</span>
+                <div className="flex-1">
+                  <p className="font-bold text-blue-700 group-hover:text-blue-800">Agente de Tendências</p>
+                  <p className="text-xs text-blue-500 mt-0.5">Vasculha a web e sugere temas em alta agora no Instagram</p>
+                </div>
+                <span className="text-blue-400 text-sm font-bold shrink-0">Novo ✨</span>
+              </button>
+
+              <div className="flex items-center gap-3 text-xs text-gray-400">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span>ou escolha o canal manualmente</span>
+                <div className="flex-1 h-px bg-gray-200" />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {CHANNELS.map(c => (
+                  <button
+                    key={c.value}
+                    onClick={() => handleSelectChannel(c.value)}
+                    className="flex items-center gap-4 p-5 rounded-xl border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50 transition-all text-left group"
+                  >
+                    <span className="text-3xl">{c.icon}</span>
+                    <div>
+                      <p className="font-semibold text-gray-800 group-hover:text-purple-700">{c.label}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{c.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -348,6 +381,13 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
           )}
         </div>
       </div>
+
+      {showScout && (
+        <TrendScoutModal
+          onClose={() => setShowScout(false)}
+          onUseTopic={handleUseTrendTopic}
+        />
+      )}
     </div>
   );
 };
