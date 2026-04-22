@@ -7,7 +7,6 @@ import ContentStudio from './ContentStudio';
 import AnalyticsPanel from './AnalyticsPanel';
 import PostsManager from './PostsManager';
 import ContentCalendar from './ContentCalendar';
-import IdeasBank from './IdeasBank';
 import ProfileSettings from './ProfileSettings';
 import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
 import InstagramMetrics from './InstagramMetrics';
@@ -38,7 +37,7 @@ const DEFAULT_METRICS: Metric[] = [
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'instagram' | 'google' | 'messages' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'calendar' | 'analytics' | 'instagram-metrics' | 'google' | 'messages' | 'settings'>('overview');
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeAlertsCount, setActiveAlertsCount] = useState(0);
   const [showStudio, setShowStudio] = useState(false);
@@ -260,7 +259,7 @@ const Dashboard: React.FC = () => {
                     <h3 className="text-base font-semibold text-gray-900 flex items-center gap-2">
                       <span>📋</span>Posts Recentes
                     </h3>
-                    <button onClick={() => setActiveTab('posts')} className="text-purple-600 hover:text-purple-700 font-medium text-sm">
+                    <button onClick={() => setActiveTab('instagram')} className="text-purple-600 hover:text-purple-700 font-medium text-sm">
                       Ver todos →
                     </button>
                   </div>
@@ -299,7 +298,7 @@ const Dashboard: React.FC = () => {
                     ) : scheduledPosts.length === 0 ? (
                       <div className="text-center py-6">
                         <p className="text-sm text-gray-400 mb-2">Nenhum post agendado.</p>
-                        <button onClick={() => setActiveTab('posts')} className="text-sm text-purple-600 hover:text-purple-700 font-medium underline">
+                        <button onClick={() => setActiveTab('instagram')} className="text-sm text-purple-600 hover:text-purple-700 font-medium underline">
                           Criar agendamento →
                         </button>
                       </div>
@@ -463,17 +462,18 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'posts' && <PostsManager />}
+      {activeTab === 'instagram' && <PostsManager fixedChannel="Instagram" />}
+      {activeTab === 'blog' && <PostsManager fixedChannel="Blog" />}
+      {activeTab === 'gmb' && <PostsManager fixedChannel="GMB" />}
+      {activeTab === 'email' && <PostsManager fixedChannel="Email" />}
 
       {activeTab === 'calendar' && <ContentCalendar />}
-
-      {activeTab === 'ideas' && <IdeasBank />}
 
       {activeTab === 'analytics' && (
         <AnalyticsPanel metrics={metrics} />
       )}
 
-      {activeTab === 'instagram' && <InstagramMetrics />}
+      {activeTab === 'instagram-metrics' && <InstagramMetrics />}
 
       {activeTab === 'google' && <SearchConsoleGMBPanel />}
 

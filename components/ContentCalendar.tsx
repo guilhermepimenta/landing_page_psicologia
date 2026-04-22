@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { postsService, Post } from '../services/firebaseService';
 import PostFormModal from './PostFormModal';
+import ContentStudio from './ContentStudio';
 
 const CHANNEL_ICON: Record<string, string> = {
   Instagram: '📱',
@@ -44,6 +45,8 @@ const ContentCalendar: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
+  const [showStudio, setShowStudio] = useState(false);
+  const [studioDate, setStudioDate] = useState<Date | undefined>(undefined);
   const [postToEdit, setPostToEdit] = useState<Post | undefined>(undefined);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -103,10 +106,8 @@ const ContentCalendar: React.FC = () => {
     } else if (dayPosts.length > 1) {
       setSelectedDate(date);
     } else {
-      // Create new post on this date
-      setPostToEdit(undefined);
-      setSelectedDate(null);
-      setShowPostModal(true);
+      setStudioDate(date);
+      setShowStudio(true);
     }
   };
 
@@ -163,13 +164,10 @@ const ContentCalendar: React.FC = () => {
             </button>
           </div>
           <button
-            onClick={() => {
-              setPostToEdit(undefined);
-              setShowPostModal(true);
-            }}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+            onClick={() => { setStudioDate(undefined); setShowStudio(true); }}
+            className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-md flex items-center gap-1.5"
           >
-            + Novo Post
+            <span>✨</span> Agendar Criativo
           </button>
         </div>
 
@@ -304,11 +302,16 @@ const ContentCalendar: React.FC = () => {
       {showPostModal && (
         <PostFormModal
           onClose={() => setShowPostModal(false)}
-          onSaved={() => {
-            setShowPostModal(false);
-            fetchPosts();
-          }}
+          onSaved={() => { setShowPostModal(false); fetchPosts(); }}
           postToEdit={postToEdit}
+        />
+      )}
+
+      {showStudio && (
+        <ContentStudio
+          onClose={() => setShowStudio(false)}
+          onSaved={() => { setShowStudio(false); fetchPosts(); }}
+          initialDate={studioDate}
         />
       )}
     </div>
