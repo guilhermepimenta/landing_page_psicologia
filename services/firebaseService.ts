@@ -501,6 +501,39 @@ export const messagesService = {
   },
 };
 
+// Weekly Goal Service
+export interface WeeklyGoal {
+  label: string;
+  target: number;
+  current: number;
+}
+
+const WEEKLY_GOAL_DEFAULTS: WeeklyGoal = { label: 'novos leads', target: 10, current: 0 };
+
+export const weeklyGoalService = {
+  async get(): Promise<{ success: boolean; data: WeeklyGoal }> {
+    try {
+      const docSnap = await getDoc(doc(db, 'settings', 'weeklyGoal'));
+      if (docSnap.exists()) {
+        const d = docSnap.data();
+        return { success: true, data: { label: d.label ?? 'novos leads', target: d.target ?? 10, current: d.current ?? 0 } };
+      }
+      return { success: true, data: WEEKLY_GOAL_DEFAULTS };
+    } catch (error) {
+      return { success: false, data: WEEKLY_GOAL_DEFAULTS };
+    }
+  },
+
+  async save(goal: WeeklyGoal): Promise<{ success: boolean }> {
+    try {
+      await setDoc(doc(db, 'settings', 'weeklyGoal'), { ...goal, updatedAt: Timestamp.now() });
+      return { success: true };
+    } catch (error) {
+      return { success: false };
+    }
+  },
+};
+
 // Profile Service
 export const profileService = {
   async get() {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import { useAuth } from '../contexts/AuthContext';
-import { postsService, metricsService, analyticsService, messagesService, alertsService, Post as FirebasePost } from '../services/firebaseService';
+import { postsService, metricsService, analyticsService, messagesService, alertsService, weeklyGoalService, WeeklyGoal, Post as FirebasePost } from '../services/firebaseService';
 import AIContentModal from './AIContentModal';
 import AnalyticsPanel from './AnalyticsPanel';
 import PostsManager from './PostsManager';
@@ -46,6 +46,8 @@ const Dashboard: React.FC = () => {
   const [recentPosts, setRecentPosts] = useState<FirebasePost[]>([]);
   const [weeklySummary, setWeeklySummary] = useState<WeeklySummary>({ totalPosts: 0, totalEngagement: 0, newLeads: 0, conversions: 0 });
   const [loadingData, setLoadingData] = useState(true);
+  const [scheduledPosts, setScheduledPosts] = useState<FirebasePost[]>([]);
+  const [weeklyGoal, setWeeklyGoal] = useState<WeeklyGoal>({ label: 'novos leads', target: 10, current: 0 });
   const [aiSuggestion, setAiSuggestion] = useState<AISuggestion | null>(null);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [suggestionError, setSuggestionError] = useState<string | null>(null);
@@ -81,6 +83,14 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
+    postsService.getScheduled().then((res) => {
+      if (res.success) setScheduledPosts(res.data.filter((p) => new Date(p.date) >= new Date()).slice(0, 5));
+    });
+
+    weeklyGoalService.get().then((res) => {
+      if (res.success) setWeeklyGoal(res.data);
+    });
+
     Promise.all([
       messagesService.getAll(),
       alertsService.getActive(),
@@ -287,35 +297,42 @@ const Dashboard: React.FC = () => {
                   <span className="mr-2">📅</span>
                   Próximos Agendados
                 </h2>
-                <button className="text-purple-600 hover:text-purple-700 font-medium text-sm">
+                <button onClick={() => setActiveTab('calendar')} className="text-purple-600 hover:text-purple-700 font-medium text-sm">
                   Calendário →
                 </button>
               </div>
               <div className="space-y-3">
-                {[
-                  { title: 'Carrossel: 5 sinais de TDAH', channel: 'Instagram', date: '2026-03-08', time: '10:00' },
-                  { title: 'FAQ: Diferença entre ansiedade e TAG', channel: 'GMB', date: '2026-03-08', time: '14:00' },
-                  { title: 'Newsletter: Saúde Mental na Primavera', channel: 'Email', date: '2026-03-09', time: '09:00' },
-                  { title: 'Stories: Dica do dia', channel: 'Instagram', date: '2026-03-09', time: '18:00' },
-                ].map((post, idx) => (
-                  <div key={idx} className="flex items-start p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer border border-blue-200">
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900 mb-2">{post.title}</h3>
-                      <div className="flex items-center flex-wrap gap-3 text-sm text-gray-600">
-                        <span className="flex items-center">
-                          {post.channel === 'Instagram' && '📱'}
-                          {post.channel === 'GMB' && '📍'}
-                          {post.channel === 'Email' && '📧'}
-                          <span className="ml-1">{post.channel}</span>
-                        </span>
-                        <span className="text-gray-400">•</span>
-                        <span>⏰ {post.time}</span>
-                        <span className="text-gray-400">•</span>
-                        <span>{new Date(post.date).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                    </div>
+                {loadingData ? (
+                  <p className="text-sm text-gray-400 py-4 text-center">Carregando...</p>
+                ) : scheduledPosts.length === 0 ? (
+                  <div className="text-center py-6">
+                    <p className="text-sm text-gray-400 mb-3">Nenhum post agendado.</p>
+                    <button onClick={() => setActiveTab('posts')} className="text-sm text-purple-600 hover:text-purple-700 font-medium underline">
+                      Criar agendamento →
+                    </button>
                   </div>
-                ))}
+                ) : (
+                  scheduledPosts.map((post) => {
+                    const channelIcon: Record<string, string> = { Instagram: '📱', GMB: '📍', Blog: '📝', Email: '📧' };
+                    return (
+                      <div key={post.id} className="flex items-start p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200">
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900 mb-2">{post.title}</h3>
+                          <div className="flex items-center flex-wrap gap-3 text-sm text-gray-600">
+                            <span className="flex items-center">
+                              {channelIcon[post.channel] ?? '📄'}
+                              <span className="ml-1">{post.channel}</span>
+                            </span>
+                            <span className="text-gray-400">•</span>
+                            <span>⏰ {new Date(post.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                            <span className="text-gray-400">•</span>
+                            <span>{new Date(post.date).toLocaleDateString('pt-BR')}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>
@@ -426,74 +443,106 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Performance por Tipo de Conteúdo */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-              <span className="mr-2">🎯</span>
-              Melhor Performance por Tipo
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 border-2 border-green-200 bg-green-50 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl">🏆</span>
-                  <span className="text-xs font-medium text-green-700 bg-green-200 px-2 py-1 rounded-full">Top 1</span>
-                </div>
-                <h4 className="font-semibold text-gray-900">Carrosséis Instagram</h4>
-                <p className="text-sm text-gray-600 mt-1">Alcance médio: 850 pessoas</p>
-                <div className="mt-3 flex items-center text-sm">
-                  <span className="text-green-600 font-medium">+124% vs posts únicos</span>
-                </div>
+          {(() => {
+            const published = recentPosts.filter((p) => p.status === 'published' && (p.engagement ?? 0) > 0);
+            const grouped: Record<string, { total: number; count: number }> = {};
+            published.forEach((p) => {
+              const key = p.channel === 'Instagram' && p.format === 'reel' ? 'Instagram Reels' : p.channel === 'Instagram' ? 'Instagram Posts' : p.channel;
+              if (!grouped[key]) grouped[key] = { total: 0, count: 0 };
+              grouped[key].total += p.engagement ?? 0;
+              grouped[key].count += 1;
+            });
+            const ranked = Object.entries(grouped)
+              .map(([type, { total, count }]) => ({ type, avg: Math.round(total / count), count }))
+              .sort((a, b) => b.avg - a.avg)
+              .slice(0, 3);
+            const medals = ['🏆', '🥈', '🥉'];
+            const colors = [
+              { border: 'border-green-200', bg: 'bg-green-50', badge: 'bg-green-200 text-green-700', text: 'text-green-600' },
+              { border: 'border-blue-200', bg: 'bg-blue-50', badge: 'bg-blue-200 text-blue-700', text: 'text-blue-600' },
+              { border: 'border-purple-200', bg: 'bg-purple-50', badge: 'bg-purple-200 text-purple-700', text: 'text-purple-600' },
+            ];
+            return (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                  <span className="mr-2">🎯</span>
+                  Melhor Performance por Tipo
+                </h2>
+                {loadingData ? (
+                  <p className="text-sm text-gray-400 text-center py-4">Carregando...</p>
+                ) : ranked.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-4">
+                    Nenhum post publicado com engajamento registrado ainda. Adicione posts com campo de engajamento para ver o ranking.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {ranked.map((item, i) => (
+                      <div key={item.type} className={`p-4 border-2 ${colors[i].border} ${colors[i].bg} rounded-lg`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-2xl">{medals[i]}</span>
+                          <span className={`text-xs font-medium px-2 py-1 rounded-full ${colors[i].badge}`}>Top {i + 1}</span>
+                        </div>
+                        <h4 className="font-semibold text-gray-900">{item.type}</h4>
+                        <p className="text-sm text-gray-600 mt-1">Engajamento médio: {item.avg}</p>
+                        <p className="text-xs text-gray-400 mt-1">{item.count} {item.count === 1 ? 'post analisado' : 'posts analisados'}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="p-4 border-2 border-blue-200 bg-blue-50 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl">🥈</span>
-                  <span className="text-xs font-medium text-blue-700 bg-blue-200 px-2 py-1 rounded-full">Top 2</span>
-                </div>
-                <h4 className="font-semibold text-gray-900">Posts GMB com FAQ</h4>
-                <p className="text-sm text-gray-600 mt-1">CTR médio: 8.2%</p>
-                <div className="mt-3 flex items-center text-sm">
-                  <span className="text-blue-600 font-medium">+68% de cliques</span>
-                </div>
-              </div>
-              <div className="p-4 border-2 border-purple-200 bg-purple-50 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl">🥉</span>
-                  <span className="text-xs font-medium text-purple-700 bg-purple-200 px-2 py-1 rounded-full">Top 3</span>
-                </div>
-                <h4 className="font-semibold text-gray-900">Artigos de Blog SEO</h4>
-                <p className="text-sm text-gray-600 mt-1">Tempo médio: 3min 24s</p>
-                <div className="mt-3 flex items-center text-sm">
-                  <span className="text-purple-600 font-medium">+89% conversão</span>
-                </div>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
-          {/* Dicas e Alertas */}
+          {/* Dica da Semana + Meta da Semana */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Dica da Semana — derivada da sugestão IA */}
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg">
               <div className="flex items-start">
                 <span className="text-2xl mr-3">💡</span>
-                <div>
+                <div className="flex-1">
                   <h3 className="font-semibold text-yellow-900 mb-2">Dica da Semana</h3>
-                  <p className="text-sm text-yellow-800">
-                    Posts publicados às <strong>10h e 19h</strong> têm 3x mais engajamento no Instagram.
-                    Considere agendar seus melhores conteúdos nesses horários!
-                  </p>
+                  {loadingSuggestion ? (
+                    <p className="text-sm text-yellow-700">Gerando dica com IA...</p>
+                  ) : aiSuggestion ? (
+                    <p className="text-sm text-yellow-800">
+                      Publique no <strong>{aiSuggestion.channel}</strong> na <strong>{aiSuggestion.bestDay}</strong> às <strong>{aiSuggestion.bestHour}</strong>.{' '}
+                      {aiSuggestion.rationale}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-yellow-700">
+                      Clique em <strong>Sugestão Inteligente → Atualizar</strong> para gerar uma dica personalizada com IA.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* Meta da Semana — Firestore */}
             <div className="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-lg">
               <div className="flex items-start">
                 <span className="text-2xl mr-3">🎯</span>
-                <div>
-                  <h3 className="font-semibold text-blue-900 mb-2">Meta da Semana</h3>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-blue-900">Meta da Semana</h3>
+                    <button
+                      onClick={() => setActiveTab('settings')}
+                      className="text-xs text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Editar
+                    </button>
+                  </div>
                   <p className="text-sm text-blue-800 mb-3">
-                    Alcançar <strong>10 novos leads</strong> via redes sociais
+                    Alcançar <strong>{weeklyGoal.target} {weeklyGoal.label}</strong>
                   </p>
                   <div className="w-full bg-blue-200 rounded-full h-2.5">
-                    <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '80%' }}></div>
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(Math.round((weeklyGoal.current / (weeklyGoal.target || 1)) * 100), 100)}%` }}
+                    />
                   </div>
-                  <p className="text-xs text-blue-700 mt-1">8 de 10 leads (80%)</p>
+                  <p className="text-xs text-blue-700 mt-1">
+                    {weeklyGoal.current} de {weeklyGoal.target} ({Math.round((weeklyGoal.current / (weeklyGoal.target || 1)) * 100)}%)
+                  </p>
                 </div>
               </div>
             </div>
