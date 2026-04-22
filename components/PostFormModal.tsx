@@ -13,7 +13,7 @@ interface PostFormModalProps {
 
 const CHANNELS: Array<Post['channel']> = ['Instagram', 'GMB', 'Blog', 'Email'];
 const STATUSES: Array<Post['status']> = ['draft', 'scheduled', 'published'];
-const FORMATS: Array<'post' | 'reel'> = ['post', 'reel'];
+const FORMATS: Array<NonNullable<Post['format']>> = ['post', 'carrossel', 'reels', 'reel'];
 
 const STATUS_LABELS = {
   draft: 'Rascunho',
@@ -21,15 +21,17 @@ const STATUS_LABELS = {
   published: 'Publicado',
 };
 
-const FORMAT_LABELS = {
-  post: 'Post/Carrossel',
+const FORMAT_LABELS: Record<NonNullable<Post['format']>, string> = {
+  post: 'Post',
+  carrossel: 'Carrossel',
+  reels: 'Reels',
   reel: 'Reel',
 };
 
 const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToEdit }) => {
   const [title, setTitle] = useState(postToEdit?.title || '');
   const [channel, setChannel] = useState<Post['channel']>(postToEdit?.channel || 'Instagram');
-  const [format, setFormat] = useState<'post' | 'reel'>(postToEdit?.format || 'post');
+  const [format, setFormat] = useState<NonNullable<Post['format']>>(postToEdit?.format ?? 'post');
   const [status, setStatus] = useState<Post['status']>(postToEdit?.status || 'draft');
   const [date, setDate] = useState<string>(
     postToEdit?.date 
@@ -357,7 +359,7 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                 displayName="Fernanda Mangia"
                 caption={content}
                 imageUrls={previewImages}
-                format={format}
+                format={format === 'reels' || format === 'reel' ? 'reel' : 'post'}
                 videoUrl={videoUrl}
                 publishDate={Number.isNaN(previewDate.getTime()) ? new Date() : previewDate}
               />

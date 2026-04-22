@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateContent, ContentChannel, ContentTone, GeneratedContent } from '../services/aiContentService';
+import { generateContent, ContentChannel, InstagramFormat, ContentTone, GeneratedContent } from '../services/aiContentService';
 import { postsService } from '../services/firebaseService';
 
 interface AIContentModalProps {
@@ -19,11 +19,17 @@ const TOPICS = [
   'Setembro Amarelo: prevenção ao suicídio',
 ];
 
-const CHANNELS: { value: ContentChannel; label: string; icon: string }[] = [
-  { value: 'Instagram', label: 'Instagram', icon: '📱' },
-  { value: 'GMB', label: 'Google Meu Negócio', icon: '📍' },
-  { value: 'Blog', label: 'Blog', icon: '📝' },
-  { value: 'Email', label: 'E-mail / Newsletter', icon: '📧' },
+const CHANNELS: { value: ContentChannel; label: string; icon: string; description: string }[] = [
+  { value: 'Instagram', label: 'Instagram', icon: '📱', description: 'Post, carrossel ou reels' },
+  { value: 'GMB', label: 'Google Meu Negócio', icon: '📍', description: 'Publicação local no Maps' },
+  { value: 'Blog', label: 'Blog', icon: '📝', description: 'Artigo SEO completo' },
+  { value: 'Email', label: 'E-mail / Newsletter', icon: '📧', description: 'Newsletter para pacientes' },
+];
+
+const INSTAGRAM_FORMATS: { value: InstagramFormat; label: string; icon: string; description: string }[] = [
+  { value: 'post', label: 'Post', icon: '🖼️', description: 'Imagem única com legenda' },
+  { value: 'carrossel', label: 'Carrossel', icon: '🎠', description: 'Roteiro slide a slide' },
+  { value: 'reels', label: 'Reels', icon: '🎬', description: 'Roteiro de vídeo curto' },
 ];
 
 const TONES: { value: ContentTone; label: string; icon: string }[] = [
@@ -33,12 +39,15 @@ const TONES: { value: ContentTone; label: string; icon: string }[] = [
   { value: 'motivacional', label: 'Motivacional', icon: '🚀' },
 ];
 
+type ModalStep = 'channel' | 'options' | 'loading' | 'result';
+
 const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
-  const [step, setStep] = useState<'form' | 'loading' | 'result'>('form');
+  const [step, setStep] = useState<ModalStep>('channel');
+  const [channel, setChannel] = useState<ContentChannel | null>(null);
+  const [instagramFormat, setInstagramFormat] = useState<InstagramFormat>('post');
+  const [tone, setTone] = useState<ContentTone>('informativo');
   const [topic, setTopic] = useState('');
   const [customTopic, setCustomTopic] = useState('');
-  const [channel, setChannel] = useState<ContentChannel>('Instagram');
-  const [tone, setTone] = useState<ContentTone>('informativo');
   const [result, setResult] = useState<GeneratedContent | null>(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -47,24 +56,36 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
 
   const finalTopic = topic === 'custom' ? customTopic : topic;
 
+  const handleSelectChannel = (c: ContentChannel) => {
+    setChannel(c);
+    setStep('options');
+  };
+
+  const handleBack = () => {
+    if (step === 'options') { setStep('channel'); setChannel(null); }
+    if (step === 'result') { setStep('options'); setResult(null); setSaved(false); }
+  };
+
   const handleGenerate = async () => {
-    if (!finalTopic.trim()) {
-      setError('Por favor, selecione ou escreva um tema.');
-      return;
-    }
+    if (!finalTopic.trim()) { setError('Por favor, selecione ou escreva um tema.'); return; }
     if (!import.meta.env.VITE_GEMINI_API_KEY) {
-      setError('Chave da API Gemini não configurada. Adicione VITE_GEMINI_API_KEY no arquivo .env');
+      setError('Chave da API Gemini não configurada. Adicione VITE_GEMINI_API_KEY no Vercel.');
       return;
     }
     setError('');
     setStep('loading');
     try {
-      const generated = await generateContent(finalTopic, channel, tone);
+      const generated = await generateContent(
+        finalTopic,
+        channel!,
+        tone,
+        channel === 'Instagram' ? instagramFormat : undefined
+      );
       setResult(generated);
       setStep('result');
-    } catch (err) {
+    } catch {
       setError('Erro ao gerar conteúdo. Verifique sua chave API e tente novamente.');
-      setStep('form');
+      setStep('options');
     }
   };
 
@@ -82,6 +103,7 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
     await postsService.create({
       title: result.title,
       channel: result.channel,
+      format: result.format ?? 'post',
       status: 'draft',
       date: new Date(),
       content: result.content,
@@ -90,16 +112,35 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
     setSaved(true);
   };
 
+  const channelLabel = CHANNELS.find(c => c.value === channel);
+  const formatLabel = INSTAGRAM_FORMATS.find(f => f.value === instagramFormat);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90dvh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
+        <div className="flex items-center justify-between p-6 border-b shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-2xl">✨</div>
+            {step !== 'channel' && step !== 'loading' && (
+              <button
+                onClick={handleBack}
+                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors mr-1"
+                aria-label="Voltar"
+              >
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-2xl shrink-0">✨</div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Gerar Conteúdo com IA</h2>
-              <p className="text-sm text-gray-500">Powered by Gemini</p>
+              <p className="text-sm text-gray-500">
+                {step === 'channel' && 'Escolha o canal de publicação'}
+                {step === 'options' && `${channelLabel?.icon} ${channelLabel?.label}${channel === 'Instagram' ? ` · ${formatLabel?.label}` : ''}`}
+                {step === 'loading' && 'Gerando...'}
+                {step === 'result' && 'Conteúdo gerado'}
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -109,30 +150,54 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
           </button>
         </div>
 
-        <div className="p-6">
-          {/* Step: Form */}
-          {step === 'form' && (
+        <div className="p-6 overflow-y-auto flex-1">
+
+          {/* Step: Channel */}
+          {step === 'channel' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {CHANNELS.map(c => (
+                <button
+                  key={c.value}
+                  onClick={() => handleSelectChannel(c.value)}
+                  className="flex items-center gap-4 p-5 rounded-xl border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50 transition-all text-left group"
+                >
+                  <span className="text-3xl">{c.icon}</span>
+                  <div>
+                    <p className="font-semibold text-gray-800 group-hover:text-purple-700">{c.label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{c.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Step: Options */}
+          {step === 'options' && (
             <div className="space-y-6">
-              {/* Canal */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Canal de publicação</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {CHANNELS.map(c => (
-                    <button
-                      key={c.value}
-                      onClick={() => setChannel(c.value)}
-                      className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                        channel === c.value
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                      }`}
-                    >
-                      <span className="text-xl">{c.icon}</span>
-                      <span className="font-medium text-sm">{c.label}</span>
-                    </button>
-                  ))}
+
+              {/* Instagram: formato */}
+              {channel === 'Instagram' && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Formato</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {INSTAGRAM_FORMATS.map(f => (
+                      <button
+                        key={f.value}
+                        onClick={() => setInstagramFormat(f.value)}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                          instagramFormat === f.value
+                            ? 'border-purple-500 bg-purple-50 text-purple-700'
+                            : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                        }`}
+                      >
+                        <span className="text-2xl">{f.icon}</span>
+                        <span className="font-semibold text-sm">{f.label}</span>
+                        <span className="text-xs text-gray-500 text-center leading-tight">{f.description}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Tom */}
               <div>
@@ -221,7 +286,7 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
               </div>
               <div className="text-center">
                 <p className="text-lg font-semibold text-gray-900">Gerando conteúdo...</p>
-                <p className="text-sm text-gray-500 mt-1">A IA está criando um post personalizado para você</p>
+                <p className="text-sm text-gray-500 mt-1">A IA está criando um conteúdo personalizado para você</p>
               </div>
             </div>
           )}
@@ -234,19 +299,16 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
                 <span className="text-sm font-medium">Conteúdo gerado com sucesso!</span>
               </div>
 
-              {/* Título */}
               <div className="bg-gray-50 p-4 rounded-xl">
                 <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Título / Assunto</p>
                 <p className="font-semibold text-gray-900">{result.title}</p>
               </div>
 
-              {/* Conteúdo */}
               <div className="bg-gray-50 p-4 rounded-xl">
                 <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Conteúdo</p>
                 <p className="text-gray-800 text-sm whitespace-pre-wrap leading-relaxed">{result.content}</p>
               </div>
 
-              {/* Hashtags */}
               {result.hashtags.length > 0 && (
                 <div className="bg-gray-50 p-4 rounded-xl">
                   <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Hashtags</p>
@@ -260,7 +322,6 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
                 </div>
               )}
 
-              {/* Actions */}
               <div className="flex gap-3">
                 <button
                   onClick={handleCopy}
@@ -278,7 +339,7 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
               </div>
 
               <button
-                onClick={() => { setStep('form'); setResult(null); setSaved(false); }}
+                onClick={() => { setStep('options'); setResult(null); setSaved(false); }}
                 className="w-full text-purple-600 hover:text-purple-700 text-sm font-medium py-2"
               >
                 ← Gerar outro conteúdo
