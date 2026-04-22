@@ -143,43 +143,43 @@ const Dashboard: React.FC = () => {
   return (
     <DashboardLayout onLogout={handleLogout} activeTab={activeTab} onTabChange={setActiveTab}>
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard de Marketing</h1>
-        <p className="text-gray-600 mt-1">Bem-vinda de volta, Fernanda! 👋</p>
+      <div className="mb-4">
+        <h1 className="text-xl md:text-3xl font-bold text-gray-900">Dashboard de Marketing</h1>
+        <p className="text-gray-500 text-sm mt-0.5">Bem-vinda de volta, Fernanda! 👋</p>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8">
+      {/* Tabs — scrollável no mobile */}
+      <div className="border-b border-gray-200 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <nav className="-mb-px flex overflow-x-auto gap-1 sm:gap-0 sm:space-x-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {[
             { id: 'overview', label: 'Visão Geral', icon: '📊' },
-            { id: 'posts', label: 'Posts', icon: '📱' },
+            { id: 'posts', label: 'Posts', icon: '📋' },
             { id: 'calendar', label: 'Calendário', icon: '📅' },
-            { id: 'ideas', label: 'Banco de Ideias', icon: '💡' },
+            { id: 'ideas', label: 'Ideias', icon: '💡' },
             { id: 'analytics', label: 'Analytics', icon: '📈' },
             { id: 'instagram', label: 'Instagram', icon: '📱' },
             { id: 'google', label: 'Google', icon: '🔍' },
             { id: 'messages', label: 'Mensagens', icon: '✉️' },
-            { id: 'settings', label: 'Configurações', icon: '⚙️' },
+            { id: 'settings', label: 'Config', icon: '⚙️' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-1 ${
+              className={`whitespace-nowrap py-3 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors flex items-center gap-1 shrink-0 ${
                 activeTab === tab.id
                   ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <span className="mr-1">{tab.icon}</span>
-              {tab.label}
+              <span className="text-base">{tab.icon}</span>
+              <span className="hidden xs:inline sm:inline">{tab.label}</span>
               {tab.id === 'analytics' && activeAlertsCount > 0 && (
-                <span className="bg-amber-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
+                <span className="bg-amber-500 text-white text-xs font-bold px-1 py-0.5 rounded-full leading-none">
                   {activeAlertsCount}
                 </span>
               )}
               {tab.id === 'messages' && unreadCount > 0 && (
-                <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full leading-none">
+                <span className="bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded-full leading-none">
                   {unreadCount}
                 </span>
               )}
@@ -203,55 +203,30 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div className="space-y-5">
-              {/* Ações rápidas de criação */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <button
-                  onClick={() => setShowAIModal(true)}
-                  className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-5 rounded-xl shadow-md hover:shadow-xl transition-all transform hover:scale-[1.02] text-left group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-3xl group-hover:scale-110 transition-transform">✨</span>
-                    <div className="bg-white/20 rounded-full p-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+              {/* Ações rápidas — linha compacta no mobile, cards no desktop */}
+              <div className="flex flex-col sm:grid sm:grid-cols-3 gap-3">
+                {[
+                  { icon: '✨', label: 'Gerar Conteúdo', sub: 'Criar posts com IA', color: 'from-purple-500 to-purple-600', subColor: 'text-purple-100', action: () => setShowAIModal(true) },
+                  { icon: '🕵️', label: 'Agente de Tendências', sub: 'Temas em alta agora', color: 'from-blue-500 to-blue-600', subColor: 'text-blue-100', action: () => setShowAIModal(true) },
+                  { icon: '📅', label: 'Agendar Posts', sub: 'Planejar no calendário', color: 'from-indigo-500 to-indigo-600', subColor: 'text-indigo-100', action: () => setActiveTab('calendar') },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={item.action}
+                    className={`bg-gradient-to-br ${item.color} text-white rounded-xl shadow-md hover:shadow-xl transition-all hover:scale-[1.02] text-left group
+                      flex items-center gap-3 px-4 py-3
+                      sm:flex-col sm:items-start sm:px-5 sm:py-5 sm:gap-0`}
+                  >
+                    <span className="text-2xl sm:text-3xl sm:mb-3 shrink-0">{item.icon}</span>
+                    <div className="flex-1 min-w-0 sm:flex-none">
+                      <h3 className="font-bold text-sm sm:text-base sm:mb-1 truncate">{item.label}</h3>
+                      <p className={`text-xs ${item.subColor} hidden sm:block`}>{item.sub}</p>
                     </div>
-                  </div>
-                  <h3 className="font-bold text-base mb-1">Gerar Conteúdo</h3>
-                  <p className="text-xs text-purple-100">Criar posts com IA para todos os canais</p>
-                </button>
-
-                <button
-                  onClick={() => { setShowAIModal(true); }}
-                  className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-5 rounded-xl shadow-md hover:shadow-xl transition-all transform hover:scale-[1.02] text-left group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-3xl group-hover:scale-110 transition-transform">🕵️</span>
-                    <div className="bg-white/20 rounded-full p-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-base mb-1">Agente de Tendências</h3>
-                  <p className="text-xs text-blue-100">Vasculha a web e sugere temas em alta</p>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('calendar')}
-                  className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-5 rounded-xl shadow-md hover:shadow-xl transition-all transform hover:scale-[1.02] text-left group"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-3xl group-hover:scale-110 transition-transform">📅</span>
-                    <div className="bg-white/20 rounded-full p-1.5">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-base mb-1">Agendar Posts</h3>
-                  <p className="text-xs text-indigo-100">Planejar conteúdo no calendário</p>
-                </button>
+                    <svg className="w-4 h-4 shrink-0 opacity-60 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                ))}
               </div>
 
               {/* Sugestão Inteligente */}

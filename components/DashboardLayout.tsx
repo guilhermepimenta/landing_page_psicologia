@@ -22,7 +22,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, onLogout, a
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Sidebar para Desktop */}
       <aside className="hidden md:flex md:flex-shrink-0 fixed inset-y-0 left-0 z-30">
         <div className="flex flex-col w-64 bg-white border-r border-gray-200">

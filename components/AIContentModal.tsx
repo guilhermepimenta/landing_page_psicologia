@@ -128,8 +128,8 @@ const AIContentModal: React.FC<AIContentModalProps> = ({ onClose }) => {
   const formatLabel = INSTAGRAM_FORMATS.find(f => f.value === instagramFormat);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90dvh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-0 sm:px-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[92dvh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b shrink-0">
           <div className="flex items-center gap-3">
