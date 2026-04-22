@@ -2,7 +2,7 @@ import React from 'react';
 import { GraduationCap, Brain, ClipboardCheck, Monitor, MapPin, ShieldCheck } from 'lucide-react';
 
 const credentials = [
-  { icon: <GraduationCap size={16} />, text: 'Mestra em Saúde Coletiva · UFF' },
+  { icon: <GraduationCap size={16} />, text: 'Mestre em Saúde Coletiva · UFF' },
   { icon: <Brain size={16} />, text: 'Especialista em TCC e Terapia do Esquema' },
   { icon: <ClipboardCheck size={16} />, text: 'Avaliação Psicológica e Neuropsicológica' },
   { icon: <Monitor size={16} />, text: 'Online e Presencial' },
