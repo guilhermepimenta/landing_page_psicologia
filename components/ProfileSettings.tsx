@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { profileService, Profile } from '../services/firebaseService';
+import { profileService, Profile, weeklyGoalService, WeeklyGoal } from '../services/firebaseService';
 
 const ProfileSettings: React.FC = () => {
   const [name, setName] = useState('');
@@ -8,6 +8,7 @@ const ProfileSettings: React.FC = () => {
   const [photoURL, setPhotoURL] = useState('');
   const [bio, setBio] = useState('');
   const [reportEmail, setReportEmail] = useState('');
+  const [weeklyGoal, setWeeklyGoal] = useState<WeeklyGoal>({ label: 'novos leads', target: 10, current: 0 });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -17,7 +18,10 @@ const ProfileSettings: React.FC = () => {
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        const result = await profileService.get();
+        const [result, goalResult] = await Promise.all([
+          profileService.get(),
+          weeklyGoalService.get(),
+        ]);
         if (result.success && result.data) {
           setName(result.data.name);
           setSpecialty(result.data.specialty);
@@ -26,6 +30,7 @@ const ProfileSettings: React.FC = () => {
           setBio(result.data.bio || '');
           setReportEmail(result.data.reportEmail || '');
         }
+        if (goalResult.success) setWeeklyGoal(goalResult.data);
       } catch (err) {
         console.error('Erro ao carregar perfil:', err);
       } finally {
@@ -49,14 +54,17 @@ const ProfileSettings: React.FC = () => {
     setError(null);
     setSaved(false);
     try {
-      const result = await profileService.save({
-        name: name.trim(),
-        specialty: specialty.trim(),
-        crp: crp.trim(),
-        photoURL: photoURL.trim(),
-        bio: bio.trim(),
-        reportEmail: reportEmail.trim(),
-      });
+      const [result] = await Promise.all([
+        profileService.save({
+          name: name.trim(),
+          specialty: specialty.trim(),
+          crp: crp.trim(),
+          photoURL: photoURL.trim(),
+          bio: bio.trim(),
+          reportEmail: reportEmail.trim(),
+        }),
+        weeklyGoalService.save(weeklyGoal),
+      ]);
       if (result.success) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
@@ -195,6 +203,56 @@ const ProfileSettings: React.FC = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
             />
             <p className="text-xs text-gray-400 mt-1">Esse email fica apenas no dashboard privado e será usado pelo resumo semanal automático.</p>
+          </div>
+
+          <hr className="border-gray-200" />
+
+          {/* Meta da Semana */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">Meta da Semana</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Descrição da meta</label>
+                <input
+                  type="text"
+                  value={weeklyGoal.label}
+                  onChange={(e) => setWeeklyGoal((g) => ({ ...g, label: e.target.value }))}
+                  placeholder="Ex: novos leads, consultas agendadas"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Meta (total)</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={weeklyGoal.target}
+                  onChange={(e) => setWeeklyGoal((g) => ({ ...g, target: Number(e.target.value) }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Progresso atual</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={weeklyGoal.current}
+                  onChange={(e) => setWeeklyGoal((g) => ({ ...g, current: Number(e.target.value) }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+              <div className="sm:col-span-2 flex items-end">
+                <div className="w-full">
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full transition-all"
+                      style={{ width: `${Math.min(Math.round((weeklyGoal.current / (weeklyGoal.target || 1)) * 100), 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">{weeklyGoal.current} de {weeklyGoal.target} ({Math.round((weeklyGoal.current / (weeklyGoal.target || 1)) * 100)}%)</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Save */}
