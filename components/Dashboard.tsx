@@ -103,14 +103,16 @@ const Dashboard: React.FC = () => {
       }
     });
 
-    setLoadingSuggestion(true);
-    getAISuggestion()
-      .then((data) => {
-        setAiSuggestion(data);
-        setSuggestionError(null);
-      })
-      .catch((err) => setSuggestionError(String(err?.message ?? 'Falha ao gerar sugestao')))
-      .finally(() => setLoadingSuggestion(false));
+    if (!import.meta.env.DEV) {
+      setLoadingSuggestion(true);
+      getAISuggestion()
+        .then((data) => {
+          setAiSuggestion(data);
+          setSuggestionError(null);
+        })
+        .catch((err) => setSuggestionError(String(err?.message ?? 'Falha ao gerar sugestao')))
+        .finally(() => setLoadingSuggestion(false));
+    }
   }, []);
 
   const getStatusBadge = (status: FirebasePost['status'] | 'idea') => {
