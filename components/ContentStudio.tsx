@@ -13,6 +13,7 @@ interface ContentStudioProps {
   initialChannel?: ContentChannel;
   initialFormat?: InstagramFormat;
   initialTopic?: string;
+  initialDate?: Date;
 }
 
 type Step = 'channel' | 'format' | 'content' | 'media' | 'preview' | 'publish';
@@ -65,6 +66,7 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
   initialChannel,
   initialFormat,
   initialTopic,
+  initialDate,
 }) => {
   const [step, setStep] = useState<Step>('channel');
 
@@ -90,7 +92,7 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState('');
 
-  const [scheduledDate, setScheduledDate] = useState(new Date().toISOString().slice(0, 16));
+  const [scheduledDate, setScheduledDate] = useState((initialDate ?? new Date()).toISOString().slice(0, 16));
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [publishSuccess, setPublishSuccess] = useState('');

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-type TabId = 'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'google' | 'instagram' | 'messages' | 'settings';
+type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'calendar' | 'analytics' | 'instagram-metrics' | 'google' | 'messages' | 'settings';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -13,20 +13,22 @@ interface DashboardLayoutProps {
 
 const NAV_GROUPS = [
   {
-    label: 'Criação & Gestão',
+    label: 'Criativos por Canal',
     items: [
       { icon: '📊', label: 'Dashboard', tab: 'overview' as TabId },
-      { icon: '📋', label: 'Posts', tab: 'posts' as TabId },
+      { icon: '📱', label: 'Instagram', tab: 'instagram' as TabId },
+      { icon: '📝', label: 'Blog', tab: 'blog' as TabId },
+      { icon: '📍', label: 'Google Meu Negócio', tab: 'gmb' as TabId },
+      { icon: '📧', label: 'E-mail', tab: 'email' as TabId },
       { icon: '📅', label: 'Calendário', tab: 'calendar' as TabId },
-      { icon: '💡', label: 'Ideias', tab: 'ideas' as TabId },
     ],
   },
   {
     label: 'Analytics & Métricas',
     items: [
-      { icon: '📈', label: 'Analytics', tab: 'analytics' as TabId },
-      { icon: '📱', label: 'Instagram', tab: 'instagram' as TabId },
-      { icon: '🔍', label: 'Google', tab: 'google' as TabId },
+      { icon: '📈', label: 'Analytics Geral', tab: 'analytics' as TabId },
+      { icon: '📊', label: 'Instagram Insights', tab: 'instagram-metrics' as TabId },
+      { icon: '🔍', label: 'Google Search', tab: 'google' as TabId },
     ],
   },
   {
@@ -39,7 +41,7 @@ const NAV_GROUPS = [
 
 const BOTTOM_NAV = [
   { icon: '📊', label: 'Início', tab: 'overview' as TabId },
-  { icon: '📋', label: 'Conteúdo', tab: 'posts' as TabId },
+  { icon: '📱', label: 'Instagram', tab: 'instagram' as TabId },
   { icon: '📈', label: 'Analytics', tab: 'analytics' as TabId },
   { icon: '✉️', label: 'Mensagens', tab: 'messages' as TabId },
   { icon: '⚙️', label: 'Config', tab: 'settings' as TabId },

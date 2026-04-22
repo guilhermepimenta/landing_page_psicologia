@@ -25,10 +25,21 @@ const CHANNEL_ICON: Record<string, string> = {
   Email: '📧',
 };
 
-const PostsManager: React.FC = () => {
+interface PostsManagerProps {
+  fixedChannel?: Post['channel'];
+}
+
+const CHANNEL_META: Record<NonNullable<Post['channel']>, { label: string; icon: string; emptyIcon: string }> = {
+  Instagram: { label: 'Criativos Instagram', icon: '📱', emptyIcon: '📱' },
+  Blog:      { label: 'Artigos do Blog',      icon: '📝', emptyIcon: '📝' },
+  GMB:       { label: 'Google Meu Negócio',   icon: '📍', emptyIcon: '📍' },
+  Email:     { label: 'Campanhas de E-mail',  icon: '📧', emptyIcon: '📧' },
+};
+
+const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterChannel, setFilterChannel] = useState<string>('Todos');
+  const [filterChannel, setFilterChannel] = useState<string>(fixedChannel ?? 'Todos');
   const [filterStatus, setFilterStatus] = useState<string>('Todos');
   const [showPostModal, setShowPostModal] = useState(false);
   const [showStudio, setShowStudio] = useState(false);
@@ -52,10 +63,11 @@ const PostsManager: React.FC = () => {
     fetchPosts();
   }, []);
 
-  const filteredPosts = posts.filter((post) => {
-    const matchChannel = filterChannel === 'Todos' || post.channel === filterChannel;
+  const channelPosts = fixedChannel ? posts.filter(p => p.channel === fixedChannel) : posts;
+
+  const filteredPosts = channelPosts.filter((post) => {
     const matchStatus = filterStatus === 'Todos' || post.status === filterStatus;
-    return matchChannel && matchStatus;
+    return matchStatus;
   });
 
   const handlePublish = async (post: Post) => {
@@ -71,11 +83,13 @@ const PostsManager: React.FC = () => {
   };
 
   const counts = {
-    total: posts.length,
-    published: posts.filter(p => p.status === 'published').length,
-    scheduled: posts.filter(p => p.status === 'scheduled').length,
-    draft: posts.filter(p => p.status === 'draft').length,
+    total: channelPosts.length,
+    published: channelPosts.filter(p => p.status === 'published').length,
+    scheduled: channelPosts.filter(p => p.status === 'scheduled').length,
+    draft: channelPosts.filter(p => p.status === 'draft').length,
   };
+
+  const meta = fixedChannel ? CHANNEL_META[fixedChannel] : null;
 
   return (
     <div className="space-y-6">
@@ -98,7 +112,10 @@ const PostsManager: React.FC = () => {
       <div className="bg-white rounded-xl shadow-md p-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-          <h2 className="text-xl font-semibold text-gray-900">Gerenciar Posts</h2>
+          <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            {meta && <span>{meta.icon}</span>}
+            {meta ? meta.label : 'Todos os Criativos'}
+          </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowStudio(true)}
@@ -117,18 +134,20 @@ const PostsManager: React.FC = () => {
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-600">Canal:</label>
-            <select
-              value={filterChannel}
-              onChange={(e) => setFilterChannel(e.target.value)}
-              className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-            >
-              {CHANNEL_OPTIONS.map(ch => (
-                <option key={ch} value={ch}>{ch === 'Todos' ? '🔗 Todos os Canais' : `${CHANNEL_ICON[ch]} ${ch}`}</option>
-              ))}
-            </select>
-          </div>
+          {!fixedChannel && (
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-600">Canal:</label>
+              <select
+                value={filterChannel}
+                onChange={(e) => setFilterChannel(e.target.value)}
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+              >
+                {CHANNEL_OPTIONS.map(ch => (
+                  <option key={ch} value={ch}>{ch === 'Todos' ? '🔗 Todos os Canais' : `${CHANNEL_ICON[ch]} ${ch}`}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-600">Status:</label>
             <select
@@ -142,9 +161,9 @@ const PostsManager: React.FC = () => {
               ))}
             </select>
           </div>
-          {(filterChannel !== 'Todos' || filterStatus !== 'Todos') && (
+          {filterStatus !== 'Todos' && (
             <button
-              onClick={() => { setFilterChannel('Todos'); setFilterStatus('Todos'); }}
+              onClick={() => setFilterStatus('Todos')}
               className="text-sm text-purple-600 hover:text-purple-800 underline"
             >
               Limpar filtros
@@ -160,14 +179,14 @@ const PostsManager: React.FC = () => {
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
-            <div className="text-6xl mb-4">📱</div>
+            <div className="text-6xl mb-4">{meta?.emptyIcon ?? '📋'}</div>
             <p className="text-lg">
-              {posts.length === 0 ? 'Nenhum post criado ainda.' : 'Nenhum post encontrado com esses filtros.'}
+              {channelPosts.length === 0 ? 'Nenhum criativo ainda.' : 'Nenhum criativo encontrado com esse filtro.'}
             </p>
             <p className="text-sm mt-2">
-              {posts.length === 0
-                ? 'Clique em "+ Novo Post" para começar.'
-                : 'Tente alterar os filtros acima.'}
+              {channelPosts.length === 0
+                ? 'Use o Content Studio para criar o primeiro.'
+                : 'Tente alterar o filtro de status acima.'}
             </p>
           </div>
         ) : (
@@ -176,7 +195,7 @@ const PostsManager: React.FC = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Canal</th>
+                  {!fixedChannel && <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Canal</th>}
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Engajamento</th>
@@ -210,11 +229,13 @@ const PostsManager: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        {CHANNEL_ICON[post.channel]} <span className="ml-1">{post.channel}</span>
-                      </span>
-                    </td>
+                    {!fixedChannel && (
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          {CHANNEL_ICON[post.channel]} <span className="ml-1">{post.channel}</span>
+                        </span>
+                      </td>
+                    )}
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex flex-col gap-1">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_BADGE[post.status]}`}>
@@ -289,6 +310,7 @@ const PostsManager: React.FC = () => {
         <ContentStudio
           onClose={() => setShowStudio(false)}
           onSaved={() => { setShowStudio(false); fetchPosts(); }}
+          initialChannel={fixedChannel}
         />
       )}
     </div>
