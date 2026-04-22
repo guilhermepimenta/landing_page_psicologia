@@ -20,7 +20,7 @@ export interface Post {
   id?: string;
   title: string;
   channel: 'Instagram' | 'GMB' | 'Blog' | 'Email';
-  format?: 'post' | 'reel';
+  format?: 'post' | 'reel' | 'carrossel' | 'reels';
   status: 'published' | 'scheduled' | 'draft';
   date: Date;
   content?: string;
