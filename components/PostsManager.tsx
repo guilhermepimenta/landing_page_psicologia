@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { postsService, Post } from '../services/firebaseService';
 import PostFormModal from './PostFormModal';
+import ContentStudio from './ContentStudio';
 
 const CHANNEL_OPTIONS = ['Todos', 'Instagram', 'GMB', 'Blog', 'Email'] as const;
 const STATUS_OPTIONS = ['Todos', 'published', 'scheduled', 'draft'] as const;
@@ -30,6 +31,7 @@ const PostsManager: React.FC = () => {
   const [filterChannel, setFilterChannel] = useState<string>('Todos');
   const [filterStatus, setFilterStatus] = useState<string>('Todos');
   const [showPostModal, setShowPostModal] = useState(false);
+  const [showStudio, setShowStudio] = useState(false);
   const [postToEdit, setPostToEdit] = useState<Post | undefined>(undefined);
 
   const fetchPosts = async () => {
@@ -97,15 +99,20 @@ const PostsManager: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <h2 className="text-xl font-semibold text-gray-900">Gerenciar Posts</h2>
-          <button
-            onClick={() => {
-              setPostToEdit(undefined);
-              setShowPostModal(true);
-            }}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            + Novo Post
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowStudio(true)}
+              className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-md flex items-center gap-1.5"
+            >
+              <span>✨</span> Content Studio
+            </button>
+            <button
+              onClick={() => { setPostToEdit(undefined); setShowPostModal(true); }}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              + Manual
+            </button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -273,11 +280,15 @@ const PostsManager: React.FC = () => {
       {showPostModal && (
         <PostFormModal
           onClose={() => setShowPostModal(false)}
-          onSaved={() => {
-            setShowPostModal(false);
-            fetchPosts();
-          }}
+          onSaved={() => { setShowPostModal(false); fetchPosts(); }}
           postToEdit={postToEdit}
+        />
+      )}
+
+      {showStudio && (
+        <ContentStudio
+          onClose={() => setShowStudio(false)}
+          onSaved={() => { setShowStudio(false); fetchPosts(); }}
         />
       )}
     </div>

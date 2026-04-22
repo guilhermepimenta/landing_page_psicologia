@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { postsService, metricsService, analyticsService, messagesService, alertsService, weeklyGoalService, WeeklyGoal, Post as FirebasePost } from '../services/firebaseService';
-import AIContentModal from './AIContentModal';
+import ContentStudio from './ContentStudio';
 import AnalyticsPanel from './AnalyticsPanel';
 import PostsManager from './PostsManager';
 import ContentCalendar from './ContentCalendar';
@@ -41,7 +41,7 @@ const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'calendar' | 'ideas' | 'analytics' | 'instagram' | 'google' | 'messages' | 'settings'>('overview');
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeAlertsCount, setActiveAlertsCount] = useState(0);
-  const [showAIModal, setShowAIModal] = useState(false);
+  const [showStudio, setShowStudio] = useState(false);
   const [metrics, setMetrics] = useState<Metric[]>(DEFAULT_METRICS);
   const [recentPosts, setRecentPosts] = useState<FirebasePost[]>([]);
   const [weeklySummary, setWeeklySummary] = useState<WeeklySummary>({ totalPosts: 0, totalEngagement: 0, newLeads: 0, conversions: 0 });
@@ -172,8 +172,8 @@ const Dashboard: React.FC = () => {
               {/* Ações rápidas — linha compacta no mobile, cards no desktop */}
               <div className="flex flex-col sm:grid sm:grid-cols-3 gap-3">
                 {[
-                  { icon: '✨', label: 'Gerar Conteúdo', sub: 'Criar posts com IA', color: 'from-purple-500 to-purple-600', subColor: 'text-purple-100', action: () => setShowAIModal(true) },
-                  { icon: '🕵️', label: 'Agente de Tendências', sub: 'Temas em alta agora', color: 'from-blue-500 to-blue-600', subColor: 'text-blue-100', action: () => setShowAIModal(true) },
+                  { icon: '✨', label: 'Gerar Conteúdo', sub: 'Criar posts com IA', color: 'from-purple-500 to-purple-600', subColor: 'text-purple-100', action: () => setShowStudio(true) },
+                  { icon: '🕵️', label: 'Agente de Tendências', sub: 'Temas em alta agora', color: 'from-blue-500 to-blue-600', subColor: 'text-blue-100', action: () => setShowStudio(true) },
                   { icon: '📅', label: 'Agendar Posts', sub: 'Planejar no calendário', color: 'from-indigo-500 to-indigo-600', subColor: 'text-indigo-100', action: () => setActiveTab('calendar') },
                 ].map((item) => (
                   <button
@@ -483,7 +483,12 @@ const Dashboard: React.FC = () => {
 
       {activeTab === 'settings' && <ProfileSettings />}
 
-      {showAIModal && <AIContentModal onClose={() => setShowAIModal(false)} />}
+      {showStudio && (
+        <ContentStudio
+          onClose={() => setShowStudio(false)}
+          onSaved={() => { setShowStudio(false); fetchDashboardData(); }}
+        />
+      )}
     </DashboardLayout>
   );
 };
