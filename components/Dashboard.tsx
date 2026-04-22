@@ -141,51 +141,17 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <DashboardLayout onLogout={handleLogout} activeTab={activeTab} onTabChange={setActiveTab}>
+    <DashboardLayout
+      onLogout={handleLogout}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      alertsCount={activeAlertsCount}
+      unreadCount={unreadCount}
+    >
       {/* Header */}
-      <div className="mb-4">
-        <h1 className="text-xl md:text-3xl font-bold text-gray-900">Dashboard de Marketing</h1>
-        <p className="text-gray-500 text-sm mt-0.5">Bem-vinda de volta, Fernanda! 👋</p>
-      </div>
-
-      {/* Tabs — scrollável no mobile */}
-      <div className="border-b border-gray-200 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <nav className="-mb-px flex overflow-x-auto gap-1 sm:gap-0 sm:space-x-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {[
-            { id: 'overview', label: 'Visão Geral', icon: '📊' },
-            { id: 'posts', label: 'Posts', icon: '📋' },
-            { id: 'calendar', label: 'Calendário', icon: '📅' },
-            { id: 'ideas', label: 'Ideias', icon: '💡' },
-            { id: 'analytics', label: 'Analytics', icon: '📈' },
-            { id: 'instagram', label: 'Instagram', icon: '📱' },
-            { id: 'google', label: 'Google', icon: '🔍' },
-            { id: 'messages', label: 'Mensagens', icon: '✉️' },
-            { id: 'settings', label: 'Config', icon: '⚙️' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`whitespace-nowrap py-3 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors flex items-center gap-1 shrink-0 ${
-                activeTab === tab.id
-                  ? 'border-purple-500 text-purple-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              <span className="text-base">{tab.icon}</span>
-              <span className="hidden xs:inline sm:inline">{tab.label}</span>
-              {tab.id === 'analytics' && activeAlertsCount > 0 && (
-                <span className="bg-amber-500 text-white text-xs font-bold px-1 py-0.5 rounded-full leading-none">
-                  {activeAlertsCount}
-                </span>
-              )}
-              {tab.id === 'messages' && unreadCount > 0 && (
-                <span className="bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded-full leading-none">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
+      <div className="mb-6">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Dashboard de Marketing</h1>
+        <p className="text-gray-400 text-sm mt-0.5">Bem-vinda de volta, Fernanda! 👋</p>
       </div>
 
       {/* Content based on active tab */}
