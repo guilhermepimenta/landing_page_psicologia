@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { User, Activity, Brain, Heart, Wind, ClipboardCheck, GraduationCap } from 'lucide-react';
 import { sendGAEvent } from '../utils/analytics';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
+import { ScreeningTest } from './ScreeningTest';
 
 const featuredService = {
   title: 'Avaliação Psicológica e Neuropsicológica',
@@ -44,8 +45,21 @@ const serviceList = [
   }
 ];
 
+const screeningTests = [
+  { id: 'tdah', label: 'TDAH', emoji: '🧠', duration: '3 min' },
+  { id: 'tea', label: 'TEA / Autismo', emoji: '🔍', duration: '3 min' },
+  { id: 'depressao', label: 'Depressão', emoji: '💙', duration: '3 min' },
+  { id: 'ansiedade', label: 'Ansiedade', emoji: '🌿', duration: '2 min' },
+];
+
 export const Services: React.FC = () => {
   const waUrl = useWhatsAppUrl('Site - Avaliação', 'Olá Fernanda, vim pelo site e gostaria de saber mais sobre a Avaliação Neuropsicológica.');
+  const [activeTest, setActiveTest] = useState<string | null>(null);
+
+  const openTest = (id: string) => {
+    setActiveTest(id);
+    sendGAEvent(`abrir_triagem_${id}`, 'triagem', id);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -98,6 +112,35 @@ export const Services: React.FC = () => {
         ))}
       </div>
 
+      {/* Screening block */}
+      <div className="mt-8 bg-white/10 border border-white/20 rounded-2xl px-6 py-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+          <div>
+            <h3 className="text-white font-bold text-base">Triagens gratuitas</h3>
+            <p className="text-white/60 text-xs mt-0.5">Questionários validados — resultado imediato, sem cadastro</p>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 bg-white/10 px-3 py-1 rounded-full self-start sm:self-auto">
+            Não substitui diagnóstico
+          </span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {screeningTests.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => openTest(t.id)}
+              className="flex flex-col items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/15 hover:border-white/30 rounded-xl px-3 py-4 transition-all group"
+            >
+              <span className="text-2xl">{t.emoji}</span>
+              <span className="text-white text-xs font-bold text-center leading-tight">{t.label}</span>
+              <span className="text-white/50 text-[10px]">{t.duration}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activeTest && (
+        <ScreeningTest testId={activeTest} onClose={() => setActiveTest(null)} />
+      )}
     </div>
   );
 };
