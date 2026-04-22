@@ -103,7 +103,7 @@ export const Footer: React.FC = () => {
               <div>
                 <h4 className="font-bold text-[#B4C2B4] mb-1 uppercase text-[10px] tracking-[0.2em]">Nova Friburgo</h4>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Rua Dr. Ernesto Brasilio, 51 - Centro<br />
+                  Rua Dr. Ernesto Brasilio, 64, sala 204 - Centro<br />
                   Nova Friburgo - RJ
                 </p>
               </div>

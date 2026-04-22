@@ -27,7 +27,7 @@ const tabContent: Record<Tab, {
     services: ['Terapia Individual', 'Avaliação Psicológica e Neuropsicológica', 'Orientação Vocacional'],
   },
   'nova-friburgo': {
-    address: 'Rua Dr. Ernesto Brasilio, 51 — Centro, Nova Friburgo - RJ',
+    address: 'Rua Dr. Ernesto Brasilio, 64, sala 204 — Centro, Nova Friburgo - RJ',
     schedule: 'Dias e horários a confirmar',
     services: ['Terapia Individual', 'Avaliação Psicológica e Neuropsicológica', 'Orientação Vocacional'],
   },
