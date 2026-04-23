@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { postsService, Post } from '../services/firebaseService';
 import PostFormModal from './PostFormModal';
-import ContentStudio from './ContentStudio';
+import SchedulePickerModal from './SchedulePickerModal';
 
 const CHANNEL_ICON: Record<string, string> = {
   Instagram: '📱',
@@ -45,8 +45,8 @@ const ContentCalendar: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPostModal, setShowPostModal] = useState(false);
-  const [showStudio, setShowStudio] = useState(false);
-  const [studioDate, setStudioDate] = useState<Date | undefined>(undefined);
+  const [showScheduler, setShowScheduler] = useState(false);
+  const [schedulerDate, setSchedulerDate] = useState<Date | undefined>(undefined);
   const [postToEdit, setPostToEdit] = useState<Post | undefined>(undefined);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -106,8 +106,8 @@ const ContentCalendar: React.FC = () => {
     } else if (dayPosts.length > 1) {
       setSelectedDate(date);
     } else {
-      setStudioDate(date);
-      setShowStudio(true);
+      setSchedulerDate(date);
+      setShowScheduler(true);
     }
   };
 
@@ -164,10 +164,10 @@ const ContentCalendar: React.FC = () => {
             </button>
           </div>
           <button
-            onClick={() => { setStudioDate(undefined); setShowStudio(true); }}
-            className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-md flex items-center gap-1.5"
+            onClick={() => { setSchedulerDate(undefined); setShowScheduler(true); }}
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-md flex items-center gap-1.5"
           >
-            <span>✨</span> Agendar Criativo
+            <span>📋</span> Agendar Criativo
           </button>
         </div>
 
@@ -307,11 +307,11 @@ const ContentCalendar: React.FC = () => {
         />
       )}
 
-      {showStudio && (
-        <ContentStudio
-          onClose={() => setShowStudio(false)}
-          onSaved={() => { setShowStudio(false); fetchPosts(); }}
-          initialDate={studioDate}
+      {showScheduler && (
+        <SchedulePickerModal
+          onClose={() => setShowScheduler(false)}
+          onScheduled={() => { setShowScheduler(false); fetchPosts(); }}
+          initialDate={schedulerDate}
         />
       )}
     </div>
