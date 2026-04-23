@@ -18,7 +18,7 @@ export async function generateImageFromPrompt(
 
 export async function suggestImagePrompt(topic: string, format: string, channel: string): Promise<string> {
   const response = await genAI.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-flash',
     contents: `You are a creative director for a Brazilian psychologist's social media.
 Generate a concise English prompt for Imagen 3 to create a professional image.
 
