@@ -96,7 +96,7 @@ export const generateContent = async (
       : buildChannelPrompt(topic, channel as Exclude<ContentChannel, 'Instagram'>, tone);
 
   const response = await genAI.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-3.1-pro-preview',
     contents: prompt,
   });
 

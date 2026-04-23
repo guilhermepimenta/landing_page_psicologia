@@ -47,7 +47,7 @@ Retorne APENAS este JSON válido (sem texto antes ou depois):
 
 export const runTrendScout = async (): Promise<TrendScoutResult> => {
   const response = await genAI.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-3.1-pro-preview',
     contents: SCOUT_PROMPT,
     config: {
       tools: [{ googleSearch: {} }],
