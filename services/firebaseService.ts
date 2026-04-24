@@ -19,7 +19,7 @@ import { db } from '../firebase.config';
 export interface Post {
   id?: string;
   title: string;
-  channel: 'Instagram' | 'GMB' | 'Blog' | 'Email';
+  channel: 'Instagram' | 'GMB' | 'Blog' | 'Email' | 'Facebook';
   format?: 'post' | 'reel' | 'carrossel' | 'reels';
   status: 'published' | 'scheduled' | 'draft';
   date: Date;
@@ -29,6 +29,8 @@ export interface Post {
   videoUrl?: string;
   instagramPostId?: string;
   instagramPermalink?: string;
+  facebookPostId?: string;
+  facebookPermalink?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

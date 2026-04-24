@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { postsService, Post } from '../services/firebaseService';
 import { imageService } from '../services/imageService';
 import { publishToInstagram } from '../services/instagramService';
+import { publishToFacebook } from '../services/facebookService';
 import ImageUploader from './ImageUploader';
 import InstagramPreview from './InstagramPreview';
 
@@ -11,7 +12,7 @@ interface PostFormModalProps {
   postToEdit?: Post | null;
 }
 
-const CHANNELS: Array<Post['channel']> = ['Instagram', 'GMB', 'Blog', 'Email'];
+const CHANNELS: Array<Post['channel']> = ['Instagram', 'Facebook', 'GMB', 'Blog', 'Email'];
 const STATUSES: Array<Post['status']> = ['draft', 'scheduled', 'published'];
 const FORMATS: Array<NonNullable<Post['format']>> = ['post', 'carrossel', 'reels', 'reel'];
 
@@ -211,6 +212,38 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
       onSaved();
     } catch (err: any) {
       setError(err?.message || 'Erro ao publicar no Instagram. Tente novamente.');
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handlePublishFacebook = async () => {
+    if (!title && !content) {
+      setError('Adicione título ou texto antes de publicar no Facebook.');
+      return;
+    }
+    setIsPublishing(true);
+    setError(null);
+    setInstagramSuccess(null);
+    try {
+      const postData = await uploadAndBuildData();
+      const imageUrl = (postData.imageUrls ?? [])[0];
+      const fbResult = await publishToFacebook(content || title, imageUrl);
+      const dataWithFB = {
+        ...postData,
+        status: 'published' as Post['status'],
+        facebookPostId: fbResult.postId,
+        facebookPermalink: fbResult.permalink,
+      };
+      if (postToEdit?.id) {
+        await postsService.update(postToEdit.id, dataWithFB);
+      } else {
+        await postsService.create(dataWithFB);
+      }
+      setInstagramSuccess(fbResult.permalink);
+      onSaved();
+    } catch (err: any) {
+      setError(err?.message || 'Erro ao publicar no Facebook. Tente novamente.');
     } finally {
       setIsPublishing(false);
     }
@@ -421,6 +454,26 @@ const PostFormModal: React.FC<PostFormModalProps> = ({ onClose, onSaved, postToE
                   <>
                     <span>📱</span>
                     Publicar no Instagram
+                  </>
+                )}
+              </button>
+            )}
+            {channel === 'Facebook' && (
+              <button
+                onClick={handlePublishFacebook}
+                disabled={isPublishing || isSaving}
+                type="button"
+                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:opacity-90 font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isPublishing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Publicando...
+                  </>
+                ) : (
+                  <>
+                    <span>📘</span>
+                    Publicar no Facebook
                   </>
                 )}
               </button>

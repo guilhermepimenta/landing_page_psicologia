@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 
 const genAI = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || '' });
 
-export type ContentChannel = 'Instagram' | 'GMB' | 'Blog' | 'Email';
+export type ContentChannel = 'Instagram' | 'GMB' | 'Blog' | 'Email' | 'Facebook';
 export type InstagramFormat = 'post' | 'carrossel' | 'reels';
 export type ContentTone = 'informativo' | 'empático' | 'educativo' | 'motivacional';
 
@@ -71,6 +71,11 @@ Retorne um JSON com: {"title": "título SEO do artigo", "content": "texto comple
     Email: `Newsletter por e-mail (máximo 600 palavras).
 Inclua: assunto impactante, saudação personalizada, conteúdo de valor, CTA claro, assinatura.
 Retorne um JSON com: {"title": "assunto do e-mail", "content": "corpo completo do e-mail", "hashtags": []}`,
+
+    Facebook: `Post para Página do Facebook (máximo 500 palavras).
+Linguagem acessível e empática. Inclua: abertura que gera identificação, desenvolvimento com informação de valor, pergunta ou reflexão para estimular comentários, CTA claro (agendar consulta, marcar alguém, salvar o post).
+Use parágrafos curtos. Emojis com moderação para tornar mais humano.
+Retorne um JSON com: {"title": "tema resumido do post", "content": "texto completo do post", "hashtags": []}`,
   };
 
   return `${SYSTEM_CONTEXT}

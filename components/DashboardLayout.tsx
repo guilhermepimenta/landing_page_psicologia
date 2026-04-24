@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'calendar' | 'analytics' | 'instagram-metrics' | 'google' | 'messages' | 'settings';
+type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'messages' | 'settings';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -20,6 +20,7 @@ const NAV_GROUPS = [
       { icon: '📝', label: 'Blog', tab: 'blog' as TabId },
       { icon: '📍', label: 'Google Meu Negócio', tab: 'gmb' as TabId },
       { icon: '📧', label: 'E-mail', tab: 'email' as TabId },
+      { icon: '📘', label: 'Facebook', tab: 'facebook' as TabId },
       { icon: '📅', label: 'Calendário', tab: 'calendar' as TabId },
     ],
   },
@@ -28,6 +29,7 @@ const NAV_GROUPS = [
     items: [
       { icon: '📈', label: 'Analytics Geral', tab: 'analytics' as TabId },
       { icon: '📊', label: 'Instagram Insights', tab: 'instagram-metrics' as TabId },
+      { icon: '📘', label: 'Facebook Insights', tab: 'facebook-metrics' as TabId },
       { icon: '🔍', label: 'Google Search', tab: 'google' as TabId },
     ],
   },

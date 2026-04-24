@@ -5,6 +5,7 @@ import { generateImageFromPrompt, suggestImagePrompt } from '../services/imagenS
 import { postsService, Post } from '../services/firebaseService';
 import { imageService } from '../services/imageService';
 import { publishToInstagram } from '../services/instagramService';
+import { publishToFacebook } from '../services/facebookService';
 import InstagramPreview from './InstagramPreview';
 
 interface ContentStudioProps {
@@ -33,6 +34,10 @@ const CHANNEL_FORMATS: Record<ContentChannel, { value: ChannelFormat; label: str
   ],
   Email: [
     { value: 'newsletter', label: 'Newsletter', icon: '📧', desc: 'E-mail para pacientes e leads' },
+  ],
+  Facebook: [
+    { value: 'post', label: 'Post com Imagem', icon: '🖼️', desc: 'Texto + foto na Página' },
+    { value: 'atualizacao', label: 'Só Texto', icon: '📝', desc: 'Atualização de texto' },
   ],
 };
 
@@ -98,12 +103,13 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
   const [publishSuccess, setPublishSuccess] = useState('');
 
   const isInstagram = channel === 'Instagram';
+  const isFacebook  = channel === 'Facebook';
   const isReels = format === 'reels';
   const instagramFormat = (format === 'post' || format === 'carrossel' || format === 'reels')
     ? format as InstagramFormat
     : 'post';
 
-  const steps: Step[] = isInstagram
+  const steps: Step[] = (isInstagram || isFacebook)
     ? ['channel', 'format', 'content', 'media', 'preview', 'publish']
     : ['channel', 'format', 'content', 'preview', 'publish'];
 
@@ -233,6 +239,13 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
         } catch {
           setPublishSuccess('Post salvo! Publicação no Instagram falhou — tente na aba Posts.');
         }
+      } else if (isFacebook && status === 'published') {
+        try {
+          await publishToFacebook(post.content, uploadedUrls[0]);
+          setPublishSuccess('Post salvo e enviado para o Facebook!');
+        } catch {
+          setPublishSuccess('Post salvo! Publicação no Facebook falhou — tente na aba Posts.');
+        }
       } else {
         setPublishSuccess(
           status === 'draft' ? 'Rascunho salvo com sucesso!' :
@@ -310,6 +323,7 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 {([
                   { value: 'Instagram' as ContentChannel, icon: '📱', label: 'Instagram', desc: 'Post · Carrossel · Reels' },
+                  { value: 'Facebook' as ContentChannel, icon: '📘', label: 'Facebook', desc: 'Post · Texto' },
                   { value: 'GMB' as ContentChannel, icon: '📍', label: 'Google Meu Negócio', desc: 'Atualizações locais' },
                   { value: 'Blog' as ContentChannel, icon: '📝', label: 'Blog', desc: 'Artigos SEO' },
                   { value: 'Email' as ContentChannel, icon: '📧', label: 'E-mail', desc: 'Newsletter' },

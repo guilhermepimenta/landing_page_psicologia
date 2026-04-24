@@ -10,6 +10,7 @@ import ContentCalendar from './ContentCalendar';
 import ProfileSettings from './ProfileSettings';
 import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
 import InstagramMetrics from './InstagramMetrics';
+import FacebookMetrics from './FacebookMetrics';
 import MessagesInbox from './MessagesInbox';
 import { getAISuggestion, AISuggestion } from '../services/aiSuggestionService';
 
@@ -37,7 +38,7 @@ const DEFAULT_METRICS: Metric[] = [
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'calendar' | 'analytics' | 'instagram-metrics' | 'google' | 'messages' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'messages' | 'settings'>('overview');
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeAlertsCount, setActiveAlertsCount] = useState(0);
   const [showStudio, setShowStudio] = useState(false);
@@ -466,6 +467,7 @@ const Dashboard: React.FC = () => {
       {activeTab === 'blog' && <PostsManager fixedChannel="Blog" />}
       {activeTab === 'gmb' && <PostsManager fixedChannel="GMB" />}
       {activeTab === 'email' && <PostsManager fixedChannel="Email" />}
+      {activeTab === 'facebook' && <PostsManager fixedChannel="Facebook" />}
 
       {activeTab === 'calendar' && <ContentCalendar />}
 
@@ -474,6 +476,7 @@ const Dashboard: React.FC = () => {
       )}
 
       {activeTab === 'instagram-metrics' && <InstagramMetrics />}
+      {activeTab === 'facebook-metrics' && <FacebookMetrics />}
 
       {activeTab === 'google' && <SearchConsoleGMBPanel />}
 
