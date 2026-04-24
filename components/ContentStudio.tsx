@@ -175,7 +175,7 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
       const dataUrl = await generateImageFromPrompt(imagenPrompt, aspectRatio);
       setImageDataUrls(prev => [...prev, dataUrl]);
     } catch {
-      setImagenError('Erro ao gerar imagem. Imagen 3 requer faturamento ativo na conta Google AI Studio.');
+      setImagenError('Erro ao gerar imagem. Verifique sua conexão e tente novamente.');
     } finally {
       setImagenGenerating(false);
     }
