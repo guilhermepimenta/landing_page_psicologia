@@ -11,18 +11,16 @@ import { getAdminDb } from './lib/firebaseAdmin.js';
  *   GA4_CLIENT_EMAIL      → client_email do JSON da service account
  *   GA4_PRIVATE_KEY       → private_key do JSON da service account (com \n literais)
  *
- * Endpoint: GET /api/analytics
- * Retorna:
- * {
- *   weeklyEngagement: [{ dia, Instagram, GMB, Blog, Email }],
- *   monthlyTrend:     [{ mes, leads, conversoes }],
- *   summaryMetrics:   [{ metrica, valor, variacao }]
- * }
+ * Modos disponíveis:
+ *   GET /api/analytics             → dados históricos completos
+ *   GET /api/analytics?mode=realtime  → usuários ativos agora (cache 60s)
+ *   GET /api/analytics?mode=suggestion → sugestão de conteúdo via AI
  */
 
 const DAYS_PT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const MONTHS_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 const DAY_NAMES = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado'];
+const DEVICE_LABELS: Record<string, string> = { mobile: 'Celular', desktop: 'Desktop', tablet: 'Tablet' };
 
 type Channel = 'Instagram' | 'GMB' | 'Blog' | 'Email';
 
@@ -232,12 +230,12 @@ function getClient() {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS para requests do frontend
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
+  // --- Modo: sugestão de conteúdo ---
   if (req.query.mode === 'suggestion') {
     try {
       const payload = await getSuggestionResponse();
@@ -259,26 +257,116 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: e.message });
   }
 
+  const property = `properties/${propertyId}`;
+
+  // --- Modo: usuários em tempo real (últimos 30 min) ---
+  if (req.query.mode === 'realtime') {
+    try {
+      const [rtResponse] = await analyticsClient.runRealtimeReport({
+        property,
+        metrics: [{ name: 'activeUsers' }],
+      });
+      const activeUsers = Number(rtResponse.rows?.[0]?.metricValues?.[0]?.value ?? 0);
+      res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
+      return res.status(200).json({ activeUsers });
+    } catch (e: any) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
+  // --- Modo principal: dados históricos completos ---
   try {
-    const property = `properties/${propertyId}`;
+    // Todas as 7 chamadas em paralelo para máxima performance
+    const [
+      [weeklyResponse],
+      [monthlyResponse],
+      [thisMonth],
+      [lastMonth],
+      [topPagesResponse],
+      [deviceResponse],
+      [sourcesResponse],
+    ] = await Promise.all([
+      // 1. Engajamento semanal (7 dias, por canal)
+      analyticsClient.runReport({
+        property,
+        dateRanges: [{ startDate: '7daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'date' }, { name: 'sessionDefaultChannelGroup' }],
+        metrics: [{ name: 'engagedSessions' }],
+        orderBys: [{ dimension: { dimensionName: 'date' } }],
+      }),
+      // 2. Tendência mensal de sessões/conversões (6 meses)
+      analyticsClient.runReport({
+        property,
+        dateRanges: [{ startDate: '180daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'yearMonth' }],
+        metrics: [{ name: 'sessions' }, { name: 'conversions' }],
+        orderBys: [{ dimension: { dimensionName: 'yearMonth' } }],
+      }),
+      // 3. Métricas do mês atual (8 métricas)
+      analyticsClient.runReport({
+        property,
+        dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        metrics: [
+          { name: 'engagementRate' },
+          { name: 'totalUsers' },
+          { name: 'conversions' },
+          { name: 'sessionConversionRate' },
+          { name: 'screenPageViews' },
+          { name: 'averageSessionDuration' },
+          { name: 'bounceRate' },
+          { name: 'newUsers' },
+        ],
+      }),
+      // 4. Métricas do mês anterior (para comparação)
+      analyticsClient.runReport({
+        property,
+        dateRanges: [{ startDate: '60daysAgo', endDate: '31daysAgo' }],
+        metrics: [
+          { name: 'engagementRate' },
+          { name: 'totalUsers' },
+          { name: 'conversions' },
+          { name: 'sessionConversionRate' },
+          { name: 'screenPageViews' },
+          { name: 'averageSessionDuration' },
+          { name: 'bounceRate' },
+          { name: 'newUsers' },
+        ],
+      }),
+      // 5. Top 6 páginas mais visitadas (30 dias)
+      analyticsClient.runReport({
+        property,
+        dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'pageTitle' }],
+        metrics: [{ name: 'screenPageViews' }, { name: 'sessions' }],
+        orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }],
+        limit: 6,
+      }),
+      // 6. Sessões por dispositivo (30 dias)
+      analyticsClient.runReport({
+        property,
+        dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'deviceCategory' }],
+        metrics: [{ name: 'sessions' }],
+        orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+      }),
+      // 7. Fontes de tráfego (30 dias)
+      analyticsClient.runReport({
+        property,
+        dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
+        dimensions: [{ name: 'sessionDefaultChannelGroup' }],
+        metrics: [{ name: 'sessions' }, { name: 'conversions' }],
+        orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
+        limit: 6,
+      }),
+    ]);
 
-    // --- 1. Engajamento semanal (últimos 7 dias, por canal/source) ---
-    const [weeklyResponse] = await analyticsClient.runReport({
-      property,
-      dateRanges: [{ startDate: '7daysAgo', endDate: 'today' }],
-      dimensions: [{ name: 'date' }, { name: 'sessionDefaultChannelGroup' }],
-      metrics: [{ name: 'engagedSessions' }],
-      orderBys: [{ dimension: { dimensionName: 'date' } }],
-    });
-
-    // Agrupa por dia da semana
+    // --- Processar engajamento semanal ---
     const weekMap: Record<string, { Instagram: number; GMB: number; Blog: number; Email: number }> = {};
     for (const row of weeklyResponse.rows ?? []) {
       const dateStr = row.dimensionValues?.[0]?.value ?? '';
       const channel = row.dimensionValues?.[1]?.value ?? '';
       const sessions = Number(row.metricValues?.[0]?.value ?? 0);
 
-      // Converte "20260305" → objeto Date
       const d = new Date(`${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`);
       const dia = DAYS_PT[d.getDay()];
 
@@ -293,18 +381,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     const weeklyEngagement = Object.entries(weekMap).map(([dia, vals]) => ({ dia, ...vals }));
 
-    // --- 2. Tendência mensal de leads (últimos 6 meses) ---
-    const [monthlyResponse] = await analyticsClient.runReport({
-      property,
-      dateRanges: [{ startDate: '180daysAgo', endDate: 'today' }],
-      dimensions: [{ name: 'yearMonth' }],
-      metrics: [
-        { name: 'sessions' },
-        { name: 'conversions' },
-      ],
-      orderBys: [{ dimension: { dimensionName: 'yearMonth' } }],
-    });
-
+    // --- Processar tendência mensal ---
     const monthlyTrend = (monthlyResponse.rows ?? []).slice(-6).map(row => {
       const ym = row.dimensionValues?.[0]?.value ?? '';
       const monthIdx = parseInt(ym.slice(4, 6), 10) - 1;
@@ -315,55 +392,78 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
     });
 
-    // --- 3. Métricas de resumo (mês atual vs mês anterior) ---
-    const [thisMonth] = await analyticsClient.runReport({
-      property,
-      dateRanges: [{ startDate: '30daysAgo', endDate: 'today' }],
-      metrics: [
-        { name: 'engagementRate' },
-        { name: 'totalUsers' },
-        { name: 'conversions' },
-        { name: 'sessionConversionRate' },
-      ],
-    });
-
-    const [lastMonth] = await analyticsClient.runReport({
-      property,
-      dateRanges: [{ startDate: '60daysAgo', endDate: '31daysAgo' }],
-      metrics: [
-        { name: 'engagementRate' },
-        { name: 'totalUsers' },
-        { name: 'conversions' },
-        { name: 'sessionConversionRate' },
-      ],
-    });
-
+    // --- Processar métricas de resumo (8 métricas com comparação) ---
     const curr = thisMonth.rows?.[0]?.metricValues ?? [];
     const prev = lastMonth.rows?.[0]?.metricValues ?? [];
 
     const pct = (c: number, p: number) =>
       p === 0 ? 0 : Math.round(((c - p) / p) * 100 * 10) / 10;
 
-    const engRate = Math.round(Number(curr[0]?.value ?? 0) * 1000) / 10;
-    const prevEngRate = Math.round(Number(prev[0]?.value ?? 0) * 1000) / 10;
-    const users = Math.round(Number(curr[1]?.value ?? 0));
-    const prevUsers = Math.round(Number(prev[1]?.value ?? 0));
-    const conversions = Math.round(Number(curr[2]?.value ?? 0));
+    const engRate       = Math.round(Number(curr[0]?.value ?? 0) * 1000) / 10;
+    const prevEngRate   = Math.round(Number(prev[0]?.value ?? 0) * 1000) / 10;
+    const users         = Math.round(Number(curr[1]?.value ?? 0));
+    const prevUsers     = Math.round(Number(prev[1]?.value ?? 0));
+    const conversions   = Math.round(Number(curr[2]?.value ?? 0));
     const prevConversions = Math.round(Number(prev[2]?.value ?? 0));
-    const convRate = Math.round(Number(curr[3]?.value ?? 0) * 1000) / 10;
-    const prevConvRate = Math.round(Number(prev[3]?.value ?? 0) * 1000) / 10;
+    const convRate      = Math.round(Number(curr[3]?.value ?? 0) * 1000) / 10;
+    const prevConvRate  = Math.round(Number(prev[3]?.value ?? 0) * 1000) / 10;
+    const pageViews     = Math.round(Number(curr[4]?.value ?? 0));
+    const prevPageViews = Math.round(Number(prev[4]?.value ?? 0));
+    const avgDuration   = Math.round(Number(curr[5]?.value ?? 0));
+    const prevAvgDuration = Math.round(Number(prev[5]?.value ?? 0));
+    const bounceRate    = Math.round(Number(curr[6]?.value ?? 0) * 1000) / 10;
+    const prevBounceRate = Math.round(Number(prev[6]?.value ?? 0) * 1000) / 10;
+    const newUsers      = Math.round(Number(curr[7]?.value ?? 0));
+    const prevNewUsers  = Math.round(Number(prev[7]?.value ?? 0));
 
     const summaryMetrics = [
-      { metrica: 'taxa_engajamento', valor: engRate, variacao: pct(engRate, prevEngRate) },
-      { metrica: 'alcance_total', valor: users, variacao: pct(users, prevUsers) },
-      { metrica: 'leads', valor: conversions, variacao: pct(conversions, prevConversions) },
-      { metrica: 'taxa_conversao', valor: convRate, variacao: pct(convRate, prevConvRate) },
+      { metrica: 'taxa_engajamento', valor: engRate,    variacao: pct(engRate, prevEngRate) },
+      { metrica: 'alcance_total',    valor: users,      variacao: pct(users, prevUsers) },
+      { metrica: 'leads',            valor: conversions, variacao: pct(conversions, prevConversions) },
+      { metrica: 'taxa_conversao',   valor: convRate,   variacao: pct(convRate, prevConvRate) },
+      { metrica: 'visualizacoes',    valor: pageViews,  variacao: pct(pageViews, prevPageViews) },
+      { metrica: 'duracao_media',    valor: avgDuration, variacao: pct(avgDuration, prevAvgDuration) },
+      { metrica: 'taxa_rejeicao',    valor: bounceRate, variacao: pct(bounceRate, prevBounceRate) },
+      { metrica: 'novos_usuarios',   valor: newUsers,   variacao: pct(newUsers, prevNewUsers) },
     ];
 
-    // Cache de 1 hora no CDN do Vercel
-    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=600');
+    // --- Processar top páginas ---
+    const topPages = (topPagesResponse.rows ?? [])
+      .filter(row => {
+        const title = row.dimensionValues?.[0]?.value ?? '';
+        return title.trim() !== '' && title !== '(not set)';
+      })
+      .slice(0, 5)
+      .map(row => ({
+        page: (row.dimensionValues?.[0]?.value ?? '').slice(0, 50),
+        views: Number(row.metricValues?.[0]?.value ?? 0),
+        sessions: Number(row.metricValues?.[1]?.value ?? 0),
+      }));
 
-    return res.status(200).json({ weeklyEngagement, monthlyTrend, summaryMetrics });
+    // --- Processar breakdown por dispositivo ---
+    const deviceBreakdown = (deviceResponse.rows ?? []).map(row => ({
+      device: DEVICE_LABELS[row.dimensionValues?.[0]?.value ?? ''] ?? row.dimensionValues?.[0]?.value ?? '',
+      sessions: Number(row.metricValues?.[0]?.value ?? 0),
+    }));
+
+    // --- Processar fontes de tráfego ---
+    const trafficSources = (sourcesResponse.rows ?? []).map(row => ({
+      source: row.dimensionValues?.[0]?.value ?? '',
+      sessions: Number(row.metricValues?.[0]?.value ?? 0),
+      conversions: Number(row.metricValues?.[1]?.value ?? 0),
+    }));
+
+    // Cache de 15 minutos — dados mais frescos
+    res.setHeader('Cache-Control', 's-maxage=900, stale-while-revalidate=300');
+
+    return res.status(200).json({
+      weeklyEngagement,
+      monthlyTrend,
+      summaryMetrics,
+      topPages,
+      deviceBreakdown,
+      trafficSources,
+    });
 
   } catch (error: any) {
     console.error('GA4 API error:', error);

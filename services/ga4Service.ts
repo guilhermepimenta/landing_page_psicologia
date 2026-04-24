@@ -23,16 +23,39 @@ export interface MetricRow {
   variacao: number;
 }
 
+export interface TopPageRow {
+  page: string;
+  views: number;
+  sessions: number;
+}
+
+export interface DeviceRow {
+  device: string;
+  sessions: number;
+}
+
+export interface SourceRow {
+  source: string;
+  sessions: number;
+  conversions: number;
+}
+
 export interface GA4Response {
   weeklyEngagement: WeeklyRow[];
   monthlyTrend: MonthlyRow[];
   summaryMetrics: MetricRow[];
+  topPages: TopPageRow[];
+  deviceBreakdown: DeviceRow[];
+  trafficSources: SourceRow[];
+}
+
+export interface GA4RealtimeResponse {
+  activeUsers: number;
 }
 
 const API_URL = '/api/analytics';
 
 // Em desenvolvimento local (Vite dev server), a Vercel Function não existe.
-// Só chamamos a API em produção (Vercel) ou quando explicitamente forçado.
 export const isDevMode = import.meta.env.DEV;
 
 export async function getGA4Data(): Promise<GA4Response> {
@@ -45,8 +68,20 @@ export async function getGA4Data(): Promise<GA4Response> {
     throw new Error(body?.error ?? `HTTP ${res.status}`);
   }
   try {
-    return await res.json() as Promise<GA4Response>;
+    return await res.json() as GA4Response;
   } catch {
     throw new Error('Resposta inválida da API — verifique o deploy no Vercel');
   }
+}
+
+export async function getGA4Realtime(): Promise<GA4RealtimeResponse> {
+  if (isDevMode) {
+    throw new Error('__dev_mode__');
+  }
+  const res = await fetch(`${API_URL}?mode=realtime`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.error ?? `HTTP ${res.status}`);
+  }
+  return res.json() as Promise<GA4RealtimeResponse>;
 }
