@@ -70,11 +70,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  const accountId = process.env.GMB_ACCOUNT_ID;
   const locationId = process.env.GMB_LOCATION_ID;
 
-  if (!accountId || !locationId) {
-    return res.status(500).json({ error: 'GMB_ACCOUNT_ID ou GMB_LOCATION_ID não configurados' });
+  if (!locationId) {
+    return res.status(500).json({ error: 'GMB_LOCATION_ID não configurado' });
   }
 
   let auth;
@@ -84,11 +83,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: e.message });
   }
 
+  // Auto-discover Account ID if not explicitly set
+  async function resolveAccountId(): Promise<string> {
+    const configured = process.env.GMB_ACCOUNT_ID;
+    if (configured) return configured;
+    try {
+      const token = await auth.getAccessToken();
+      const t = typeof token === 'string' ? token : token?.token ?? '';
+      const res = await fetch('https://mybusinessaccountmanagement.googleapis.com/v1/accounts', {
+        headers: { Authorization: `Bearer ${t}` },
+      });
+      const data = await res.json() as any;
+      return (data.accounts?.[0]?.name as string) ?? '';
+    } catch {
+      return '';
+    }
+  }
+
   try {
     const mybusiness = google.mybusinessbusinessinformation({ version: 'v1', auth });
 
-    // Fetch location data (name, address, phone)
-    const locationName = `${accountId}/${locationId}`;
+    const accountId = await resolveAccountId();
+    // Combine into full resource name when account is available
+    const locationName = accountId ? `${accountId}/${locationId}` : locationId;
     let locationData: any = null;
     try {
       const locRes = await mybusiness.locations.get({
