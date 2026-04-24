@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import { GoogleGenAI } from '@google/genai';
-import { getAdminDb } from './lib/firebaseAdmin.js';
+import { getAdminDb } from './_lib/firebaseAdmin.js';
 
 /**
  * Vercel Serverless Function — chama a GA4 Data API com service account.

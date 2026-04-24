@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { runWeeklyReport } from '../lib/weeklyReportEngine.js';
+import { runWeeklyReport } from '../_lib/weeklyReportEngine.js';
 
 function isAuthorized(req: VercelRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;

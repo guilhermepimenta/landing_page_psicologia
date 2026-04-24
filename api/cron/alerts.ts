@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { runAlerts } from '../lib/alertsEngine.js';
+import { runAlerts } from '../_lib/alertsEngine.js';
 
 function isAuthorized(req: VercelRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;

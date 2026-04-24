@@ -67,7 +67,7 @@ export interface FacebookMetricsResponse {
   monthlyTrend: FacebookMonthlyRow[];
 }
 
-const API_URL = '/api/facebook-metrics';
+const API_URL = '/api/facebook';
 
 export const isDevMode = import.meta.env.DEV;
 
