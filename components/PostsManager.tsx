@@ -33,6 +33,7 @@ const CHANNEL_META: Record<NonNullable<Post['channel']>, { label: string; icon: 
   Instagram: { label: 'Criativos Instagram', icon: '📱', emptyIcon: '📱' },
   Blog:      { label: 'Artigos do Blog',      icon: '📝', emptyIcon: '📝' },
   GMB:       { label: 'Google Meu Negócio',   icon: '📍', emptyIcon: '📍' },
+  Facebook:  { label: 'Posts do Facebook',    icon: '📘', emptyIcon: '📘' },
   Email:     { label: 'Campanhas de E-mail',  icon: '📧', emptyIcon: '📧' },
 };
 
