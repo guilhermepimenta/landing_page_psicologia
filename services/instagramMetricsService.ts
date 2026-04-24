@@ -11,6 +11,7 @@ export interface InstagramAccount {
   following: number;
   mediaCount: number;
   biography: string;
+  website?: string;
 }
 
 export interface InstagramSummary {
@@ -19,6 +20,12 @@ export interface InstagramSummary {
   totalProfileViews: number;
   totalEngagement: number;
   engagementRate: number;
+  totalSaves: number;
+  totalShares: number;
+  websiteClicks: number;
+  emailContacts: number;
+  phoneClicks: number;
+  followersGained: number;
   impressionsChange: number;
   reachChange: number;
   profileViewsChange: number;
@@ -46,6 +53,8 @@ export interface InstagramMediaItem {
     reach?: number;
     total_interactions?: number;
     saved?: number;
+    shares?: number;
+    video_views?: number;
   } | null;
 }
 
@@ -55,12 +64,26 @@ export interface InstagramBestHour {
   posts: number;
 }
 
+export interface InstagramBestDay {
+  day: number;
+  dayName: string;
+  avgEngagement: number;
+  posts: number;
+}
+
+export interface InstagramOnlineHour {
+  hour: number;
+  avgFollowers: number;
+}
+
 export interface InstagramMetricsResponse {
   account: InstagramAccount;
   summary: InstagramSummary;
   dailyData: InstagramDailyRow[];
   topPosts: InstagramMediaItem[];
   bestHours: InstagramBestHour[];
+  bestDays: InstagramBestDay[];
+  onlineFollowers: InstagramOnlineHour[];
   recentMedia: InstagramMediaItem[];
 }
 
