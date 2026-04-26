@@ -65,6 +65,16 @@ const STEP_LABELS: Record<Step, string> = {
   publish: 'Publicar',
 };
 
+// Templates Canva da Fernanda — abre direto na conta dela
+const CANVA_TEMPLATES: Partial<Record<string, { label: string; url: string }>> = {
+  'Instagram:post':        { label: 'Post Instagram',      url: 'https://www.canva.com/design/DAHH_8w7QrE/edit' },
+  'Instagram:carrossel':   { label: 'Post Instagram',      url: 'https://www.canva.com/design/DAHH_8w7QrE/edit' },
+  'Instagram:reels':       { label: 'Story / Reels',       url: 'https://www.canva.com/design/DAHH_zvi1Mw/edit' },
+  'Facebook:post':         { label: 'Post Facebook',       url: 'https://www.canva.com/design/DAHH_w8OY3U/edit' },
+  'Facebook:atualizacao':  { label: 'Post Facebook',       url: 'https://www.canva.com/design/DAHH_w8OY3U/edit' },
+  'Email:newsletter':      { label: 'Template E-mail',     url: 'https://www.canva.com/design/DAHH_xiXqdE/edit' },
+};
+
 const ContentStudio: React.FC<ContentStudioProps> = ({
   onClose,
   onSaved,
@@ -101,6 +111,7 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [publishSuccess, setPublishSuccess] = useState('');
+  const [canvaCopied, setCanvaCopied] = useState(false);
 
   const isInstagram = channel === 'Instagram';
   const isFacebook  = channel === 'Facebook';
@@ -705,6 +716,45 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                 <h3 className="text-lg font-bold text-gray-900 mb-1">Publicar</h3>
                 <p className="text-sm text-gray-500">Como deseja salvar este conteúdo?</p>
               </div>
+
+              {/* ── Canva shortcut ── */}
+              {!publishSuccess && (() => {
+                const key = `${channel}:${format}`;
+                const tpl = CANVA_TEMPLATES[key];
+                if (!tpl) return null;
+                return (
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-2">
+                      🎨 Criar arte no Canva
+                    </p>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Clique para copiar o texto gerado e abrir o template <strong>{tpl.label}</strong> direto na sua conta.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(editedContent || editedTitle || topic).catch(() => {});
+                        window.open(tpl.url, '_blank', 'noopener,noreferrer');
+                        setCanvaCopied(true);
+                        setTimeout(() => setCanvaCopied(false), 3000);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 bg-white border border-purple-300 text-purple-700 hover:bg-purple-50 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+                    >
+                      {canvaCopied ? (
+                        <>✅ Texto copiado — Canva aberto!</>
+                      ) : (
+                        <>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#7C3AED" opacity="0.15"/>
+                            <path d="M8.5 14.5L12 8l3.5 6.5H8.5z" fill="#7C3AED"/>
+                          </svg>
+                          Abrir template · {tpl.label}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                );
+              })()}
 
               {publishSuccess ? (
                 <div className="text-center py-10">
