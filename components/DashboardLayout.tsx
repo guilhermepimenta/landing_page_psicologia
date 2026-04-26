@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'messages' | 'settings';
+type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'messages' | 'settings';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -9,6 +9,7 @@ interface DashboardLayoutProps {
   onTabChange?: (tab: TabId) => void;
   alertsCount?: number;
   unreadCount?: number;
+  leadsCount?: number;
 }
 
 const NAV_GROUPS = [
@@ -36,6 +37,7 @@ const NAV_GROUPS = [
   {
     label: 'Relacionamento',
     items: [
+      { icon: '🎯', label: 'Leads', tab: 'leads' as TabId },
       { icon: '✉️', label: 'Mensagens', tab: 'messages' as TabId },
     ],
   },
@@ -56,6 +58,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   onTabChange,
   alertsCount = 0,
   unreadCount = 0,
+  leadsCount = 0,
 }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
@@ -84,7 +87,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 const isActive = activeTab === item.tab;
                 const badge =
                   item.tab === 'analytics' && alertsCount > 0 ? alertsCount :
-                  item.tab === 'messages' && unreadCount > 0 ? unreadCount : 0;
+                  item.tab === 'messages' && unreadCount > 0 ? unreadCount :
+                  item.tab === 'leads' && leadsCount > 0 ? leadsCount : 0;
                 return (
                   <button
                     key={item.tab}

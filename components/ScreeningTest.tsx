@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
+import { X, ChevronLeft, AlertCircle, Mail, User, Loader2 } from 'lucide-react';
 import { sendGAEvent } from '../utils/analytics';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
+import { leadsService } from '../services/firebaseService';
 
 type ScaleType = 'frequency' | 'agreement' | 'frequency5';
 
@@ -46,24 +47,15 @@ const TESTS: Record<string, Test> = {
     ],
     cutoffs: { low: 3, moderate: 6 },
     results: {
-      low: {
-        label: 'Pontuação baixa',
-        message: 'Sua pontuação não indica sinais fortes de TDAH. Ainda assim, se você sente que atenção ou organização impactam sua vida, vale uma conversa com a Fernanda.',
-      },
-      moderate: {
-        label: 'Pontuação moderada',
-        message: 'Alguns sinais de TDAH estão presentes. Uma avaliação neuropsicológica pode esclarecer se esses sintomas têm impacto funcional na sua vida.',
-      },
-      high: {
-        label: 'Pontuação elevada',
-        message: 'Sua pontuação indica sintomas consistentes com TDAH. Uma avaliação neuropsicológica é o próximo passo recomendado para um diagnóstico preciso.',
-      },
+      low:      { label: 'Pontuação baixa',    message: 'Sua pontuação não indica sinais fortes de TDAH. Ainda assim, se você sente que atenção ou organização impactam sua vida, vale uma conversa com a Fernanda.' },
+      moderate: { label: 'Pontuação moderada', message: 'Alguns sinais de TDAH estão presentes. Uma avaliação neuropsicológica pode esclarecer se esses sintomas têm impacto funcional na sua vida.' },
+      high:     { label: 'Pontuação elevada',  message: 'Sua pontuação indica sintomas consistentes com TDAH. Uma avaliação neuropsicológica é o próximo passo recomendado para um diagnóstico preciso.' },
     },
     waLabel: 'Site - Triagem TDAH',
     waMessages: {
-      low: 'Olá Fernanda, fiz a triagem de TDAH no site (pontuação baixa) e gostaria de conversar sobre atenção e organização.',
+      low:      'Olá Fernanda, fiz a triagem de TDAH no site (pontuação baixa) e gostaria de conversar sobre atenção e organização.',
       moderate: 'Olá Fernanda, fiz a triagem de TDAH no site (pontuação moderada) e gostaria de saber mais sobre avaliação neuropsicológica.',
-      high: 'Olá Fernanda, fiz a triagem de TDAH no site (pontuação elevada) e gostaria de agendar uma avaliação neuropsicológica.',
+      high:     'Olá Fernanda, fiz a triagem de TDAH no site (pontuação elevada) e gostaria de agendar uma avaliação neuropsicológica.',
     },
   },
   tea: {
@@ -87,24 +79,15 @@ const TESTS: Record<string, Test> = {
     ],
     cutoffs: { low: 3, moderate: 6 },
     results: {
-      low: {
-        label: 'Pontuação baixa',
-        message: 'Sua pontuação não indica sinais fortes de TEA. Se você tem dúvidas sobre funcionamento social ou sensorial, a Fernanda pode ajudar a investigar.',
-      },
-      moderate: {
-        label: 'Pontuação moderada',
-        message: 'Alguns traços do espectro autista estão presentes. Uma avaliação mais detalhada pode ajudar a entender melhor seu perfil de funcionamento.',
-      },
-      high: {
-        label: 'Pontuação elevada',
-        message: 'Sua pontuação sugere a presença de traços do espectro. Uma avaliação neuropsicológica é recomendada para investigar com mais precisão.',
-      },
+      low:      { label: 'Pontuação baixa',    message: 'Sua pontuação não indica sinais fortes de TEA. Se você tem dúvidas sobre funcionamento social ou sensorial, a Fernanda pode ajudar a investigar.' },
+      moderate: { label: 'Pontuação moderada', message: 'Alguns traços do espectro autista estão presentes. Uma avaliação mais detalhada pode ajudar a entender melhor seu perfil de funcionamento.' },
+      high:     { label: 'Pontuação elevada',  message: 'Sua pontuação sugere a presença de traços do espectro. Uma avaliação neuropsicológica é recomendada para investigar com mais precisão.' },
     },
     waLabel: 'Site - Triagem TEA',
     waMessages: {
-      low: 'Olá Fernanda, fiz a triagem de TEA no site (pontuação baixa) e gostaria de conversar sobre funcionamento social e sensorial.',
+      low:      'Olá Fernanda, fiz a triagem de TEA no site (pontuação baixa) e gostaria de conversar sobre funcionamento social e sensorial.',
       moderate: 'Olá Fernanda, fiz a triagem de TEA no site (pontuação moderada) e gostaria de saber mais sobre avaliação para o espectro autista.',
-      high: 'Olá Fernanda, fiz a triagem de TEA no site (pontuação elevada) e gostaria de agendar uma avaliação neuropsicológica.',
+      high:     'Olá Fernanda, fiz a triagem de TEA no site (pontuação elevada) e gostaria de agendar uma avaliação neuropsicológica.',
     },
   },
   depressao: {
@@ -127,24 +110,15 @@ const TESTS: Record<string, Test> = {
     ],
     cutoffs: { low: 5, moderate: 10 },
     results: {
-      low: {
-        label: 'Pontuação baixa',
-        message: 'Sua pontuação não indica sintomas significativos de depressão. Se você sente que seu bem-estar emocional poderia melhorar, a terapia pode ajudar.',
-      },
-      moderate: {
-        label: 'Pontuação moderada',
-        message: 'Sua pontuação indica sintomas moderados que merecem atenção. Conversar com a Fernanda pode ser um passo importante para se sentir melhor.',
-      },
-      high: {
-        label: 'Pontuação elevada',
-        message: 'Sua pontuação indica sintomas importantes de depressão. É recomendável buscar acompanhamento profissional — a Fernanda está disponível para te ajudar.',
-      },
+      low:      { label: 'Pontuação baixa',    message: 'Sua pontuação não indica sintomas significativos de depressão. Se você sente que seu bem-estar emocional poderia melhorar, a terapia pode ajudar.' },
+      moderate: { label: 'Pontuação moderada', message: 'Sua pontuação indica sintomas moderados que merecem atenção. Conversar com a Fernanda pode ser um passo importante para se sentir melhor.' },
+      high:     { label: 'Pontuação elevada',  message: 'Sua pontuação indica sintomas importantes de depressão. É recomendável buscar acompanhamento profissional — a Fernanda está disponível para te ajudar.' },
     },
     waLabel: 'Site - Triagem Depressão',
     waMessages: {
-      low: 'Olá Fernanda, fiz a triagem de depressão no site (pontuação baixa) e gostaria de conversar sobre bem-estar emocional.',
+      low:      'Olá Fernanda, fiz a triagem de depressão no site (pontuação baixa) e gostaria de conversar sobre bem-estar emocional.',
       moderate: 'Olá Fernanda, fiz a triagem de depressão no site (pontuação moderada) e gostaria de agendar uma sessão.',
-      high: 'Olá Fernanda, fiz a triagem de depressão no site (pontuação elevada) e preciso de acompanhamento psicológico.',
+      high:     'Olá Fernanda, fiz a triagem de depressão no site (pontuação elevada) e preciso de acompanhamento psicológico.',
     },
   },
   ansiedade: {
@@ -165,40 +139,30 @@ const TESTS: Record<string, Test> = {
     ],
     cutoffs: { low: 5, moderate: 10 },
     results: {
-      low: {
-        label: 'Pontuação baixa',
-        message: 'Sua pontuação não indica ansiedade significativa. Se você sente que o estresse do dia a dia está pesado, a terapia pode oferecer ferramentas práticas.',
-      },
-      moderate: {
-        label: 'Pontuação moderada',
-        message: 'Sua pontuação indica ansiedade moderada. Trabalhar esses sintomas na terapia costuma trazer resultados bastante positivos.',
-      },
-      high: {
-        label: 'Pontuação elevada',
-        message: 'Sua pontuação indica ansiedade intensa. Buscar acompanhamento profissional é importante — a Fernanda trabalha especificamente com ansiedade usando TCC.',
-      },
+      low:      { label: 'Pontuação baixa',    message: 'Sua pontuação não indica ansiedade significativa. Se você sente que o estresse do dia a dia está pesado, a terapia pode oferecer ferramentas práticas.' },
+      moderate: { label: 'Pontuação moderada', message: 'Sua pontuação indica ansiedade moderada. Trabalhar esses sintomas na terapia costuma trazer resultados bastante positivos.' },
+      high:     { label: 'Pontuação elevada',  message: 'Sua pontuação indica ansiedade intensa. Buscar acompanhamento profissional é importante — a Fernanda trabalha especificamente com ansiedade usando TCC.' },
     },
     waLabel: 'Site - Triagem Ansiedade',
     waMessages: {
-      low: 'Olá Fernanda, fiz a triagem de ansiedade no site (pontuação baixa) e gostaria de conversar sobre estresse e qualidade de vida.',
+      low:      'Olá Fernanda, fiz a triagem de ansiedade no site (pontuação baixa) e gostaria de conversar sobre estresse e qualidade de vida.',
       moderate: 'Olá Fernanda, fiz a triagem de ansiedade no site (pontuação moderada) e gostaria de agendar uma sessão.',
-      high: 'Olá Fernanda, fiz a triagem de ansiedade no site (pontuação elevada) e preciso de ajuda com ansiedade.',
+      high:     'Olá Fernanda, fiz a triagem de ansiedade no site (pontuação elevada) e preciso de ajuda com ansiedade.',
     },
   },
 };
 
 const FREQUENCY_LABELS: Record<ScaleType, string[]> = {
-  frequency: ['Nenhuma vez', 'Vários dias', 'Mais da metade dos dias', 'Quase todos os dias'],
+  frequency:  ['Nenhuma vez', 'Vários dias', 'Mais da metade dos dias', 'Quase todos os dias'],
   frequency5: ['Nunca', 'Raramente', 'Às vezes', 'Frequentemente', 'Muito frequentemente'],
-  agreement: ['Concordo totalmente', 'Concordo', 'Discordo', 'Discordo totalmente'],
+  agreement:  ['Concordo totalmente', 'Concordo', 'Discordo', 'Discordo totalmente'],
 };
 
 function getScore(test: Test, answers: number[]): number {
   if (test.scaleType === 'agreement') {
     return answers.reduce((acc, val, i) => {
       const q = test.questions[i];
-      const score = q.reverseScore ? (val <= 1 ? 0 : 1) : (val <= 1 ? 1 : 0);
-      return acc + score;
+      return acc + (q.reverseScore ? (val <= 1 ? 0 : 1) : (val <= 1 ? 1 : 0));
     }, 0);
   }
   return answers.reduce((a, b) => a + b, 0);
@@ -211,9 +175,9 @@ function getRange(test: Test, score: number): 'low' | 'moderate' | 'high' {
 }
 
 const RANGE_COLORS = {
-  low: 'text-green-600 bg-green-50 border-green-200',
+  low:      'text-green-600 bg-green-50 border-green-200',
   moderate: 'text-yellow-700 bg-yellow-50 border-yellow-200',
-  high: 'text-red-700 bg-red-50 border-red-200',
+  high:     'text-red-700 bg-red-50 border-red-200',
 };
 
 interface Props {
@@ -223,16 +187,29 @@ interface Props {
 
 export const ScreeningTest: React.FC<Props> = ({ testId, onClose }) => {
   const test = TESTS[testId];
-  const [step, setStep] = useState<'intro' | 'questions' | 'result'>('intro');
+  const [step, setStep] = useState<'intro' | 'questions' | 'capture' | 'result'>('intro');
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
+
+  // Capture gate state
+  const [captureName, setCaptureName]   = useState('');
+  const [captureEmail, setCaptureEmail] = useState('');
+  const [captureError, setCaptureError] = useState('');
+  const [capturing, setCapturing]       = useState(false);
+
   const options = FREQUENCY_LABELS[test.scaleType];
 
-  const score = answers.length === test.questions.length ? getScore(test, answers) : 0;
-  const range = getRange(test, score);
-  const result = test.results[range];
+  const score    = answers.length === test.questions.length ? getScore(test, answers) : 0;
+  const range    = getRange(test, score);
+  const result   = test.results[range];
   const waMessage = test.waMessages[range];
-  const waUrl = useWhatsAppUrl(test.waLabel, waMessage);
+  const waUrl    = useWhatsAppUrl(test.waLabel, waMessage);
+
+  const maxScore = test.scaleType === 'agreement'
+    ? test.questions.length
+    : test.scaleType === 'frequency5'
+      ? test.questions.length * 4
+      : test.questions.length * 3;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -241,39 +218,71 @@ export const ScreeningTest: React.FC<Props> = ({ testId, onClose }) => {
   }, [onClose]);
 
   useEffect(() => {
-    if (step === 'questions') {
-      sendGAEvent(`inicio_triagem_${test.id}`, 'triagem', test.id);
-    }
-    if (step === 'result') {
-      sendGAEvent(`conclusao_triagem_${test.id}`, 'triagem', `${test.id}_${range}_score${score}`);
-    }
+    if (step === 'questions') sendGAEvent(`inicio_triagem_${test.id}`, 'triagem', test.id);
+    if (step === 'capture')   sendGAEvent(`gate_triagem_${test.id}`,   'triagem', test.id);
+    if (step === 'result')    sendGAEvent(`conclusao_triagem_${test.id}`, 'triagem', `${test.id}_${range}_score${score}`);
   }, [step]);
 
   const handleAnswer = (val: number) => {
     const next = [...answers, val];
     setAnswers(next);
     if (next.length === test.questions.length) {
-      setStep('result');
+      setStep('capture'); // gate antes do resultado
     } else {
       setCurrent(current + 1);
     }
   };
 
   const handleBack = () => {
-    if (current === 0) {
-      setStep('intro');
-      setAnswers([]);
-    } else {
-      setCurrent(current - 1);
-      setAnswers(answers.slice(0, -1));
-    }
+    if (current === 0) { setStep('intro'); setAnswers([]); }
+    else { setCurrent(current - 1); setAnswers(answers.slice(0, -1)); }
   };
 
-  const maxScore = test.scaleType === 'agreement'
-    ? test.questions.length
-    : test.scaleType === 'frequency5'
-    ? test.questions.length * 4
-    : test.questions.length * 3;
+  const handleCapture = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!captureName.trim()) { setCaptureError('Informe seu nome.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(captureEmail)) { setCaptureError('E-mail inválido.'); return; }
+
+    setCapturing(true);
+    setCaptureError('');
+
+    // Salva lead no Firebase
+    const leadResult = await leadsService.create({
+      name:        captureName.trim(),
+      email:       captureEmail.trim(),
+      source:      'screening_test',
+      testId:      test.id,
+      testTitle:   test.title,
+      testScore:   score,
+      testMaxScore: maxScore,
+      testRange:   range,
+    });
+
+    // Dispara e-mail via Resend (fire-and-forget — não bloqueia o resultado)
+    fetch('/api/resend-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:          captureName.trim(),
+        email:         captureEmail.trim(),
+        source:        'screening_test',
+        testId:        test.id,
+        testTitle:     test.title,
+        testScore:     score,
+        testMaxScore:  maxScore,
+        testRange:     range,
+        resultMessage: result.message,
+      }),
+    }).then(async (r) => {
+      if (r.ok && leadResult.id) {
+        leadsService.markEmailSent(leadResult.id);
+      }
+    }).catch(() => {});
+
+    sendGAEvent(`lead_capturado_${test.id}`, 'lead', `${test.id}_${range}`);
+    setCapturing(false);
+    setStep('result');
+  };
 
   return (
     <div
@@ -290,17 +299,14 @@ export const ScreeningTest: React.FC<Props> = ({ testId, onClose }) => {
             <h2 className="text-lg font-bold text-[#3A4A3A]">{test.title}</h2>
             <p className="text-xs text-gray-400 mt-0.5">{test.subtitle}</p>
           </div>
-          <button
-            onClick={onClose}
-            className="ml-4 shrink-0 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Fechar"
-          >
+          <button onClick={onClose} className="ml-4 shrink-0 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Fechar">
             <X size={18} />
           </button>
         </div>
 
         <div className="px-6 py-6">
-          {/* INTRO */}
+
+          {/* ── INTRO ── */}
           {step === 'intro' && (
             <div className="space-y-5">
               <div className="flex items-center gap-3 text-sm text-gray-500 bg-gray-50 rounded-xl px-4 py-3">
@@ -310,20 +316,14 @@ export const ScreeningTest: React.FC<Props> = ({ testId, onClose }) => {
                 <span className="text-gray-300">·</span>
                 <span>Gratuito</span>
               </div>
-
               <div className="flex gap-2 items-start bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
                 <AlertCircle size={16} className="text-amber-500 shrink-0 mt-0.5" />
                 <p className="text-xs text-amber-700 leading-relaxed">
                   Este questionário é uma ferramenta de triagem e <strong>não substitui avaliação clínica</strong>. Os resultados são orientativos — apenas um profissional pode fazer um diagnóstico.
                 </p>
               </div>
-
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Responda de acordo com como você se sentiu nas <strong>últimas 2 semanas</strong>.
-              </p>
-
+              <p className="text-sm text-gray-500 leading-relaxed">Responda de acordo com como você se sentiu nas <strong>últimas 2 semanas</strong>.</p>
               <p className="text-[10px] text-gray-400">Fonte: {test.source}</p>
-
               <button
                 onClick={() => setStep('questions')}
                 className="w-full bg-[#4A5D4A] hover:bg-[#3A4A3A] text-white font-bold py-3.5 rounded-xl transition-colors"
@@ -333,27 +333,21 @@ export const ScreeningTest: React.FC<Props> = ({ testId, onClose }) => {
             </div>
           )}
 
-          {/* QUESTIONS */}
+          {/* ── QUESTIONS ── */}
           {step === 'questions' && (
             <div className="space-y-6">
-              {/* Progress */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs text-gray-400">
                   <span>Pergunta {current + 1} de {test.questions.length}</span>
-                  <span>{Math.round(((current) / test.questions.length) * 100)}%</span>
+                  <span>{Math.round((current / test.questions.length) * 100)}%</span>
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[#4A5D4A] rounded-full transition-all duration-300"
-                    style={{ width: `${(current / test.questions.length) * 100}%` }}
-                  />
+                  <div className="h-full bg-[#4A5D4A] rounded-full transition-all duration-300" style={{ width: `${(current / test.questions.length) * 100}%` }} />
                 </div>
               </div>
-
               <p className="text-base font-medium text-[#3A4A3A] leading-relaxed min-h-[3.5rem]">
                 {test.questions[current].text}
               </p>
-
               <div className="grid gap-2">
                 {options.map((label, i) => (
                   <button
@@ -365,17 +359,81 @@ export const ScreeningTest: React.FC<Props> = ({ testId, onClose }) => {
                   </button>
                 ))}
               </div>
-
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
-              >
+              <button onClick={handleBack} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors">
                 <ChevronLeft size={14} /> Voltar
               </button>
             </div>
           )}
 
-          {/* RESULT */}
+          {/* ── CAPTURE GATE ── */}
+          {step === 'capture' && (
+            <div className="space-y-5">
+              <div className="text-center">
+                <div className="w-14 h-14 bg-[#4A5D4A]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Mail size={24} className="text-[#4A5D4A]" />
+                </div>
+                <h3 className="text-lg font-bold text-[#3A4A3A]">Triagem concluída!</h3>
+                <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+                  Informe seus dados para receber seus resultados detalhados por e-mail.
+                </p>
+              </div>
+
+              <form onSubmit={handleCapture} className="space-y-3">
+                <div className="relative">
+                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Seu nome"
+                    value={captureName}
+                    onChange={(e) => { setCaptureName(e.target.value); setCaptureError(''); }}
+                    required
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B4C2B4]/50 text-sm transition-all"
+                  />
+                </div>
+                <div className="relative">
+                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="email"
+                    placeholder="Seu e-mail"
+                    value={captureEmail}
+                    onChange={(e) => { setCaptureEmail(e.target.value); setCaptureError(''); }}
+                    required
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#B4C2B4]/50 text-sm transition-all"
+                  />
+                </div>
+
+                {captureError && (
+                  <p className="text-red-500 text-xs flex items-center gap-1">
+                    <AlertCircle size={12} /> {captureError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={capturing}
+                  className="w-full bg-[#4A5D4A] hover:bg-[#3A4A3A] disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                  {capturing
+                    ? <><Loader2 size={17} className="animate-spin" /> Salvando...</>
+                    : 'Ver meus resultados'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setStep('result')}
+                  className="w-full text-xs text-gray-400 hover:text-gray-600 transition-colors py-1"
+                >
+                  Pular e ver resultado sem salvar
+                </button>
+              </form>
+
+              <p className="text-[10px] text-gray-400 text-center">
+                Seus dados são protegidos e não serão compartilhados com terceiros.
+              </p>
+            </div>
+          )}
+
+          {/* ── RESULT ── */}
           {step === 'result' && (
             <div className="space-y-5">
               <div className={`rounded-xl border px-5 py-4 ${RANGE_COLORS[range]}`}>
@@ -397,7 +455,7 @@ export const ScreeningTest: React.FC<Props> = ({ testId, onClose }) => {
               </a>
 
               <button
-                onClick={() => { setStep('intro'); setCurrent(0); setAnswers([]); }}
+                onClick={() => { setStep('intro'); setCurrent(0); setAnswers([]); setCaptureName(''); setCaptureEmail(''); }}
                 className="w-full text-sm text-gray-400 hover:text-gray-600 transition-colors py-2"
               >
                 Refazer o teste
@@ -406,6 +464,7 @@ export const ScreeningTest: React.FC<Props> = ({ testId, onClose }) => {
               <p className="text-[10px] text-gray-400 text-center">Fonte: {test.source}</p>
             </div>
           )}
+
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Send, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { sendGAEvent } from '../utils/analytics';
-import { messagesService } from '../services/firebaseService';
+import { messagesService, leadsService } from '../services/firebaseService';
 
 interface ContactModalProps {
   onClose: () => void;
@@ -61,6 +61,23 @@ export const ContactModal: React.FC<ContactModalProps> = ({ onClose }) => {
     setSending(true);
     try {
       await messagesService.create(formData);
+
+      // Salva também como lead e dispara e-mail de boas-vindas
+      const leadResult = await leadsService.create({
+        name:    formData.name,
+        email:   formData.email,
+        phone:   formData.phone,
+        message: formData.message,
+        source:  'contact_form',
+      });
+      fetch('/api/resend-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formData.name, email: formData.email, source: 'contact_form' }),
+      }).then(async (r) => {
+        if (r.ok && leadResult.id) leadsService.markEmailSent(leadResult.id);
+      }).catch(() => {});
+
       sendGAEvent('envio_formulario_contato', 'contato', 'footer');
       setSent(true);
       setFormData({ name: '', email: '', phone: '', message: '' });

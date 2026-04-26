@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
 import { useAuth } from '../contexts/AuthContext';
-import { postsService, metricsService, analyticsService, messagesService, alertsService, weeklyGoalService, WeeklyGoal, Post as FirebasePost } from '../services/firebaseService';
+import { postsService, metricsService, analyticsService, messagesService, alertsService, weeklyGoalService, leadsService, WeeklyGoal, Post as FirebasePost } from '../services/firebaseService';
 import ContentStudio from './ContentStudio';
 import AnalyticsPanel from './AnalyticsPanel';
 import PostsManager from './PostsManager';
@@ -11,6 +11,7 @@ import ProfileSettings from './ProfileSettings';
 import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
 import InstagramMetrics from './InstagramMetrics';
 import FacebookMetrics from './FacebookMetrics';
+import LeadsPanel from './LeadsPanel';
 import MessagesInbox from './MessagesInbox';
 import { getAISuggestion, AISuggestion } from '../services/aiSuggestionService';
 
@@ -38,9 +39,10 @@ const DEFAULT_METRICS: Metric[] = [
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'messages' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'messages' | 'settings'>('overview');
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeAlertsCount, setActiveAlertsCount] = useState(0);
+  const [newLeadsCount, setNewLeadsCount] = useState(0);
   const [showStudio, setShowStudio] = useState(false);
   const [metrics, setMetrics] = useState<Metric[]>(DEFAULT_METRICS);
   const [recentPosts, setRecentPosts] = useState<FirebasePost[]>([]);
@@ -94,9 +96,13 @@ const Dashboard: React.FC = () => {
     Promise.all([
       messagesService.getAll(),
       alertsService.getActive(),
-    ]).then(([messagesResult, alertsResult]) => {
+      leadsService.getNewCount(),
+    ]).then(([messagesResult, alertsResult, leadsResult]) => {
       if (messagesResult.success) {
         setUnreadCount(messagesResult.data.filter((m) => m.status === 'nova').length);
+      }
+      if (leadsResult.success) {
+        setNewLeadsCount(leadsResult.count);
       }
       if (alertsResult.success) {
         setActiveAlertsCount(alertsResult.data.length);
@@ -147,6 +153,7 @@ const Dashboard: React.FC = () => {
       onTabChange={setActiveTab}
       alertsCount={activeAlertsCount}
       unreadCount={unreadCount}
+      leadsCount={newLeadsCount}
     >
       {/* Header */}
       <div className="mb-6">
@@ -477,6 +484,7 @@ const Dashboard: React.FC = () => {
 
       {activeTab === 'instagram-metrics' && <InstagramMetrics />}
       {activeTab === 'facebook-metrics' && <FacebookMetrics />}
+      {activeTab === 'leads' && <LeadsPanel />}
 
       {activeTab === 'google' && <SearchConsoleGMBPanel />}
 

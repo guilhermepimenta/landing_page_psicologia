@@ -536,6 +536,100 @@ export const weeklyGoalService = {
   },
 };
 
+// Leads Service
+export interface Lead {
+  id?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  source: 'contact_form' | 'screening_test';
+  testId?: string;
+  testTitle?: string;
+  testScore?: number;
+  testMaxScore?: number;
+  testRange?: 'low' | 'moderate' | 'high';
+  message?: string;
+  status: 'new' | 'contacted' | 'converted';
+  resendEmailSent?: boolean;
+  createdAt?: Date;
+}
+
+const mapLead = (id: string, data: any): Lead => ({
+  id,
+  name: data.name,
+  email: data.email,
+  phone: data.phone,
+  source: data.source,
+  testId: data.testId,
+  testTitle: data.testTitle,
+  testScore: data.testScore,
+  testMaxScore: data.testMaxScore,
+  testRange: data.testRange,
+  message: data.message,
+  status: data.status ?? 'new',
+  resendEmailSent: data.resendEmailSent ?? false,
+  createdAt: data.createdAt?.toDate(),
+});
+
+export const leadsService = {
+  async create(lead: Omit<Lead, 'id' | 'status' | 'createdAt'>) {
+    try {
+      const docRef = await addDoc(collection(db, 'leads'), {
+        ...lead,
+        status: 'new',
+        resendEmailSent: false,
+        createdAt: Timestamp.now(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Erro ao salvar lead:', error);
+      return { success: false, error };
+    }
+  },
+
+  async getAll() {
+    try {
+      const q = query(collection(db, 'leads'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      const leads: Lead[] = [];
+      snapshot.forEach((d) => leads.push(mapLead(d.id, d.data())));
+      return { success: true, data: leads };
+    } catch (error) {
+      console.error('Erro ao buscar leads:', error);
+      return { success: false, error, data: [] as Lead[] };
+    }
+  },
+
+  async getNewCount() {
+    try {
+      const q = query(collection(db, 'leads'), where('status', '==', 'new'));
+      const snapshot = await getDocs(q);
+      return { success: true, count: snapshot.size };
+    } catch (error) {
+      return { success: false, count: 0 };
+    }
+  },
+
+  async updateStatus(id: string, status: Lead['status']) {
+    try {
+      await updateDoc(doc(db, 'leads', id), { status });
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao atualizar lead:', error);
+      return { success: false, error };
+    }
+  },
+
+  async markEmailSent(id: string) {
+    try {
+      await updateDoc(doc(db, 'leads', id), { resendEmailSent: true });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error };
+    }
+  },
+};
+
 // Profile Service
 export const profileService = {
   async get() {
