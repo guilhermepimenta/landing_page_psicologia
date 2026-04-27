@@ -111,7 +111,10 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [publishSuccess, setPublishSuccess] = useState('');
-  const [canvaCopied, setCanvaCopied] = useState(false);
+  const [canvaOpened, setCanvaOpened] = useState(false);
+  const [canvaDropActive, setCanvaDropActive] = useState(false);
+  const [canvaImageAdded, setCanvaImageAdded] = useState(false);
+  const canvaInputRef = React.useRef<HTMLInputElement>(null);
 
   const isInstagram = channel === 'Instagram';
   const isFacebook  = channel === 'Facebook';
@@ -722,36 +725,96 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                 const key = `${channel}:${format}`;
                 const tpl = CANVA_TEMPLATES[key];
                 if (!tpl) return null;
+
+                const handleCanvaUploadFile = (file: File) => {
+                  if (!file.type.startsWith('image/')) return;
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    const url = ev.target?.result as string;
+                    setImageDataUrls(prev => [...prev, url]);
+                    setCanvaImageAdded(true);
+                  };
+                  reader.readAsDataURL(file);
+                };
+
                 return (
-                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-2">
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide">
                       🎨 Criar arte no Canva
                     </p>
-                    <p className="text-xs text-gray-500 mb-3">
-                      Clique para copiar o texto gerado e abrir o template <strong>{tpl.label}</strong> direto na sua conta.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(editedContent || editedTitle || topic).catch(() => {});
-                        window.open(tpl.url, '_blank', 'noopener,noreferrer');
-                        setCanvaCopied(true);
-                        setTimeout(() => setCanvaCopied(false), 3000);
-                      }}
-                      className="w-full flex items-center justify-center gap-2 bg-white border border-purple-300 text-purple-700 hover:bg-purple-50 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
-                    >
-                      {canvaCopied ? (
-                        <>✅ Texto copiado — Canva aberto!</>
-                      ) : (
-                        <>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#7C3AED" opacity="0.15"/>
-                            <path d="M8.5 14.5L12 8l3.5 6.5H8.5z" fill="#7C3AED"/>
-                          </svg>
+
+                    {!canvaOpened ? (
+                      <>
+                        <p className="text-xs text-gray-500">
+                          Clique para copiar o texto e abrir o template <strong>{tpl.label}</strong> na sua conta.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(editedContent || editedTitle || topic).catch(() => {});
+                            window.open(tpl.url, '_blank', 'noopener,noreferrer');
+                            setCanvaOpened(true);
+                          }}
+                          className="w-full flex items-center justify-center gap-2 bg-white border border-purple-300 text-purple-700 hover:bg-purple-50 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#7C3AED" opacity="0.2"/><path d="M8.5 14.5L12 8l3.5 6.5H8.5z" fill="#7C3AED"/></svg>
                           Abrir template · {tpl.label}
-                        </>
-                      )}
-                    </button>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-xs text-green-600 font-semibold">
+                          ✅ Canva aberto · {tpl.label} — texto copiado
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Após baixar a arte no Canva, arraste o arquivo aqui:
+                        </p>
+
+                        {/* Drop zone */}
+                        <div
+                          onDragOver={(e) => { e.preventDefault(); setCanvaDropActive(true); }}
+                          onDragLeave={() => setCanvaDropActive(false)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setCanvaDropActive(false);
+                            const file = e.dataTransfer.files[0];
+                            if (file) handleCanvaUploadFile(file);
+                          }}
+                          onClick={() => canvaInputRef.current?.click()}
+                          className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all ${
+                            canvaDropActive
+                              ? 'border-purple-500 bg-purple-100'
+                              : canvaImageAdded
+                                ? 'border-green-400 bg-green-50'
+                                : 'border-purple-300 bg-white hover:bg-purple-50'
+                          }`}
+                        >
+                          {canvaImageAdded ? (
+                            <div className="space-y-1">
+                              <p className="text-green-600 font-semibold text-sm">✓ Arte adicionada à publicação!</p>
+                              <p className="text-xs text-gray-400">Clique para trocar</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-1">
+                              <p className="text-2xl">⬇️</p>
+                              <p className="text-sm font-medium text-purple-700">Arraste a arte aqui</p>
+                              <p className="text-xs text-gray-400">ou clique para selecionar o arquivo</p>
+                            </div>
+                          )}
+                        </div>
+
+                        <input
+                          ref={canvaInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleCanvaUploadFile(file);
+                          }}
+                        />
+                      </>
+                    )}
                   </div>
                 );
               })()}
