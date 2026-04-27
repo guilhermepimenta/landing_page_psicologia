@@ -1,31 +1,27 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { BetaAnalyticsDataClient } from '@google-analytics/data';
 
 /**
  * GET /api/google-ads?month=YYYY-MM
  *
- * Retorna o total gasto no Google Ads para o mês informado.
+ * Retorna o gasto mensal do Google Ads via GA4 Data API.
+ * Requer que o Google Ads esteja vinculado à propriedade GA4:
+ *   GA4 → Admin → Integrações de produtos → Google Ads → Vincular
  *
- * Variáveis de ambiente necessárias no Vercel:
- *   GOOGLE_ADS_DEVELOPER_TOKEN  → token de desenvolvedor da conta MCC
- *   GOOGLE_ADS_CLIENT_ID        → OAuth2 client_id (Google Cloud Console)
- *   GOOGLE_ADS_CLIENT_SECRET    → OAuth2 client_secret
- *   GOOGLE_ADS_REFRESH_TOKEN    → refresh_token gerado uma vez via OAuth2
- *   GOOGLE_ADS_CUSTOMER_ID      → ID da conta de anúncios (ex: "123-456-7890")
+ * Usa as mesmas variáveis de ambiente do GA4 já configuradas:
+ *   GA4_PROPERTY_ID, GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY
+ *
+ * Métricas disponíveis após vinculação:
+ *   advertiserAdCost, advertiserAdClicks, advertiserAdImpressions
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  const {
-    GOOGLE_ADS_DEVELOPER_TOKEN,
-    GOOGLE_ADS_CUSTOMER_ID,
-    GOOGLE_ADS_CLIENT_ID,
-    GOOGLE_ADS_CLIENT_SECRET,
-    GOOGLE_ADS_REFRESH_TOKEN,
-  } = process.env;
+  const { GA4_PROPERTY_ID, GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY } = process.env;
 
-  if (!GOOGLE_ADS_DEVELOPER_TOKEN || !GOOGLE_ADS_CUSTOMER_ID || !GOOGLE_ADS_CLIENT_ID || !GOOGLE_ADS_CLIENT_SECRET || !GOOGLE_ADS_REFRESH_TOKEN) {
-    return res.status(503).json({ error: 'Google Ads não configurado', configured: false });
+  if (!GA4_PROPERTY_ID || !GA4_CLIENT_EMAIL || !GA4_PRIVATE_KEY) {
+    return res.status(503).json({ error: 'GA4 não configurado', configured: false });
   }
 
   const month = (req.query.month as string) || new Date().toISOString().slice(0, 7);
@@ -33,72 +29,63 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const startDate = `${year}-${m}-01`;
   const daysInMonth = new Date(parseInt(year), parseInt(m), 0).getDate();
   const endDate = `${year}-${m}-${String(daysInMonth).padStart(2, '0')}`;
-  const customerId = GOOGLE_ADS_CUSTOMER_ID.replace(/-/g, '');
 
   try {
-    // Obter access token via refresh token
-    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: GOOGLE_ADS_CLIENT_ID,
-        client_secret: GOOGLE_ADS_CLIENT_SECRET,
-        refresh_token: GOOGLE_ADS_REFRESH_TOKEN,
-        grant_type: 'refresh_token',
-      }).toString(),
+    const analytics = new BetaAnalyticsDataClient({
+      credentials: {
+        client_email: GA4_CLIENT_EMAIL,
+        private_key: GA4_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      },
     });
 
-    const tokenData = await tokenRes.json() as { access_token?: string; error?: string };
-    if (!tokenData.access_token) {
-      return res.status(401).json({ error: 'Falha na autenticação OAuth: ' + (tokenData.error ?? 'token inválido') });
-    }
+    const [response] = await analytics.runReport({
+      property: `properties/${GA4_PROPERTY_ID}`,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [{ name: 'sessionGoogleAdsAdNetworkType' }],
+      metrics: [
+        { name: 'advertiserAdCost' },
+        { name: 'advertiserAdClicks' },
+        { name: 'advertiserAdImpressions' },
+      ],
+    });
 
-    // Consultar Google Ads via GAQL
-    const query = `
-      SELECT
-        campaign.name,
-        metrics.cost_micros
-      FROM campaign
-      WHERE
-        segments.date BETWEEN '${startDate}' AND '${endDate}'
-        AND campaign.status != 'REMOVED'
-        AND metrics.cost_micros > 0
-    `;
+    let totalCost = 0;
+    let totalClicks = 0;
+    let totalImpressions = 0;
+    const campaigns: { name: string; spend: number }[] = [];
 
-    const searchRes = await fetch(
-      `https://googleads.googleapis.com/v17/customers/${customerId}/googleAds:search`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${tokenData.access_token}`,
-          'developer-token': GOOGLE_ADS_DEVELOPER_TOKEN,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
-      },
-    );
+    (response.rows ?? []).forEach(row => {
+      const network = row.dimensionValues?.[0]?.value ?? 'Google Ads';
+      const cost    = parseFloat(row.metricValues?.[0]?.value ?? '0');
+      const clicks  = parseInt(row.metricValues?.[1]?.value ?? '0', 10);
+      const impr    = parseInt(row.metricValues?.[2]?.value ?? '0', 10);
+      if (cost > 0) {
+        totalCost        += cost;
+        totalClicks      += clicks;
+        totalImpressions += impr;
+        campaigns.push({ name: network, spend: cost });
+      }
+    });
 
-    const searchData = await searchRes.json() as { results?: any[]; error?: any };
-
-    if (!searchRes.ok) {
-      const msg = searchData.error?.message ?? searchData.error?.details?.[0]?.errors?.[0]?.message ?? 'Erro na Google Ads API';
-      return res.status(400).json({ error: msg });
-    }
-
-    const totalMicros = (searchData.results ?? []).reduce(
-      (sum: number, r: any) => sum + Number(r.metrics?.costMicros ?? 0),
-      0,
-    );
-    const totalBRL = totalMicros / 1_000_000;
-
-    const campaigns = (searchData.results ?? []).map((r: any) => ({
-      name: r.campaign?.name ?? '',
-      spend: Number(r.metrics?.costMicros ?? 0) / 1_000_000,
-    }));
-
-    return res.json({ spend: totalBRL, month, currency: 'BRL', campaigns });
+    return res.json({
+      spend: totalCost,
+      clicks: totalClicks,
+      impressions: totalImpressions,
+      month,
+      currency: 'BRL',
+      campaigns,
+      source: 'ga4',
+    });
   } catch (err: any) {
-    console.error('[google-ads]', err);
-    return res.status(500).json({ error: err.message ?? 'Erro interno' });
+    // Se a métrica não está disponível, provavelmente o Google Ads ainda não foi vinculado
+    const msg: string = err.message ?? '';
+    if (msg.includes('INVALID_ARGUMENT') || msg.includes('advertiserAdCost')) {
+      return res.status(503).json({
+        error: 'Vincule o Google Ads ao GA4 primeiro: GA4 → Admin → Integrações → Google Ads',
+        configured: false,
+      });
+    }
+    console.error('[google-ads via ga4]', err);
+    return res.status(500).json({ error: msg || 'Erro interno' });
   }
 }
