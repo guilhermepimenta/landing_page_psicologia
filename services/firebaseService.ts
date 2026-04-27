@@ -630,6 +630,49 @@ export const leadsService = {
   },
 };
 
+// ROI Ads Sync Service — armazena o último valor sincronizado de cada plataforma por mês
+export interface ROIAdsSync {
+  month: string;
+  googleAds: number;
+  metaAds: number;
+  googleCampaigns?: { name: string; spend: number }[];
+  metaCampaigns?: { name: string; spend: number }[];
+  syncedAt?: Date;
+}
+
+export const roiAdsSyncService = {
+  async save(sync: Omit<ROIAdsSync, 'syncedAt'>) {
+    try {
+      await setDoc(doc(db, 'roi_ads_sync', sync.month), {
+        ...sync,
+        syncedAt: Timestamp.now(),
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao salvar sync de ads:', error);
+      return { success: false, error };
+    }
+  },
+
+  async get(month: string): Promise<ROIAdsSync | null> {
+    try {
+      const snap = await getDoc(doc(db, 'roi_ads_sync', month));
+      if (!snap.exists()) return null;
+      const d = snap.data();
+      return {
+        month: d.month,
+        googleAds: d.googleAds ?? 0,
+        metaAds: d.metaAds ?? 0,
+        googleCampaigns: d.googleCampaigns ?? [],
+        metaCampaigns: d.metaCampaigns ?? [],
+        syncedAt: d.syncedAt?.toDate(),
+      };
+    } catch {
+      return null;
+    }
+  },
+};
+
 // ROI Service
 export interface ROIEntry {
   id?: string;
