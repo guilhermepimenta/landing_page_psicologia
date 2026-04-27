@@ -630,6 +630,65 @@ export const leadsService = {
   },
 };
 
+// ROI Service
+export interface ROIEntry {
+  id?: string;
+  type: 'investment' | 'revenue';
+  amount: number;
+  category: string;
+  description?: string;
+  month: string; // YYYY-MM
+  createdAt?: Date;
+}
+
+export const roiService = {
+  async create(entry: Omit<ROIEntry, 'id' | 'createdAt'>) {
+    try {
+      const docRef = await addDoc(collection(db, 'roi_entries'), {
+        ...entry,
+        createdAt: Timestamp.now(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Erro ao salvar entrada ROI:', error);
+      return { success: false, error };
+    }
+  },
+
+  async getAll() {
+    try {
+      const q = query(collection(db, 'roi_entries'), orderBy('month', 'desc'));
+      const snapshot = await getDocs(q);
+      const entries: ROIEntry[] = [];
+      snapshot.forEach((d) => {
+        const data = d.data();
+        entries.push({
+          id: d.id,
+          type: data.type,
+          amount: data.amount,
+          category: data.category,
+          description: data.description,
+          month: data.month,
+          createdAt: data.createdAt?.toDate(),
+        });
+      });
+      return { success: true, data: entries };
+    } catch (error) {
+      console.error('Erro ao buscar entradas ROI:', error);
+      return { success: false, error, data: [] as ROIEntry[] };
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      await deleteDoc(doc(db, 'roi_entries', id));
+      return { success: true };
+    } catch (error) {
+      return { success: false, error };
+    }
+  },
+};
+
 // Profile Service
 export const profileService = {
   async get() {

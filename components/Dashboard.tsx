@@ -12,6 +12,8 @@ import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
 import InstagramMetrics from './InstagramMetrics';
 import FacebookMetrics from './FacebookMetrics';
 import LeadsPanel from './LeadsPanel';
+import LeadsFunnel from './LeadsFunnel';
+import ROIPanel from './ROIPanel';
 import MessagesInbox from './MessagesInbox';
 import { getAISuggestion, AISuggestion } from '../services/aiSuggestionService';
 
@@ -39,7 +41,7 @@ const DEFAULT_METRICS: Metric[] = [
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'messages' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'leads-funnel' | 'roi' | 'messages' | 'settings'>('overview');
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeAlertsCount, setActiveAlertsCount] = useState(0);
   const [newLeadsCount, setNewLeadsCount] = useState(0);
@@ -485,6 +487,8 @@ const Dashboard: React.FC = () => {
       {activeTab === 'instagram-metrics' && <InstagramMetrics />}
       {activeTab === 'facebook-metrics' && <FacebookMetrics />}
       {activeTab === 'leads' && <LeadsPanel />}
+      {activeTab === 'leads-funnel' && <LeadsFunnel />}
+      {activeTab === 'roi' && <ROIPanel />}
 
       {activeTab === 'google' && <SearchConsoleGMBPanel />}
 
