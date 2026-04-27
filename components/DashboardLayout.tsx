@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'messages' | 'settings';
+type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'hashtags' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'messages' | 'settings';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -23,6 +23,7 @@ const NAV_GROUPS = [
       { icon: '📧', label: 'E-mail', tab: 'email' as TabId },
       { icon: '📘', label: 'Facebook', tab: 'facebook' as TabId },
       { icon: '📅', label: 'Calendário', tab: 'calendar' as TabId },
+      { icon: '#️⃣', label: 'Hashtags', tab: 'hashtags' as TabId },
     ],
   },
   {

@@ -3,6 +3,7 @@ import { postsService, Post } from '../services/firebaseService';
 import PostFormModal from './PostFormModal';
 import ContentStudio from './ContentStudio';
 import AdaptContentModal from './AdaptContentModal';
+import CampaignStudio from './CampaignStudio';
 
 const CHANNEL_OPTIONS = ['Todos', 'Instagram', 'GMB', 'Blog', 'Email'] as const;
 const STATUS_OPTIONS = ['Todos', 'published', 'scheduled', 'draft'] as const;
@@ -45,6 +46,7 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
   const [filterStatus, setFilterStatus] = useState<string>('Todos');
   const [showPostModal, setShowPostModal] = useState(false);
   const [showStudio, setShowStudio] = useState(false);
+  const [showCampaign, setShowCampaign] = useState(false);
   const [postToEdit, setPostToEdit] = useState<Post | undefined>(undefined);
   const [postToAdapt, setPostToAdapt] = useState<Post | null>(null);
 
@@ -120,6 +122,12 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
             {meta ? meta.label : 'Todos os Criativos'}
           </h2>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowCampaign(true)}
+              className="bg-gradient-to-r from-indigo-500 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-md flex items-center gap-1.5"
+            >
+              <span>🎯</span> Criar Série
+            </button>
             <button
               onClick={() => setShowStudio(true)}
               className="bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white px-4 py-2 rounded-lg font-medium transition-all shadow-md flex items-center gap-1.5"
@@ -317,6 +325,14 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
         <ContentStudio
           onClose={() => setShowStudio(false)}
           onSaved={() => { setShowStudio(false); fetchPosts(); }}
+          initialChannel={fixedChannel}
+        />
+      )}
+
+      {showCampaign && (
+        <CampaignStudio
+          onClose={() => setShowCampaign(false)}
+          onSaved={() => fetchPosts()}
           initialChannel={fixedChannel}
         />
       )}

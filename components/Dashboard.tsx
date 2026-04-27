@@ -13,6 +13,7 @@ import InstagramMetrics from './InstagramMetrics';
 import FacebookMetrics from './FacebookMetrics';
 import LeadsPanel from './LeadsPanel';
 import MessagesInbox from './MessagesInbox';
+import HashtagBank from './HashtagBank';
 import { getAISuggestion, AISuggestion } from '../services/aiSuggestionService';
 
 interface Metric {
@@ -39,7 +40,7 @@ const DEFAULT_METRICS: Metric[] = [
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'messages' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'hashtags' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'messages' | 'settings'>('overview');
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeAlertsCount, setActiveAlertsCount] = useState(0);
   const [newLeadsCount, setNewLeadsCount] = useState(0);
@@ -477,6 +478,7 @@ const Dashboard: React.FC = () => {
       {activeTab === 'facebook' && <PostsManager fixedChannel="Facebook" />}
 
       {activeTab === 'calendar' && <ContentCalendar />}
+      {activeTab === 'hashtags' && <HashtagBank />}
 
       {activeTab === 'analytics' && (
         <AnalyticsPanel metrics={metrics} />
