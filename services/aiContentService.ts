@@ -89,6 +89,80 @@ ${formats[channel]}
 IMPORTANTE: Retorne APENAS o JSON válido, sem texto adicional antes ou depois.`;
 };
 
+export interface AdaptedContent {
+  channel: ContentChannel;
+  title: string;
+  content: string;
+  hashtags: string[];
+}
+
+const ADAPT_FORMATS: Record<ContentChannel, string> = {
+  Instagram: `Post para Instagram (máximo 2200 caracteres).
+Reescreva com: gancho inicial forte, parágrafos curtos, call-to-action no final, 5 hashtags relevantes.
+Retorne JSON: {"title": "...", "content": "...", "hashtags": ["tag1","tag2","tag3","tag4","tag5"]}`,
+
+  Facebook: `Post para Página do Facebook (300-500 palavras).
+Linguagem conversacional e empática. Inclua uma pergunta no final para estimular comentários. Sem hashtags.
+Retorne JSON: {"title": "tema resumido", "content": "...", "hashtags": []}`,
+
+  Blog: `Artigo de blog SEO-friendly (800-1200 palavras).
+Inclua: título H1 atraente, introdução, 3-4 seções com subtítulos H2, conclusão com CTA para agendar consulta.
+Retorne JSON: {"title": "título SEO", "content": "texto completo", "hashtags": ["palavra-chave1","palavra-chave2"]}`,
+
+  Email: `Newsletter por e-mail (máximo 500 palavras).
+Inclua: assunto impactante, saudação personalizada, conteúdo de valor, CTA claro, assinatura da Fernanda.
+Retorne JSON: {"title": "assunto do e-mail", "content": "corpo completo", "hashtags": []}`,
+
+  GMB: `Post para Google Meu Negócio (máximo 1500 caracteres).
+Texto direto, foco local (Niterói/Nova Friburgo), mencione agendamento presencial ou online.
+Retorne JSON: {"title": "título da publicação", "content": "texto completo", "hashtags": []}`,
+};
+
+export const adaptContent = async (
+  sourceTitle: string,
+  sourceContent: string,
+  sourceChannel: ContentChannel,
+  targetChannels: ContentChannel[],
+): Promise<AdaptedContent[]> => {
+  const results: AdaptedContent[] = [];
+
+  await Promise.all(
+    targetChannels.map(async (targetChannel) => {
+      const prompt = `${SYSTEM_CONTEXT}
+
+Você recebeu o seguinte conteúdo criado para ${sourceChannel}:
+
+TÍTULO: ${sourceTitle}
+CONTEÚDO: ${sourceContent}
+
+Sua tarefa: adapte este conteúdo para ${targetChannel}, mantendo a essência e as informações principais, mas adequando linguagem, tamanho e formato para o novo canal.
+
+${ADAPT_FORMATS[targetChannel]}
+
+IMPORTANTE: Retorne APENAS o JSON válido, sem texto adicional.`;
+
+      try {
+        const response = await genAI.models.generateContent({
+          model: 'gemini-2.0-flash',
+          contents: prompt,
+        });
+        const text = response.text ?? '';
+        const match = text.match(/\{[\s\S]*\}/);
+        if (!match) return;
+        const parsed = JSON.parse(match[0]);
+        results.push({
+          channel: targetChannel,
+          title:   parsed.title   ?? sourceTitle,
+          content: parsed.content ?? '',
+          hashtags: parsed.hashtags ?? [],
+        });
+      } catch { /* ignora canais que falharem */ }
+    }),
+  );
+
+  return results;
+};
+
 export const generateContent = async (
   topic: string,
   channel: ContentChannel,

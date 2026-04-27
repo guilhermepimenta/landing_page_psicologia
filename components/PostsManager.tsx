@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { postsService, Post } from '../services/firebaseService';
 import PostFormModal from './PostFormModal';
 import ContentStudio from './ContentStudio';
+import AdaptContentModal from './AdaptContentModal';
 
 const CHANNEL_OPTIONS = ['Todos', 'Instagram', 'GMB', 'Blog', 'Email'] as const;
 const STATUS_OPTIONS = ['Todos', 'published', 'scheduled', 'draft'] as const;
@@ -45,6 +46,7 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
   const [showPostModal, setShowPostModal] = useState(false);
   const [showStudio, setShowStudio] = useState(false);
   const [postToEdit, setPostToEdit] = useState<Post | undefined>(undefined);
+  const [postToAdapt, setPostToAdapt] = useState<Post | null>(null);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -268,10 +270,7 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                       <button
-                        onClick={() => {
-                          setPostToEdit(post);
-                          setShowPostModal(true);
-                        }}
+                        onClick={() => { setPostToEdit(post); setShowPostModal(true); }}
                         className="text-purple-600 hover:text-purple-900"
                       >
                         Editar
@@ -284,6 +283,13 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
                           Publicar
                         </button>
                       )}
+                      <button
+                        onClick={() => setPostToAdapt(post)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                        title="Adaptar para outros canais"
+                      >
+                        Adaptar →
+                      </button>
                       <button
                         onClick={() => handleDelete(post)}
                         className="text-red-600 hover:text-red-900"
@@ -312,6 +318,14 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
           onClose={() => setShowStudio(false)}
           onSaved={() => { setShowStudio(false); fetchPosts(); }}
           initialChannel={fixedChannel}
+        />
+      )}
+
+      {postToAdapt && (
+        <AdaptContentModal
+          post={postToAdapt}
+          onClose={() => setPostToAdapt(null)}
+          onSaved={() => { fetchPosts(); }}
         />
       )}
     </div>
