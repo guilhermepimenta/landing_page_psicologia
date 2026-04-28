@@ -222,7 +222,7 @@ const ROIPanel: React.FC = () => {
             )}
             <div className="mt-3 pt-3 border-t border-blue-100">
               <p className="text-[10px] text-blue-400">
-                Vars: <code className="bg-blue-100 px-1 rounded">GOOGLE_ADS_DEVELOPER_TOKEN</code> · <code className="bg-blue-100 px-1 rounded">GOOGLE_ADS_CUSTOMER_ID</code> · OAuth2
+                Vars: <code className="bg-blue-100 px-1 rounded">GA4_PROPERTY_ID</code> · <code className="bg-blue-100 px-1 rounded">GA4_CLIENT_EMAIL</code> · <code className="bg-blue-100 px-1 rounded">GA4_PRIVATE_KEY</code>
               </p>
             </div>
           </div>
@@ -278,7 +278,7 @@ const ROIPanel: React.FC = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
-              <Tooltip formatter={(v: number) => formatBRL(v)} />
+              <Tooltip formatter={(v: number | undefined) => formatBRL(v ?? 0)} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar dataKey="Manual" name="Investimento manual" fill="#f87171" radius={[4, 4, 0, 0]} />
               <Bar dataKey="Receita" fill="#34d399" radius={[4, 4, 0, 0]} />
