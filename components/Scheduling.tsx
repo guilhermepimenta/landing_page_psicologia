@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { MapPin, Monitor, Calendar } from 'lucide-react';
-import { sendGAEvent } from '../utils/analytics';
+import { sendGAEvent, trackWhatsAppClick } from '../utils/analytics';
 import { buildWhatsAppUrl } from '../utils/useWhatsAppUrl';
 
 type Tab = 'niteroi' | 'nova-friburgo' | 'online';
@@ -61,6 +61,7 @@ export const Scheduling: React.FC = () => {
     };
     const url = buildWhatsAppUrl(siteLabels[activeTab], messages[activeTab]);
     sendGAEvent(`agendar_whatsapp_${activeTab}`, 'agendamento', 'whatsapp');
+    trackWhatsAppClick(`agendamento_${activeTab}`);
     window.open(url, '_blank');
   };
 

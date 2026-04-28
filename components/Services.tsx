@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { User, Activity, Brain, Heart, Wind, ClipboardCheck, GraduationCap } from 'lucide-react';
-import { sendGAEvent } from '../utils/analytics';
+import { sendGAEvent, trackWhatsAppClick } from '../utils/analytics';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 import { ScreeningTest } from './ScreeningTest';
 
@@ -87,7 +87,7 @@ export const Services: React.FC = () => {
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => sendGAEvent('agendar_avaliacao_neuropsicologica', 'servicos', 'whatsapp')}
+          onClick={() => { sendGAEvent('agendar_avaliacao_neuropsicologica', 'servicos', 'whatsapp'); trackWhatsAppClick('servicos'); }}
           className="shrink-0 bg-[#4A5D4A] hover:bg-[#3A4A3A] text-white text-sm font-bold px-5 py-2.5 rounded-full transition-all shadow-md hover:shadow-lg active:scale-95 whitespace-nowrap"
         >
           Agendar Avaliação

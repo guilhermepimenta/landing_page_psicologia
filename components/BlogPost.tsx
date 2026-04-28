@@ -5,6 +5,7 @@ import { Footer } from './Footer';
 import { AIChatAssistant } from './AIChatAssistant';
 import { ArrowLeft, Clock, Calendar, Share2 } from 'lucide-react';
 import { ShareModal } from './ShareModal';
+import { trackWhatsAppClick } from '../utils/analytics';
 
 const blogPosts = {
     'avaliacao-neuropsicologica': {
@@ -304,6 +305,7 @@ export const BlogPost: React.FC = () => {
                         href="https://wa.me/5521971318289"
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => trackWhatsAppClick('blog_cta')}
                         className="inline-block bg-[#128C7E] text-white px-8 py-4 rounded-full font-bold hover:scale-105 transition-transform shadow-lg hover:shadow-xl hover:bg-[#075E54] flex items-center justify-center gap-2 max-w-xs mx-auto"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -322,6 +324,7 @@ export const BlogPost: React.FC = () => {
                 href="https://wa.me/5521971318289"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('blog_flutuante')}
                 className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform duration-300 flex items-center justify-center"
                 aria-label="Falar no WhatsApp"
             >

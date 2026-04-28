@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Send, AlertCircle, MapPin, MessageCircle, CheckCircle } from 'lucide-react';
-import { sendGAEvent } from '../utils/analytics';
+import { sendGAEvent, trackFormLead } from '../utils/analytics';
 import { messagesService } from '../services/firebaseService';
 
 export const Contact: React.FC = () => {
@@ -95,6 +95,7 @@ export const Contact: React.FC = () => {
         message: formData.message,
       });
       sendGAEvent('envio_formulario_contato', 'contato', 'dashboard');
+      trackFormLead();
       setSent(true);
       setFormData({ name: '', email: '', phone: '', message: '' });
       setTimeout(() => setSent(false), 5000);

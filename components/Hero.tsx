@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { sendGAEvent } from '../utils/analytics';
+import { sendGAEvent, trackWhatsAppClick } from '../utils/analytics';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 
 export const Hero: React.FC = () => {
@@ -39,7 +39,7 @@ export const Hero: React.FC = () => {
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => sendGAEvent('agendar_consulta_hero', 'hero', 'whatsapp')}
+            onClick={() => { sendGAEvent('agendar_consulta_hero', 'hero', 'whatsapp'); trackWhatsAppClick('hero'); }}
             className="w-full sm:w-auto bg-[#B4C2B4] hover:bg-[#9BAB9B] text-white px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
           >
             Agendar Consulta

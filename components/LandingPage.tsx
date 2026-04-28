@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { sendGAEvent } from '../utils/analytics';
+import { sendGAEvent, trackWhatsAppClick } from '../utils/analytics';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 import { Navbar } from './Navbar';
 import { Hero } from './Hero';
@@ -113,7 +113,7 @@ export const LandingPage: React.FC = () => {
                 href={waFloatingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => sendGAEvent('whatsapp_flutuante', 'floating', 'whatsapp')}
+                onClick={() => { sendGAEvent('whatsapp_flutuante', 'floating', 'whatsapp'); trackWhatsAppClick('flutuante'); }}
                 className="fixed bottom-24 right-6 z-50 bg-[#25D366] text-white pl-4 pr-5 py-3 rounded-full shadow-lg hover:scale-105 transition-transform duration-300 flex items-center gap-2"
                 aria-label="Falar no WhatsApp"
             >
