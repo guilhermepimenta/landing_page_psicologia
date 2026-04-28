@@ -31,6 +31,8 @@ export interface Post {
   instagramPermalink?: string;
   facebookPostId?: string;
   facebookPermalink?: string;
+  campaignId?: string;
+  campaignTitle?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -48,6 +50,10 @@ const mapPost = (id: string, data: any): Post => ({
   videoUrl: data.videoUrl,
   instagramPostId: data.instagramPostId,
   instagramPermalink: data.instagramPermalink,
+  facebookPostId: data.facebookPostId,
+  facebookPermalink: data.facebookPermalink,
+  campaignId: data.campaignId,
+  campaignTitle: data.campaignTitle,
   createdAt: data.createdAt?.toDate?.(),
   updatedAt: data.updatedAt?.toDate?.(),
 });
@@ -625,6 +631,60 @@ export const leadsService = {
       await updateDoc(doc(db, 'leads', id), { resendEmailSent: true });
       return { success: true };
     } catch (error) {
+      return { success: false, error };
+    }
+  },
+};
+
+// Hashtag Sets Service
+export interface HashtagSet {
+  id?: string;
+  theme: string;
+  hashtags: string[];
+  createdAt?: Date;
+}
+
+export const hashtagsService = {
+  async create(set: Omit<HashtagSet, 'id' | 'createdAt'>) {
+    try {
+      const docRef = await addDoc(collection(db, 'hashtags'), {
+        ...set,
+        createdAt: Timestamp.now(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Erro ao salvar hashtags:', error);
+      return { success: false, error };
+    }
+  },
+
+  async getAll() {
+    try {
+      const q = query(collection(db, 'hashtags'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      const sets: HashtagSet[] = [];
+      snapshot.forEach((d) => {
+        const data = d.data();
+        sets.push({
+          id: d.id,
+          theme: data.theme,
+          hashtags: data.hashtags ?? [],
+          createdAt: data.createdAt?.toDate(),
+        });
+      });
+      return { success: true, data: sets };
+    } catch (error) {
+      console.error('Erro ao buscar hashtags:', error);
+      return { success: false, error, data: [] as HashtagSet[] };
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      await deleteDoc(doc(db, 'hashtags', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao deletar hashtags:', error);
       return { success: false, error };
     }
   },

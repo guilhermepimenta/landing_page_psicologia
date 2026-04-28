@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { postsService, Post } from '../services/firebaseService';
+import { generateEditorialCalendar, EditorialSuggestion, ContentChannel, InstagramFormat } from '../services/aiContentService';
 import PostFormModal from './PostFormModal';
 import SchedulePickerModal from './SchedulePickerModal';
+import ContentStudio from './ContentStudio';
 
 const CHANNEL_ICON: Record<string, string> = {
   Instagram: '📱',
   GMB: '📍',
   Blog: '📝',
   Email: '📧',
+  Facebook: '📘',
 };
+
+const SUGGESTION_COLOR = 'bg-orange-100 border-orange-300 text-orange-800';
 
 const STATUS_COLOR: Record<string, string> = {
   published: 'bg-green-200 border-green-400 text-green-900',
@@ -49,6 +54,18 @@ const ContentCalendar: React.FC = () => {
   const [schedulerDate, setSchedulerDate] = useState<Date | undefined>(undefined);
   const [postToEdit, setPostToEdit] = useState<Post | undefined>(undefined);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const [aiSuggestions, setAiSuggestions] = useState<EditorialSuggestion[]>([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [suggestionsError, setSuggestionsError] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const [studioProps, setStudioProps] = useState<{
+    channel: ContentChannel;
+    format?: InstagramFormat;
+    topic: string;
+    date: Date;
+  } | null>(null);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -96,6 +113,39 @@ const ContentCalendar: React.FC = () => {
   const goToToday = () => {
     setCurrentMonth(today.getMonth());
     setCurrentYear(today.getFullYear());
+  };
+
+  const handleGenerateSuggestions = async () => {
+    setSuggestionsLoading(true);
+    setSuggestionsError('');
+    setShowSuggestions(true);
+    try {
+      const suggestions = await generateEditorialCalendar(currentMonth, currentYear);
+      setAiSuggestions(suggestions);
+    } catch {
+      setSuggestionsError('Erro ao gerar sugestões. Verifique a chave Gemini.');
+    } finally {
+      setSuggestionsLoading(false);
+    }
+  };
+
+  const getSuggestionsForDay = (date: Date): EditorialSuggestion[] => {
+    const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    return aiSuggestions.filter(s => s.date === iso);
+  };
+
+  const handleUseSuggestion = (s: EditorialSuggestion) => {
+    const [year, month, day] = s.date.split('-').map(Number);
+    const date = new Date(year, month - 1, day, 9, 0);
+    const instagramFormats = ['post', 'carrossel', 'reels'];
+    setStudioProps({
+      channel: s.channel,
+      format: s.channel === 'Instagram' && instagramFormats.includes(s.format)
+        ? (s.format as InstagramFormat)
+        : undefined,
+      topic: s.theme,
+      date,
+    });
   };
 
   const handleDayClick = (date: Date) => {
@@ -163,12 +213,25 @@ const ContentCalendar: React.FC = () => {
               Hoje
             </button>
           </div>
-          <button
-            onClick={() => { setSchedulerDate(undefined); setShowScheduler(true); }}
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-md flex items-center gap-1.5"
-          >
-            <span>📋</span> Agendar Criativo
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleGenerateSuggestions}
+              disabled={suggestionsLoading}
+              className="bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-500 hover:to-pink-600 disabled:opacity-60 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-md flex items-center gap-1.5"
+            >
+              {suggestionsLoading ? (
+                <><div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Gerando...</>
+              ) : (
+                <><span>✨</span> Sugerir com IA</>
+              )}
+            </button>
+            <button
+              onClick={() => { setSchedulerDate(undefined); setShowScheduler(true); }}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-md flex items-center gap-1.5"
+            >
+              <span>📋</span> Agendar
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -196,7 +259,9 @@ const ContentCalendar: React.FC = () => {
 
               {days.map((date) => {
                 const dayPosts = getPostsForDay(date);
+                const daySuggestions = getSuggestionsForDay(date);
                 const isToday = isSameDay(date, today);
+                const totalItems = dayPosts.length + daySuggestions.length;
 
                 return (
                   <div
@@ -210,23 +275,31 @@ const ContentCalendar: React.FC = () => {
                       {date.getDate()}
                     </div>
                     <div className="space-y-0.5">
-                      {dayPosts.slice(0, 3).map((post) => (
+                      {dayPosts.slice(0, 2).map((post) => (
                         <div
                           key={post.id}
                           className={`text-[10px] leading-tight px-1 py-0.5 rounded border truncate ${STATUS_COLOR[post.status]}`}
-                          title={`${post.title} (${post.channel})${post.status === 'scheduled' && post.channel === 'Instagram' ? ' • Será publicado automaticamente' : ''}`}
+                          title={`${post.title} (${post.channel})`}
                         >
                           {CHANNEL_ICON[post.channel]} {post.title}
                           {post.status === 'scheduled' && post.channel === 'Instagram' && (
-                            <span className="ml-1" aria-label="Será publicado automaticamente" title="Será publicado automaticamente">
-                              ⏰
-                            </span>
+                            <span className="ml-1">⏰</span>
                           )}
                         </div>
                       ))}
-                      {dayPosts.length > 3 && (
+                      {daySuggestions.slice(0, 2).map((s, si) => (
+                        <div
+                          key={`s-${si}`}
+                          onClick={(e) => { e.stopPropagation(); handleUseSuggestion(s); }}
+                          className={`text-[10px] leading-tight px-1 py-0.5 rounded border truncate cursor-pointer hover:opacity-80 ${SUGGESTION_COLOR}`}
+                          title={`Sugestão IA: ${s.theme} — clique para criar`}
+                        >
+                          ✨ {s.theme}
+                        </div>
+                      ))}
+                      {totalItems > 4 && (
                         <div className="text-[10px] text-gray-400 px-1">
-                          +{dayPosts.length - 3} mais
+                          +{totalItems - 4} mais
                         </div>
                       )}
                     </div>
@@ -252,11 +325,68 @@ const ContentCalendar: React.FC = () => {
             Rascunho
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-600">
-            <span>⏰</span>
-            Será publicado automaticamente
+            <div className="w-3 h-3 rounded bg-orange-100 border border-orange-300" />
+            Sugestão IA (clique para criar)
           </div>
         </div>
       </div>
+
+      {/* AI Suggestions panel */}
+      {showSuggestions && (
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+              <span>✨</span>
+              Sugestões IA — {MONTHS[currentMonth]} {currentYear}
+            </h3>
+            <button
+              onClick={() => { setShowSuggestions(false); setAiSuggestions([]); }}
+              className="text-sm text-gray-400 hover:text-gray-600"
+            >
+              Fechar
+            </button>
+          </div>
+
+          {suggestionsLoading ? (
+            <div className="flex items-center gap-3 py-6 text-gray-500">
+              <div className="w-5 h-5 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin" />
+              Gerando calendário editorial com IA...
+            </div>
+          ) : suggestionsError ? (
+            <p className="text-sm text-red-500">{suggestionsError}</p>
+          ) : aiSuggestions.length === 0 ? (
+            <p className="text-sm text-gray-400">Nenhuma sugestão gerada.</p>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-xs text-gray-400 mb-3">
+                {aiSuggestions.length} sugestões — clique numa sugestão no calendário ou na lista abaixo para criar o conteúdo.
+              </p>
+              {aiSuggestions.map((s, i) => {
+                const [year, month, day] = s.date.split('-').map(Number);
+                const d = new Date(year, month - 1, day);
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 p-3 rounded-xl border border-orange-100 bg-orange-50 hover:bg-orange-100 transition-colors cursor-pointer"
+                    onClick={() => handleUseSuggestion(s)}
+                  >
+                    <div className="text-sm font-bold text-orange-700 w-16 shrink-0 text-center">
+                      {d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{s.theme}</p>
+                      <p className="text-xs text-gray-500">
+                        {CHANNEL_ICON[s.channel]} {s.channel} · {s.format} · {s.tone}
+                      </p>
+                    </div>
+                    <span className="text-xs text-orange-600 font-semibold shrink-0">Criar →</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Day detail panel */}
       {selectedDate && (
@@ -312,6 +442,17 @@ const ContentCalendar: React.FC = () => {
           onClose={() => setShowScheduler(false)}
           onScheduled={() => { setShowScheduler(false); fetchPosts(); }}
           initialDate={schedulerDate}
+        />
+      )}
+
+      {studioProps && (
+        <ContentStudio
+          onClose={() => setStudioProps(null)}
+          onSaved={() => { setStudioProps(null); fetchPosts(); }}
+          initialChannel={studioProps.channel}
+          initialFormat={studioProps.format}
+          initialTopic={studioProps.topic}
+          initialDate={studioProps.date}
         />
       )}
     </div>
