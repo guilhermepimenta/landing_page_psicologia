@@ -118,6 +118,131 @@ Texto direto, foco local (Niterói/Nova Friburgo), mencione agendamento presenci
 Retorne JSON: {"title": "título da publicação", "content": "texto completo", "hashtags": []}`,
 };
 
+export interface CampaignPost {
+  title: string;
+  content: string;
+  hashtags: string[];
+  dayOffset: number;
+}
+
+export interface CampaignResult {
+  campaignTitle: string;
+  posts: CampaignPost[];
+}
+
+export const generateCampaign = async (
+  theme: string,
+  channel: ContentChannel,
+  tone: ContentTone,
+  postCount: number = 5,
+): Promise<CampaignResult> => {
+  const offsets = [0, 2, 4, 7, 10, 14, 17].slice(0, postCount);
+  const prompt = `${SYSTEM_CONTEXT}
+
+Crie uma série de ${postCount} posts conectados para uma campanha temática no canal ${channel}.
+Tema da campanha: "${theme}"
+Tom desejado: ${TONE_LABELS[tone]}
+
+A série deve ter narrativa progressiva:
+- Post 1: introdução/gancho — apresenta o tema com curiosidade
+- Posts intermediários: subtemas diferentes com aprofundamento gradual
+- Último post: conclusão + CTA para agendar consulta
+
+Retorne APENAS um JSON válido:
+{
+  "campaignTitle": "Nome da campanha",
+  "posts": [
+    {"title": "...", "content": "...", "hashtags": ["tag1","tag2","tag3","tag4","tag5"], "dayOffset": ${offsets[0]}},
+    ${offsets.slice(1).map((d, i) => `{"title": "...", "content": "...", "hashtags": ["tag1","tag2","tag3","tag4","tag5"], "dayOffset": ${d}}`).join(',\n    ')}
+  ]
+}`;
+
+  const response = await genAI.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+  });
+
+  const text = response.text ?? '';
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('Resposta da IA não contém JSON válido');
+
+  const parsed = JSON.parse(jsonMatch[0]);
+  return {
+    campaignTitle: parsed.campaignTitle ?? theme,
+    posts: (parsed.posts ?? []).map((p: any, i: number) => ({
+      title: p.title ?? `Post ${i + 1}`,
+      content: p.content ?? '',
+      hashtags: p.hashtags ?? [],
+      dayOffset: p.dayOffset ?? offsets[i] ?? i * 2,
+    })),
+  };
+};
+
+export interface EditorialSuggestion {
+  date: string;
+  theme: string;
+  channel: ContentChannel;
+  format: string;
+  tone: ContentTone;
+}
+
+export const generateEditorialCalendar = async (
+  month: number,
+  year: number,
+): Promise<EditorialSuggestion[]> => {
+  const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(year, month, 1));
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const mm = String(month + 1).padStart(2, '0');
+
+  const prompt = `${SYSTEM_CONTEXT}
+
+Crie um calendário editorial para ${monthName} de ${year} para a Dra. Fernanda Mangia.
+Distribua sugestões em aproximadamente 15 dias do mês (3-4 por semana, evite finais de semana).
+Varie canais: Instagram, Facebook, Blog, Email, GMB.
+Varie formatos: post, carrossel, reels, artigo, newsletter, atualizacao.
+Temas: TDAH, ansiedade, neuropsicologia, avaliação psicológica, saúde mental no trabalho, dificuldades de aprendizagem, bem-estar.
+
+Retorne APENAS um JSON array:
+[
+  {"date": "${year}-${mm}-02", "theme": "...", "channel": "Instagram", "format": "post", "tone": "informativo"},
+  ...
+]
+Use datas entre ${year}-${mm}-01 e ${year}-${mm}-${String(daysInMonth).padStart(2, '0')}.`;
+
+  const response = await genAI.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+  });
+
+  const text = response.text ?? '';
+  const jsonMatch = text.match(/\[[\s\S]*\]/);
+  if (!jsonMatch) throw new Error('Resposta da IA não contém JSON válido');
+
+  return JSON.parse(jsonMatch[0]);
+};
+
+export const generateHashtags = async (theme: string): Promise<string[]> => {
+  const prompt = `${SYSTEM_CONTEXT}
+
+Gere 25 hashtags para o Instagram sobre o tema: "${theme}"
+Mix: 8 amplas (>1M posts), 10 médias (100K-1M posts), 7 de nicho (<100K, específicas de psicologia).
+Sem o símbolo #, apenas o texto da hashtag.
+
+Retorne APENAS um JSON array de strings:
+["hashtag1", "hashtag2", ...]`;
+
+  const response = await genAI.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: prompt,
+  });
+
+  const text = response.text ?? '';
+  const jsonMatch = text.match(/\[[\s\S]*\]/);
+  if (!jsonMatch) return [];
+
+  return JSON.parse(jsonMatch[0]);
+};
+
 export const adaptContent = async (
   sourceTitle: string,
   sourceContent: string,

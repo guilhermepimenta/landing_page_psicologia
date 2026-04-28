@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'messages' | 'settings';
+type TabId = 'overview' | 'instagram' | 'blog' | 'gmb' | 'email' | 'facebook' | 'calendar' | 'hashtags' | 'analytics' | 'instagram-metrics' | 'facebook-metrics' | 'google' | 'leads' | 'leads-funnel' | 'roi' | 'messages' | 'settings';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -23,6 +23,7 @@ const NAV_GROUPS = [
       { icon: '📧', label: 'E-mail', tab: 'email' as TabId },
       { icon: '📘', label: 'Facebook', tab: 'facebook' as TabId },
       { icon: '📅', label: 'Calendário', tab: 'calendar' as TabId },
+      { icon: '#️⃣', label: 'Hashtags', tab: 'hashtags' as TabId },
     ],
   },
   {
@@ -38,6 +39,8 @@ const NAV_GROUPS = [
     label: 'Relacionamento',
     items: [
       { icon: '🎯', label: 'Leads', tab: 'leads' as TabId },
+      { icon: '🔄', label: 'Funil de Leads', tab: 'leads-funnel' as TabId },
+      { icon: '💰', label: 'ROI', tab: 'roi' as TabId },
       { icon: '✉️', label: 'Mensagens', tab: 'messages' as TabId },
     ],
   },

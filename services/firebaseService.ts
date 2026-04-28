@@ -31,6 +31,8 @@ export interface Post {
   instagramPermalink?: string;
   facebookPostId?: string;
   facebookPermalink?: string;
+  campaignId?: string;
+  campaignTitle?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -48,6 +50,10 @@ const mapPost = (id: string, data: any): Post => ({
   videoUrl: data.videoUrl,
   instagramPostId: data.instagramPostId,
   instagramPermalink: data.instagramPermalink,
+  facebookPostId: data.facebookPostId,
+  facebookPermalink: data.facebookPermalink,
+  campaignId: data.campaignId,
+  campaignTitle: data.campaignTitle,
   createdAt: data.createdAt?.toDate?.(),
   updatedAt: data.updatedAt?.toDate?.(),
 });
@@ -623,6 +629,162 @@ export const leadsService = {
   async markEmailSent(id: string) {
     try {
       await updateDoc(doc(db, 'leads', id), { resendEmailSent: true });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error };
+    }
+  },
+};
+
+// Hashtag Sets Service
+export interface HashtagSet {
+  id?: string;
+  theme: string;
+  hashtags: string[];
+  createdAt?: Date;
+}
+
+export const hashtagsService = {
+  async create(set: Omit<HashtagSet, 'id' | 'createdAt'>) {
+    try {
+      const docRef = await addDoc(collection(db, 'hashtags'), {
+        ...set,
+        createdAt: Timestamp.now(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Erro ao salvar hashtags:', error);
+      return { success: false, error };
+    }
+  },
+
+  async getAll() {
+    try {
+      const q = query(collection(db, 'hashtags'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      const sets: HashtagSet[] = [];
+      snapshot.forEach((d) => {
+        const data = d.data();
+        sets.push({
+          id: d.id,
+          theme: data.theme,
+          hashtags: data.hashtags ?? [],
+          createdAt: data.createdAt?.toDate(),
+        });
+      });
+      return { success: true, data: sets };
+    } catch (error) {
+      console.error('Erro ao buscar hashtags:', error);
+      return { success: false, error, data: [] as HashtagSet[] };
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      await deleteDoc(doc(db, 'hashtags', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao deletar hashtags:', error);
+      return { success: false, error };
+    }
+  },
+};
+
+// ROI Ads Sync Service
+export interface ROIAdsSync {
+  month: string;
+  googleAds: number;
+  metaAds: number;
+  googleCampaigns?: { name: string; spend: number }[];
+  metaCampaigns?: { name: string; spend: number }[];
+  syncedAt?: Date;
+}
+
+export const roiAdsSyncService = {
+  async save(sync: Omit<ROIAdsSync, 'syncedAt'>) {
+    try {
+      await setDoc(doc(db, 'roi_ads_sync', sync.month), {
+        ...sync,
+        syncedAt: Timestamp.now(),
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao salvar sync de ads:', error);
+      return { success: false, error };
+    }
+  },
+
+  async get(month: string): Promise<ROIAdsSync | null> {
+    try {
+      const snap = await getDoc(doc(db, 'roi_ads_sync', month));
+      if (!snap.exists()) return null;
+      const d = snap.data();
+      return {
+        month: d.month,
+        googleAds: d.googleAds ?? 0,
+        metaAds: d.metaAds ?? 0,
+        googleCampaigns: d.googleCampaigns ?? [],
+        metaCampaigns: d.metaCampaigns ?? [],
+        syncedAt: d.syncedAt?.toDate(),
+      };
+    } catch {
+      return null;
+    }
+  },
+};
+
+// ROI Service
+export interface ROIEntry {
+  id?: string;
+  type: 'investment' | 'revenue';
+  amount: number;
+  category: string;
+  description?: string;
+  month: string;
+  createdAt?: Date;
+}
+
+export const roiService = {
+  async create(entry: Omit<ROIEntry, 'id' | 'createdAt'>) {
+    try {
+      const docRef = await addDoc(collection(db, 'roi_entries'), {
+        ...entry,
+        createdAt: Timestamp.now(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Erro ao salvar entrada ROI:', error);
+      return { success: false, error };
+    }
+  },
+
+  async getAll() {
+    try {
+      const q = query(collection(db, 'roi_entries'), orderBy('month', 'desc'));
+      const snapshot = await getDocs(q);
+      const entries: ROIEntry[] = [];
+      snapshot.forEach((d) => {
+        const data = d.data();
+        entries.push({
+          id: d.id,
+          type: data.type,
+          amount: data.amount,
+          category: data.category,
+          description: data.description,
+          month: data.month,
+          createdAt: data.createdAt?.toDate(),
+        });
+      });
+      return { success: true, data: entries };
+    } catch (error) {
+      console.error('Erro ao buscar entradas ROI:', error);
+      return { success: false, error, data: [] as ROIEntry[] };
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      await deleteDoc(doc(db, 'roi_entries', id));
       return { success: true };
     } catch (error) {
       return { success: false, error };
