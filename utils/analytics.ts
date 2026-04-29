@@ -24,9 +24,7 @@ export const trackWhatsAppClick = (source: string) => {
 // Alimenta audiências de remarketing e otimização de lances.
 export const trackFormLead = () => {
     if (typeof window === 'undefined' || !(window as any).gtag) return;
-    (window as any).gtag('event', 'generate_lead', {
-        event_category: 'formulario',
-        event_label: 'contato',
-        send_to: 'AW-17262838643',
+    (window as any).gtag('event', 'conversion', {
+        send_to: 'AW-17262838643/WAogCMHf36QcEPOGyKdA',
     });
 };
