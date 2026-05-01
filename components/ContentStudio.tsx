@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { generateContent, ContentChannel, InstagramFormat, ContentTone, GeneratedContent } from '../services/aiContentService';
+import React, { useState, useEffect } from 'react';
+import { ContentChannel, InstagramFormat, ContentTone, GeneratedContent } from '../services/aiContentService';
+import { generateWithContext, validateContent, ContentQuality, getTopEngagingTopics, EngagingTopic } from '../services/contentContextService';
 import { runTrendScout, TrendSuggestion, TrendScoutResult } from '../services/trendScoutService';
 import { generateImageFromPrompt, suggestImagePrompt } from '../services/imagenService';
 import { postsService, Post } from '../services/firebaseService';
@@ -104,6 +105,15 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
   const [trendError, setTrendError] = useState('');
   const [trendScanStep, setTrendScanStep] = useState(0);
 
+  const [contentQuality, setContentQuality] = useState<ContentQuality | null>(null);
+  const [engagingTopics, setEngagingTopics] = useState<EngagingTopic[]>([]);
+
+  // Carrega os temas mais engajados quando o canal muda (step de conteúdo)
+  useEffect(() => {
+    if (step !== 'content') return;
+    getTopEngagingTopics(channel).then(setEngagingTopics).catch(() => {});
+  }, [channel, step]);
+
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState('');
 
@@ -165,15 +175,35 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
     if (!topic.trim()) { setAiError('Informe o tema do conteúdo primeiro.'); return; }
     setAiGenerating(true);
     setAiError('');
+    setContentQuality(null);
     try {
-      const result = await generateContent(topic, channel, tone, isInstagram ? instagramFormat : undefined);
+      const result = await generateWithContext(
+        topic,
+        channel,
+        tone,
+        isInstagram ? instagramFormat : undefined,
+      );
       setGeneratedContent(result);
       setEditedContent(result.content);
       setEditedTitle(result.title);
+      setContentQuality(result.quality);
     } catch {
       setAiError('Erro ao gerar conteúdo. Verifique a chave da API Gemini.');
     } finally {
       setAiGenerating(false);
+    }
+  };
+
+  const handleContentChange = (newContent: string) => {
+    setEditedContent(newContent);
+    if (generatedContent) {
+      const quality = validateContent(
+        newContent,
+        generatedContent.hashtags,
+        channel,
+        isInstagram ? instagramFormat : undefined,
+      );
+      setContentQuality(quality);
     }
   };
 
@@ -479,6 +509,31 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                 )}
               </div>
 
+              {/* Sugestões rápidas baseadas em engajamento */}
+              {engagingTopics.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                    <span>🔥</span> Temas que mais engajaram neste canal
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {engagingTopics.map((t, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setTopic(t.title)}
+                        title={`${t.engagement} engajamentos${t.format ? ` · ${t.format}` : ''}`}
+                        className={`text-xs px-3 py-1.5 rounded-full border transition-all text-left max-w-[200px] truncate ${
+                          topic === t.title
+                            ? 'bg-purple-600 text-white border-purple-600'
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                        }`}
+                      >
+                        {t.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Topic */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Tema do conteúdo *</label>
@@ -544,10 +599,13 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Conteúdo</label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-sm font-medium text-gray-700">Conteúdo</label>
+                      <span className="text-xs text-gray-400">{editedContent.length} chars</span>
+                    </div>
                     <textarea
                       value={editedContent}
-                      onChange={e => setEditedContent(e.target.value)}
+                      onChange={e => handleContentChange(e.target.value)}
                       rows={8}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
                     />
@@ -557,6 +615,44 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                       </p>
                     )}
                   </div>
+
+                  {/* Quality score widget */}
+                  {contentQuality && (
+                    <div className={`rounded-xl border p-3 space-y-2 ${
+                      contentQuality.passed ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-gray-700">Score de qualidade</span>
+                        <span className={`text-sm font-bold ${
+                          contentQuality.score >= 80 ? 'text-green-600' :
+                          contentQuality.score >= 60 ? 'text-amber-600' : 'text-red-500'
+                        }`}>
+                          {contentQuality.score}/100
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div
+                          className={`h-1.5 rounded-full transition-all ${
+                            contentQuality.score >= 80 ? 'bg-green-500' :
+                            contentQuality.score >= 60 ? 'bg-amber-400' : 'bg-red-400'
+                          }`}
+                          style={{ width: `${contentQuality.score}%` }}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        {contentQuality.checks.map((check, i) => (
+                          <div key={i} className="flex items-start gap-1.5 text-xs">
+                            <span className={check.ok ? 'text-green-500' : 'text-amber-500'}>
+                              {check.ok ? '✓' : '⚠'}
+                            </span>
+                            <span className={check.ok ? 'text-gray-600' : 'text-amber-700'}>
+                              {check.label}{check.hint ? ` — ${check.hint}` : ''}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div>
@@ -615,8 +711,8 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                 <div className="flex items-center gap-2">
                   <span className="text-xl">🎨</span>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-gray-900">Gerar com Imagen 3</p>
-                    <p className="text-xs text-gray-500">Google AI · requer faturamento ativo</p>
+                    <p className="text-sm font-semibold text-gray-900">Gerar com IA</p>
+                    <p className="text-xs text-gray-500">Flux · gratuito · até 30s</p>
                   </div>
                   <button
                     onClick={handleSuggestPrompt}
