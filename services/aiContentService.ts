@@ -62,9 +62,18 @@ const INSTAGRAM_REELS_RULES = `REGRAS DO ROTEIRO DE REELS (obedeça rigorosament
 - Legenda do Reel: 1 parágrafo curto (máx 150 chars) + hashtags no final
 - Hashtags: 5 a 8`;
 
-const buildInstagramPrompt = (topic: string, tone: ContentTone, format: InstagramFormat, recentTopics: string[]): string => {
+const buildInstagramPrompt = (
+  topic: string,
+  tone: ContentTone,
+  format: InstagramFormat,
+  recentTopics: string[],
+  trendTopics: string[],
+): string => {
   const avoidNote = recentTopics.length > 0
     ? `\nTemas recentes JÁ publicados (EVITE repetir): ${recentTopics.join(', ')}.`
+    : '';
+  const trendNote = trendTopics.length > 0
+    ? `\nTemas em alta no momento (use como inspiração se relevante): ${trendTopics.slice(0, 3).join(', ')}.`
     : '';
 
   const formatRules: Record<InstagramFormat, string> = {
@@ -85,7 +94,7 @@ Retorne APENAS JSON válido:
   };
 
   return `${SYSTEM_CONTEXT}
-${avoidNote}
+${avoidNote}${trendNote}
 
 Tema: "${topic}"
 Tom: ${TONE_LABELS[tone]}
@@ -105,9 +114,13 @@ const buildChannelPrompt = (
   channel: Exclude<ContentChannel, 'Instagram'>,
   tone: ContentTone,
   recentTopics: string[],
+  trendTopics: string[] = [],
 ): string => {
   const avoidNote = recentTopics.length > 0
     ? `\nTemas recentes JÁ publicados nesse canal (EVITE repetir): ${recentTopics.join(', ')}.`
+    : '';
+  const trendNote = trendTopics.length > 0
+    ? `\nTemas em alta no momento (use como inspiração se relevante): ${trendTopics.slice(0, 3).join(', ')}.`
     : '';
 
   const formats: Record<Exclude<ContentChannel, 'Instagram'>, string> = {
@@ -132,7 +145,7 @@ Retorne JSON: {"title": "tema resumido (máx 60 chars)", "content": "texto compl
   };
 
   return `${SYSTEM_CONTEXT}
-${avoidNote}
+${avoidNote}${trendNote}
 
 Tema: "${topic}"
 Tom: ${TONE_LABELS[tone]}
@@ -372,11 +385,12 @@ export const generateContent = async (
   tone: ContentTone,
   instagramFormat?: InstagramFormat,
   recentTopics: string[] = [],
+  trendTopics: string[] = [],
 ): Promise<GeneratedContent> => {
   const prompt =
     channel === 'Instagram'
-      ? buildInstagramPrompt(topic, tone, instagramFormat ?? 'post', recentTopics)
-      : buildChannelPrompt(topic, channel as Exclude<ContentChannel, 'Instagram'>, tone, recentTopics);
+      ? buildInstagramPrompt(topic, tone, instagramFormat ?? 'post', recentTopics, trendTopics)
+      : buildChannelPrompt(topic, channel as Exclude<ContentChannel, 'Instagram'>, tone, recentTopics, trendTopics);
 
   const response = await genAI.models.generateContent({
     model: MAIN_MODEL,

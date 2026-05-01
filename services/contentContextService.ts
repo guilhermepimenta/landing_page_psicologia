@@ -1,10 +1,12 @@
 /**
  * Camada de agente contextual para geração de conteúdo.
  *
- * Fornece três ferramentas que o fluxo de criação usa antes de chamar a IA:
- *   1. getRecentTopics      — o que já foi publicado no canal (evita repetição)
- *   2. validateContent      — pontua qualidade antes de salvar/publicar
- *   3. generateWithContext  — orquestra tudo em uma única chamada
+ * Ferramentas disponíveis:
+ *   1. getRecentTopics       — posts recentes do canal (evita repetição)
+ *   2. getCachedTrends       — tendências em alta (cache 2h, timeout 12s)
+ *   3. validateContent       — score de qualidade 0–100
+ *   4. getTopEngagingTopics  — temas com maior engajamento histórico
+ *   5. generateWithContext   — orquestra 1+2+3 em uma única chamada
  */
 
 import { db } from '../firebase.config';
@@ -17,6 +19,7 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { generateContent, ContentChannel, InstagramFormat, ContentTone, GeneratedContent } from './aiContentService';
+import { runTrendScout } from './trendScoutService';
 
 // ─────────────────────────────────────────────
 // Ferramenta 1 — Posts recentes (evita repetição)
@@ -39,13 +42,65 @@ export async function getRecentTopics(channel: ContentChannel, limitCount = 8): 
 }
 
 // ─────────────────────────────────────────────
-// Ferramenta 2 — Validação de qualidade
+// Ferramenta 2 — Tendências em alta (com cache)
+// ─────────────────────────────────────────────
+
+const TREND_CACHE_KEY = 'contentContext_trends';
+const TREND_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 horas em ms
+const TREND_FETCH_TIMEOUT = 12_000; // 12s — não bloqueia a geração
+
+interface TrendCache {
+  topics: string[];
+  cachedAt: number;
+}
+
+function loadCachedTrends(): string[] | null {
+  try {
+    const raw = localStorage.getItem(TREND_CACHE_KEY);
+    if (!raw) return null;
+    const cache: TrendCache = JSON.parse(raw);
+    if (Date.now() - cache.cachedAt > TREND_CACHE_TTL) return null;
+    return cache.topics;
+  } catch {
+    return null;
+  }
+}
+
+function saveTrendCache(topics: string[]): void {
+  try {
+    const cache: TrendCache = { topics, cachedAt: Date.now() };
+    localStorage.setItem(TREND_CACHE_KEY, JSON.stringify(cache));
+  } catch { /* localStorage pode estar indisponível */ }
+}
+
+export async function getCachedTrends(): Promise<string[]> {
+  const cached = loadCachedTrends();
+  if (cached) return cached;
+
+  try {
+    const result = await Promise.race([
+      runTrendScout(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), TREND_FETCH_TIMEOUT),
+      ),
+    ]);
+    const topics = result.suggestions.map((s) => s.topic).filter(Boolean);
+    saveTrendCache(topics);
+    return topics;
+  } catch {
+    // Timeout ou erro — não bloqueia a geração, retorna vazio
+    return [];
+  }
+}
+
+// ─────────────────────────────────────────────
+// Ferramenta 3 — Validação de qualidade
 // ─────────────────────────────────────────────
 
 export interface ContentQuality {
-  score: number;                // 0–100
+  score: number;    // 0–100
   checks: QualityCheck[];
-  passed: boolean;              // true se score >= 70
+  passed: boolean;  // true se score >= 70
 }
 
 export interface QualityCheck {
@@ -63,14 +118,14 @@ const HASHTAG_RANGE: Record<ContentChannel, [number, number]> = {
 };
 
 const CONTENT_LIMITS: Record<string, { min: number; max: number }> = {
-  'Instagram:post':       { min: 100,  max: 2200  },
-  'Instagram:carrossel':  { min: 200,  max: 3000  },
-  'Instagram:reels':      { min: 100,  max: 1500  },
-  'Facebook:post':        { min: 100,  max: 1800  },
-  'Facebook:atualizacao': { min: 50,   max: 500   },
-  'GMB:atualizacao':      { min: 50,   max: 1500  },
-  'Blog:artigo':          { min: 800,  max: 5000  },
-  'Email:newsletter':     { min: 200,  max: 3000  },
+  'Instagram:post':       { min: 100,  max: 2200 },
+  'Instagram:carrossel':  { min: 200,  max: 3000 },
+  'Instagram:reels':      { min: 100,  max: 1500 },
+  'Facebook:post':        { min: 100,  max: 1800 },
+  'Facebook:atualizacao': { min: 50,   max: 500  },
+  'GMB:atualizacao':      { min: 50,   max: 1500 },
+  'Blog:artigo':          { min: 800,  max: 5000 },
+  'Email:newsletter':     { min: 200,  max: 3000 },
 };
 
 export function validateContent(
@@ -80,12 +135,12 @@ export function validateContent(
   format?: string,
 ): ContentQuality {
   const checks: QualityCheck[] = [];
-  const key = format ? `${channel}:${format}` : channel;
+  const key    = format ? `${channel}:${format}` : channel;
   const limits = CONTENT_LIMITS[key] ?? { min: 50, max: 5000 };
   const [minHt, maxHt] = HASHTAG_RANGE[channel];
 
-  // 1. Tamanho do conteúdo
-  const len = content.length;
+  // 1. Tamanho
+  const len    = content.length;
   const sizeOk = len >= limits.min && len <= limits.max;
   checks.push({
     label: 'Tamanho do texto',
@@ -93,10 +148,10 @@ export function validateContent(
     hint:  sizeOk ? undefined : `${len} chars — ideal: ${limits.min}–${limits.max}`,
   });
 
-  // 2. Hashtags (só para canais que usam)
+  // 2. Hashtags (canais que usam)
   if (maxHt > 0) {
     const htCount = hashtags.length;
-    const htOk = htCount >= minHt && htCount <= maxHt;
+    const htOk    = htCount >= minHt && htCount <= maxHt;
     checks.push({
       label: 'Hashtags',
       ok:    htOk,
@@ -104,19 +159,19 @@ export function validateContent(
     });
   }
 
-  // 3. CTA presente
+  // 3. CTA
   const ctaPatterns = [
     /agendar?/i, /link na bio/i, /salve/i, /comente/i, /compartilhe/i,
     /marque/i, /clique/i, /acesse/i, /entre em contato/i, /whatsapp/i,
   ];
-  const hasCtA = ctaPatterns.some((p) => p.test(content));
+  const hasCta = ctaPatterns.some((p) => p.test(content));
   checks.push({
     label: 'Call-to-action',
-    ok:    hasCtA,
-    hint:  hasCtA ? undefined : 'Adicione uma chamada para ação (ex: "Agende sua avaliação")',
+    ok:    hasCta,
+    hint:  hasCta ? undefined : 'Adicione uma chamada para ação (ex: "Agende sua avaliação")',
   });
 
-  // 4. Sem diagnósticos proibidos
+  // 4. Conformidade ética
   const bannedPhrases = [
     /você tem tdah/i, /você é autista/i, /você tem depressão/i,
     /diagnóstico confirm/i, /certeza que você/i,
@@ -128,9 +183,9 @@ export function validateContent(
     hint:  hasBanned ? 'Texto contém possível diagnóstico indevido — revise' : undefined,
   });
 
-  // 5. Instagram: hook nos primeiros 125 chars
+  // 5. Hook Instagram (primeiros 125 chars)
   if (channel === 'Instagram') {
-    const hook = content.slice(0, 125);
+    const hook   = content.slice(0, 125);
     const hookOk = hook.trim().length >= 30 && !hook.startsWith('#');
     checks.push({
       label: 'Hook inicial (Instagram)',
@@ -139,10 +194,45 @@ export function validateContent(
     });
   }
 
-  const passed = checks.filter((c) => !c.ok).length === 0;
+  const passed = checks.every((c) => c.ok);
   const score  = Math.round((checks.filter((c) => c.ok).length / checks.length) * 100);
 
   return { score, checks, passed };
+}
+
+// ─────────────────────────────────────────────
+// Ferramenta 4 — Temas mais engajados por canal
+// ─────────────────────────────────────────────
+
+export interface EngagingTopic {
+  title: string;
+  engagement: number;
+  format?: string;
+}
+
+export async function getTopEngagingTopics(
+  channel: ContentChannel,
+  limitCount = 6,
+): Promise<EngagingTopic[]> {
+  try {
+    const q = query(
+      collection(db, 'posts'),
+      where('channel', '==', channel),
+      where('status', '==', 'published'),
+      orderBy('engagement', 'desc'),
+      limit(limitCount),
+    );
+    const snap = await getDocs(q);
+    return snap.docs
+      .map((d) => ({
+        title:      String(d.data().title ?? ''),
+        engagement: Number(d.data().engagement ?? 0),
+        format:     d.data().format as string | undefined,
+      }))
+      .filter((t) => t.title && t.engagement > 0);
+  } catch {
+    return [];
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -151,6 +241,7 @@ export function validateContent(
 
 export interface GeneratedContentWithQuality extends GeneratedContent {
   quality: ContentQuality;
+  usedTrends: boolean;
 }
 
 export async function generateWithContext(
@@ -159,13 +250,25 @@ export async function generateWithContext(
   tone: ContentTone,
   instagramFormat?: InstagramFormat,
 ): Promise<GeneratedContentWithQuality> {
-  // Ferramenta 1: busca contexto de posts recentes para evitar repetição
-  const recentTopics = await getRecentTopics(channel);
+  // Ferramentas 1 e 2 em paralelo — nenhuma bloqueia a outra
+  const [recentTopics, trendTopics] = await Promise.all([
+    getRecentTopics(channel),
+    getCachedTrends(),
+  ]);
 
-  // Gera conteúdo com contexto injetado no prompt
-  const generated = await generateContent(topic, channel, tone, instagramFormat, recentTopics);
+  const usedTrends = trendTopics.length > 0;
 
-  // Ferramenta 2: valida qualidade automaticamente
+  // Gera com contexto completo injetado no prompt
+  const generated = await generateContent(
+    topic,
+    channel,
+    tone,
+    instagramFormat,
+    recentTopics,
+    trendTopics,
+  );
+
+  // Ferramenta 3 — valida qualidade
   const quality = validateContent(
     generated.content,
     generated.hashtags,
@@ -173,5 +276,5 @@ export async function generateWithContext(
     instagramFormat ?? (channel === 'Instagram' ? 'post' : undefined),
   );
 
-  return { ...generated, quality };
+  return { ...generated, quality, usedTrends };
 }
