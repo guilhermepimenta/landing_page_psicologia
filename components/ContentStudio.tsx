@@ -107,11 +107,16 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
 
   const [contentQuality, setContentQuality] = useState<ContentQuality | null>(null);
   const [engagingTopics, setEngagingTopics] = useState<EngagingTopic[]>([]);
+  const [engagingLoading, setEngagingLoading] = useState(false);
 
   // Carrega os temas mais engajados quando o canal muda (step de conteúdo)
   useEffect(() => {
     if (step !== 'content') return;
-    getTopEngagingTopics(channel).then(setEngagingTopics).catch(() => {});
+    setEngagingLoading(true);
+    getTopEngagingTopics(channel)
+      .then(setEngagingTopics)
+      .catch(() => setEngagingTopics([]))
+      .finally(() => setEngagingLoading(false));
   }, [channel, step]);
 
   const [aiGenerating, setAiGenerating] = useState(false);
@@ -211,8 +216,13 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
     try {
       const suggested = await suggestImagePrompt(topic || 'psicologia mental health', format, channel);
       setImagenPrompt(suggested);
-    } catch {
-      setImagenPrompt('Calming psychology office, soft purple tones, minimalist, abstract, no text, no faces');
+    } catch (err: any) {
+      if (typeof err?.message === 'string' && err.message.includes('Limite de uso da API Gemini')) {
+        setImagenError(err.message);
+        setImagenPrompt('');
+      } else {
+        setImagenPrompt('Calming psychology office, soft purple tones, minimalist, abstract, no text, no faces');
+      }
     }
   };
 
@@ -510,11 +520,17 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
               </div>
 
               {/* Sugestões rápidas baseadas em engajamento */}
-              {engagingTopics.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
-                    <span>🔥</span> Temas que mais engajaram neste canal
-                  </p>
+              <div>
+                <p className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                  <span>🔥</span> Temas que mais engajaram neste canal
+                </p>
+                {engagingLoading ? (
+                  <div className="flex flex-wrap gap-2">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="h-7 w-28 rounded-full bg-gray-100 animate-pulse" />
+                    ))}
+                  </div>
+                ) : engagingTopics.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {engagingTopics.map((t, i) => (
                       <button
@@ -531,8 +547,12 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                       </button>
                     ))}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <p className="text-xs text-gray-400 italic">
+                    Sem dados ainda — sugestões aparecem após publicar posts com engajamento.
+                  </p>
+                )}
+              </div>
 
               {/* Topic */}
               <div>
@@ -669,13 +689,18 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                       placeholder="Título do conteúdo"
                       className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
                     />
-                    <textarea
-                      value={editedContent}
-                      onChange={e => setEditedContent(e.target.value)}
-                      placeholder="Escreva o conteúdo aqui..."
-                      rows={6}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={editedContent}
+                        onChange={e => handleContentChange(e.target.value)}
+                        placeholder="Escreva o conteúdo aqui..."
+                        rows={6}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+                      />
+                      <span className="absolute bottom-2 right-3 text-[10px] text-gray-400">
+                        {editedContent.length} chars
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
