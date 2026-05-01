@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContentChannel, InstagramFormat, ContentTone, GeneratedContent } from '../services/aiContentService';
-import { generateWithContext, validateContent, ContentQuality } from '../services/contentContextService';
+import { generateWithContext, validateContent, ContentQuality, getTopEngagingTopics, EngagingTopic } from '../services/contentContextService';
 import { runTrendScout, TrendSuggestion, TrendScoutResult } from '../services/trendScoutService';
 import { generateImageFromPrompt, suggestImagePrompt } from '../services/imagenService';
 import { postsService, Post } from '../services/firebaseService';
@@ -106,6 +106,13 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
   const [trendScanStep, setTrendScanStep] = useState(0);
 
   const [contentQuality, setContentQuality] = useState<ContentQuality | null>(null);
+  const [engagingTopics, setEngagingTopics] = useState<EngagingTopic[]>([]);
+
+  // Carrega os temas mais engajados quando o canal muda (step de conteúdo)
+  useEffect(() => {
+    if (step !== 'content') return;
+    getTopEngagingTopics(channel).then(setEngagingTopics).catch(() => {});
+  }, [channel, step]);
 
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState('');
@@ -501,6 +508,31 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
                   </div>
                 )}
               </div>
+
+              {/* Sugestões rápidas baseadas em engajamento */}
+              {engagingTopics.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                    <span>🔥</span> Temas que mais engajaram neste canal
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {engagingTopics.map((t, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setTopic(t.title)}
+                        title={`${t.engagement} engajamentos${t.format ? ` · ${t.format}` : ''}`}
+                        className={`text-xs px-3 py-1.5 rounded-full border transition-all text-left max-w-[200px] truncate ${
+                          topic === t.title
+                            ? 'bg-purple-600 text-white border-purple-600'
+                            : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300 hover:bg-purple-50'
+                        }`}
+                      >
+                        {t.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Topic */}
               <div>
