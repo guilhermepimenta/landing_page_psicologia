@@ -71,9 +71,10 @@ export async function suggestImagePrompt(topic: string, format: string, channel:
 
   const formatHint = formatHints[format] ?? 'professional social media content';
 
-  const response = await genAI.models.generateContent({
-    model: 'gemini-2.0-flash',
-    contents: `You are a creative director for a Brazilian neuropsychologist's social media (@fernandamangiaoficial).
+  try {
+    const response = await genAI.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: `You are a creative director for a Brazilian neuropsychologist's social media (@fernandamangiaoficial).
 Generate a precise English prompt for the Flux AI image generator.
 
 Topic: "${topic}"
@@ -90,7 +91,14 @@ Requirements:
 - Avoid medical clichés (no brain icons, no pills, no couches)
 
 Return ONLY the English prompt. Max 200 characters. No quotes.`,
-  });
+    });
 
-  return response.text?.trim() ?? `Calming psychology concept, ${topic}, soft purple tones, minimalist, no text, no faces`;
+    return response.text?.trim() ?? `Calming psychology concept, ${topic}, soft purple tones, minimalist, no text, no faces`;
+  } catch (err: any) {
+    // Trata erro 429 (Too Many Requests)
+    if (err?.response?.status === 429 || String(err).includes('429')) {
+      throw new Error('Limite de uso da API Gemini atingido. Tente novamente em alguns minutos.');
+    }
+    throw err;
+  }
 }
