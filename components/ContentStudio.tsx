@@ -262,10 +262,14 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
       const uploadedUrls: string[] = [];
       for (const dataUrl of imageDataUrls) {
         if (dataUrl.startsWith('data:')) {
-          const res = await fetch(dataUrl);
+          // Normaliza proporção para Instagram antes de fazer upload
+          const normalizedUrl = isInstagram
+            ? await imageService.normalizeForInstagram(dataUrl)
+            : dataUrl;
+          const res  = await fetch(normalizedUrl);
           const blob = await res.blob();
-          const file = new File([blob], `imagen-${Date.now()}.png`, { type: 'image/png' });
-          const url = await imageService.uploadImage(file);
+          const file = new File([blob], `imagen-${Date.now()}.jpg`, { type: 'image/jpeg' });
+          const url  = await imageService.uploadImage(file);
           uploadedUrls.push(url);
         } else {
           uploadedUrls.push(dataUrl);
