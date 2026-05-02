@@ -7,7 +7,7 @@ export async function publishToInstagram(
   imageUrls: string[],
   caption: string,
 ): Promise<InstagramPublishResult> {
-  const response = await fetch('/api/instagram/publish', {
+  const response = await fetch('/api/instagram', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ imageUrls, caption }),
