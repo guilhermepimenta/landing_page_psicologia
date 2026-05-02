@@ -272,11 +272,17 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
         }
       }
 
+      const willPublishToApi =
+        (isInstagram && status === 'published' && uploadedUrls.length > 0) ||
+        (isFacebook  && status === 'published');
+
+      // Salva no Firebase com status 'draft' se vai tentar publicar na API.
+      // Só atualiza para 'published' depois que a API confirmar sucesso.
       const post: Omit<Post, 'id' | 'createdAt' | 'updatedAt'> = {
         title,
         channel,
         format: isInstagram ? instagramFormat : undefined,
-        status,
+        status: willPublishToApi ? 'draft' : status,
         date: status === 'scheduled' ? new Date(scheduledDate) : new Date(),
         content: editedContent || title,
         engagement: 0,
@@ -284,27 +290,33 @@ const ContentStudio: React.FC<ContentStudioProps> = ({
       };
 
       const result = await postsService.create(post);
-      if (!result.success) throw new Error('Falha ao salvar');
+      if (!result.success || !result.id) throw new Error('Falha ao salvar');
 
       if (isInstagram && status === 'published' && uploadedUrls.length > 0) {
         try {
-          await publishToInstagram(uploadedUrls, post.content);
-          setPublishSuccess('Post salvo e enviado para o Instagram!');
-        } catch {
-          setPublishSuccess('Post salvo! Publicação no Instagram falhou — tente na aba Posts.');
+          const igResult = await publishToInstagram(uploadedUrls, post.content);
+          await postsService.update(result.id, {
+            status: 'published',
+            instagramPostId: igResult.instagramPostId,
+            instagramPermalink: igResult.instagramPermalink,
+          });
+          setPublishSuccess('Post publicado no Instagram com sucesso!');
+        } catch (e: any) {
+          setSaveError(`Post salvo como rascunho. Erro ao publicar no Instagram: ${e?.message ?? 'verifique o token de acesso.'}`);
         }
       } else if (isFacebook && status === 'published') {
         try {
           await publishToFacebook(post.content, uploadedUrls[0]);
-          setPublishSuccess('Post salvo e enviado para o Facebook!');
-        } catch {
-          setPublishSuccess('Post salvo! Publicação no Facebook falhou — tente na aba Posts.');
+          await postsService.update(result.id, { status: 'published' });
+          setPublishSuccess('Post publicado no Facebook com sucesso!');
+        } catch (e: any) {
+          setSaveError(`Post salvo como rascunho. Erro ao publicar no Facebook: ${e?.message ?? 'verifique o token de acesso.'}`);
         }
       } else {
         setPublishSuccess(
-          status === 'draft' ? 'Rascunho salvo com sucesso!' :
-          status === 'scheduled' ? 'Post agendado!' :
-          'Post publicado!'
+          status === 'draft'     ? 'Rascunho salvo com sucesso!' :
+          status === 'scheduled' ? 'Post agendado!'              :
+                                   'Post publicado!'
         );
       }
 

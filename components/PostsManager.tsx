@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { postsService, Post } from '../services/firebaseService';
+import { publishToInstagram } from '../services/instagramService';
+import { publishToFacebook } from '../services/facebookService';
 import PostFormModal from './PostFormModal';
 import ContentStudio from './ContentStudio';
 import AdaptContentModal from './AdaptContentModal';
@@ -49,6 +51,8 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
   const [showCampaign, setShowCampaign] = useState(false);
   const [postToEdit, setPostToEdit] = useState<Post | undefined>(undefined);
   const [postToAdapt, setPostToAdapt] = useState<Post | null>(null);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [publishError, setPublishError] = useState<{ id: string; message: string } | null>(null);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -77,8 +81,32 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
 
   const handlePublish = async (post: Post) => {
     if (!post.id) return;
-    await postsService.update(post.id, { status: 'published' });
-    fetchPosts();
+    setPublishingId(post.id);
+    setPublishError(null);
+    try {
+      if (post.channel === 'Instagram') {
+        if (!post.imageUrls || post.imageUrls.length === 0) {
+          throw new Error('O post precisa ter pelo menos uma imagem para publicar no Instagram.');
+        }
+        const igResult = await publishToInstagram(post.imageUrls, post.content ?? '');
+        await postsService.update(post.id, {
+          status: 'published',
+          instagramPostId: igResult.instagramPostId,
+          instagramPermalink: igResult.instagramPermalink,
+        });
+      } else if (post.channel === 'Facebook') {
+        await publishToFacebook(post.content ?? '', post.imageUrls?.[0]);
+        await postsService.update(post.id, { status: 'published' });
+      } else {
+        // Blog, Email, GMB — sem API de publicação direta, apenas marca como publicado
+        await postsService.update(post.id, { status: 'published' });
+      }
+      fetchPosts();
+    } catch (e: any) {
+      setPublishError({ id: post.id, message: e?.message ?? 'Erro desconhecido' });
+    } finally {
+      setPublishingId(null);
+    }
   };
 
   const handleDelete = async (post: Post) => {
@@ -286,10 +314,16 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
                       {post.status !== 'published' && (
                         <button
                           onClick={() => handlePublish(post)}
-                          className="text-green-600 hover:text-green-900"
+                          disabled={publishingId === post.id}
+                          className="text-green-600 hover:text-green-900 disabled:opacity-50 disabled:cursor-wait"
                         >
-                          Publicar
+                          {publishingId === post.id ? 'Publicando...' : 'Publicar'}
                         </button>
+                      )}
+                      {publishError?.id === post.id && (
+                        <span className="text-xs text-red-500 block mt-1">
+                          ⚠ {publishError.message}
+                        </span>
                       )}
                       <button
                         onClick={() => setPostToAdapt(post)}
