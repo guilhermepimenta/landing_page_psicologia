@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { postsService, Post } from '../services/firebaseService';
 import { publishToInstagram } from '../services/instagramService';
 import { publishToFacebook } from '../services/facebookService';
+import { prepareImagesForInstagram } from '../services/imageService';
 import PostFormModal from './PostFormModal';
 import ContentStudio from './ContentStudio';
 import AdaptContentModal from './AdaptContentModal';
@@ -88,7 +89,8 @@ const PostsManager: React.FC<PostsManagerProps> = ({ fixedChannel }) => {
         if (!post.imageUrls || post.imageUrls.length === 0) {
           throw new Error('O post precisa ter pelo menos uma imagem para publicar no Instagram.');
         }
-        const igResult = await publishToInstagram(post.imageUrls, post.content ?? '');
+        const readyUrls = await prepareImagesForInstagram(post.imageUrls);
+        const igResult  = await publishToInstagram(readyUrls, post.content ?? '');
         await postsService.update(post.id, {
           status: 'published',
           instagramPostId: igResult.instagramPostId,
