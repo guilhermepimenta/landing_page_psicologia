@@ -4,7 +4,7 @@ import { LandingPage } from './components/LandingPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // C1: React.lazy — Dashboard, BlogPost e Login não bloqueiam o bundle da landing page
-const BlogPost       = lazy(() => import('./components/BlogPost').then(m => ({ default: m.BlogPost })));
+const BlogPost       = lazy(() => import('./components/BlogPost').then(m => ({ default: m.BlogPost ?? m.default })));
 const Login          = lazy(() => import('./components/Login'));
 const Dashboard      = lazy(() => import('./components/Dashboard'));
 const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
