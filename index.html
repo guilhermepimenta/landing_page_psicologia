@@ -94,11 +94,18 @@
     }
   }
   </script>
-  <!-- Preconnect: máximo 4, somente origens do caminho crítico -->
+  <!-- Preconnect: máximo 4, somente origens do caminho crítico de render -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://fernanda-psicologia.firebaseapp.com" />
+  <!-- Firebase auth iframe carrega de firebaseapp.com — crossorigin obrigatório para CORS -->
+  <link rel="preconnect" href="https://fernanda-psicologia.firebaseapp.com" crossorigin />
+  <!-- apis.google.com é a origem do iframe de auth do Firebase (maior latência na chain) -->
+  <link rel="preconnect" href="https://apis.google.com" crossorigin />
+  <!-- DNS prefetch para demais origens Firebase/Google usadas após o primeiro render -->
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
   <link rel="dns-prefetch" href="https://firebaseinstallations.googleapis.com" />
+  <link rel="dns-prefetch" href="https://securetoken.googleapis.com" />
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
   <link rel="dns-prefetch" href="https://firebase.googleapis.com" />
   <!-- A4: Preload da variante Playfair Display usada no H1 (elemento LCP) -->
   <link
