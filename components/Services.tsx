@@ -1,9 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { User, Activity, Brain, Heart, Wind, ClipboardCheck, GraduationCap } from 'lucide-react';
 import { sendGAEvent, trackWhatsAppClick } from '../utils/analytics';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
-import { ScreeningTest } from './ScreeningTest';
+
+// Lazy: ScreeningTest importa leadsService → firebaseService → firebase SDK.
+// Como é um modal, só precisa carregar quando o usuário clica em "Fazer triagem".
+const ScreeningTest = lazy(() =>
+  import('./ScreeningTest').then(m => ({ default: m.ScreeningTest }))
+);
 
 const featuredService = {
   title: 'Avaliação Psicológica e Neuropsicológica',
@@ -139,7 +144,9 @@ export const Services: React.FC = () => {
       </div>
 
       {activeTest && (
-        <ScreeningTest testId={activeTest} onClose={() => setActiveTest(null)} />
+        <Suspense fallback={null}>
+          <ScreeningTest testId={activeTest} onClose={() => setActiveTest(null)} />
+        </Suspense>
       )}
     </div>
   );

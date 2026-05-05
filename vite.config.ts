@@ -34,8 +34,10 @@ export default defineConfig(({ mode }) => {
             manualChunks: {
               // React core — carregado imediatamente em todo render
               'vendor-react':         ['react', 'react-dom', 'react-router-dom'],
-              // Firebase core + data — necessário na landing (Firestore para leads, Storage)
-              'vendor-firebase-core': ['firebase/app', 'firebase/firestore', 'firebase/storage', 'firebase/analytics'],
+              // Firebase app + data — inicializado via dynamic import, não entra no bundle crítico
+              'vendor-firebase-core':      ['firebase/app', 'firebase/firestore', 'firebase/storage'],
+              // Analytics separada — carrega após idle via GTM, não bloqueia render
+              'vendor-firebase-analytics': ['firebase/analytics'],
               // firebase/auth em chunk separado — carregado lazy via AuthContext (dynamic import)
               // Não faz parte da cadeia crítica de render da landing page
               'vendor-firebase-auth': ['firebase/auth'],

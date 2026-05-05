@@ -9,11 +9,11 @@ import { AuthorityBar } from './AuthorityBar';
 import { HowItWorks } from './HowItWorks';
 
 // C2: Lazy load das seções below-fold — não bloqueiam FCP/LCP da landing page
-const Scheduling     = lazy(() => import('./Scheduling').then(m => ({ default: m.Scheduling ?? m.default })));
-const Blog           = lazy(() => import('./Blog').then(m => ({ default: m.Blog ?? m.default })));
-const Testimonials   = lazy(() => import('./Testimonials').then(m => ({ default: m.Testimonials ?? m.default })));
-const Footer         = lazy(() => import('./Footer').then(m => ({ default: m.Footer ?? m.default })));
-const AIChatAssistant = lazy(() => import('./AIChatAssistant').then(m => ({ default: m.AIChatAssistant ?? m.default })));
+const Scheduling      = lazy(() => import('./Scheduling').then(m => ({ default: m.Scheduling })));
+const Blog            = lazy(() => import('./Blog').then(m => ({ default: m.Blog })));
+const Testimonials    = lazy(() => import('./Testimonials').then(m => ({ default: m.Testimonials })));
+const Footer          = lazy(() => import('./Footer').then(m => ({ default: m.Footer })));
+const AIChatAssistant = lazy(() => import('./AIChatAssistant').then(m => ({ default: m.AIChatAssistant })));
 
 const SectionLoader: React.FC = () => (
   <div className="py-20 flex justify-center">
