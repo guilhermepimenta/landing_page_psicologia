@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { Star, ChevronDown } from 'lucide-react';
 
+const toInitials = (name: string): string =>
+  name.split(' ').map(w => w[0].toUpperCase() + '.').join('');
+
 interface Testimonial {
   id: number;
   name: string;
@@ -156,7 +159,7 @@ export const Testimonials: React.FC = () => {
                 <span className="text-white text-sm font-bold">{t.initials}</span>
               </div>
               <div>
-                <span className="font-bold text-[#3A4A3A] text-sm block">{t.name}</span>
+                <span className="font-bold text-[#3A4A3A] text-sm block">{toInitials(t.name)}</span>
                 <span className="text-xs text-gray-500">{t.time}</span>
               </div>
             </div>
