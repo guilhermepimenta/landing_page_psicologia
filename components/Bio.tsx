@@ -10,11 +10,12 @@ export const Bio: React.FC = () => {
         {/* Photo Column */}
         <div className="md:w-1/3 bg-[#F0EFEB] p-8 flex flex-col items-center justify-center">
           <div className="relative group">
-            {/* C1: WebP com fallback PNG — C2: width/height explícitos evitam CLS */}
+            {/* WebP (21KB) → JPEG (27KB) → nunca o PNG antigo de 500KB */}
             <picture>
               <source srcSet="/assets/image.webp" type="image/webp" />
+              <source srcSet="/assets/image.jpg"  type="image/jpeg" />
               <img
-                src="/assets/image.png"
+                src="/assets/image.jpg"
                 alt="Fernanda Abreu Mangia — Psicóloga clínica em Niterói e Nova Friburgo"
                 width="400"
                 height="500"
