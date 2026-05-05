@@ -4,10 +4,11 @@ import { LandingPage } from './components/LandingPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // C1: React.lazy — Dashboard, BlogPost e Login não bloqueiam o bundle da landing page
-const BlogPost       = lazy(() => import('./components/BlogPost').then(m => ({ default: m.BlogPost ?? m.default })));
-const Login          = lazy(() => import('./components/Login'));
-const Dashboard      = lazy(() => import('./components/Dashboard'));
-const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
+const BlogPost                  = lazy(() => import('./components/BlogPost').then(m => ({ default: m.BlogPost ?? m.default })));
+const Login                     = lazy(() => import('./components/Login'));
+const Dashboard                 = lazy(() => import('./components/Dashboard'));
+const ProtectedRoute            = lazy(() => import('./components/ProtectedRoute'));
+const AvaliacaoNeuropsicologica = lazy(() => import('./components/AvaliacaoNeuropsicologica'));
 
 const PageLoader: React.FC = () => (
   <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB]">
@@ -23,6 +24,7 @@ const AppRoutes: React.FC = () => {
       <Routes>
         {/* Rotas Públicas */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/avaliacao-neuropsicologica" element={<AvaliacaoNeuropsicologica />} />
         <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="/login" element={<Login onLogin={login} />} />
         
