@@ -225,7 +225,7 @@ const InstagramMetrics: React.FC = () => {
       <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-xl shadow-lg p-6 text-white">
         <div className="flex items-center gap-4">
           {account.profilePicture ? (
-            <img src={account.profilePicture} alt={account.name} className="w-16 h-16 rounded-full border-2 border-white/50" />
+            <img src={account.profilePicture} alt={account.name} loading="lazy" className="w-16 h-16 rounded-full border-2 border-white/50" />
           ) : (
             <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl">📱</div>
           )}

@@ -53,7 +53,7 @@ export const HowItWorks: React.FC = () => {
             </div>
 
             {/* Step number badge */}
-            <span className="text-xs font-bold text-[#B4C2B4] tracking-widest uppercase">
+            <span className="text-xs font-bold text-[#4A5D4A] tracking-widest uppercase">
               Passo {step.number}
             </span>
 

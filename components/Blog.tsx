@@ -103,13 +103,15 @@ export const Blog: React.FC = () => {
         {/* Navigation Buttons */}
         <button
           onClick={prev}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-10 p-3 bg-white text-[#4A5D4A] rounded-full shadow-lg opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 hover:scale-110 border border-gray-100 hidden md:block" // Hidden on mobile touch, can rely on dots or always show? Let's show on mobile always actually or allow swipe. For now, simple buttons.
+          aria-label="Post anterior"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-10 p-3 bg-white text-[#4A5D4A] rounded-full shadow-lg opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 hover:scale-110 border border-gray-100 hidden md:block"
         >
           <ChevronLeft size={24} />
         </button>
 
         <button
           onClick={next}
+          aria-label="Próximo post"
           className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-10 p-3 bg-white text-[#4A5D4A] rounded-full shadow-lg opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 hover:scale-110 border border-gray-100 hidden md:block"
         >
           <ChevronRight size={24} />
@@ -117,8 +119,8 @@ export const Blog: React.FC = () => {
 
         {/* Mobile Navigation (Always visible) */}
         <div className="flex md:hidden justify-between absolute top-1/2 -translate-y-1/2 w-full z-10 px-0 pointer-events-none">
-          <button onClick={prev} className="pointer-events-auto p-2 bg-white/80 rounded-full shadow-sm text-[#4A5D4A] -ml-4"><ChevronLeft size={20} /></button>
-          <button onClick={next} className="pointer-events-auto p-2 bg-white/80 rounded-full shadow-sm text-[#4A5D4A] -mr-4"><ChevronRight size={20} /></button>
+          <button onClick={prev} aria-label="Post anterior" className="pointer-events-auto p-2 bg-white/80 rounded-full shadow-sm text-[#4A5D4A] -ml-4"><ChevronLeft size={20} /></button>
+          <button onClick={next} aria-label="Próximo post" className="pointer-events-auto p-2 bg-white/80 rounded-full shadow-sm text-[#4A5D4A] -mr-4"><ChevronRight size={20} /></button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -140,14 +142,15 @@ export const Blog: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => navigate(`/blog/${post.id}`)}
+                    aria-label={`Ler mais sobre: ${post.title}`}
                     className="bg-[#9C6644] hover:bg-[#7F5539] text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors shadow-md hover:shadow-lg"
                   >
                     Leia Mais
                   </button>
                   <button
                     onClick={() => handleOpenShare(post.title, post.id)}
+                    aria-label={`Compartilhar: ${post.title}`}
                     className="p-2 text-gray-400 hover:text-[#4A5D4A] hover:bg-gray-50 rounded-lg transition-all"
-                    title="Compartilhar postagem"
                   >
                     <Share2 size={20} />
                   </button>
@@ -159,12 +162,18 @@ export const Blog: React.FC = () => {
 
         {/* Dots Indicators */}
         <div className="flex justify-center gap-2 mt-12">
-          {posts.map((_, idx) => (
+          {posts.map((post, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
-              className={`h-2 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8 bg-[#4A5D4A]' : 'w-2 bg-[#B4C2B4]/50 hover:bg-[#B4C2B4]'}`}
-            />
+              aria-label={`Ver post ${idx + 1}: ${post.title}`}
+              aria-current={idx === currentIndex ? 'true' : undefined}
+              className="flex items-center justify-center min-w-[44px] min-h-[44px]"
+            >
+              <span
+                className={`h-2 rounded-full transition-all duration-300 block ${idx === currentIndex ? 'w-8 bg-[#4A5D4A]' : 'w-2 bg-[#B4C2B4]/50 hover:bg-[#B4C2B4]'}`}
+              />
+            </button>
           ))}
         </div>
 

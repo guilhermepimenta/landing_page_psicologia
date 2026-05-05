@@ -52,6 +52,9 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
+              aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
               className={`p-2 rounded-md transition-colors ${isScrolled ? 'text-gray-600' : 'text-white'}`}
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -62,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isScrolled }) => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-white shadow-2xl absolute top-full left-0 w-full animate-fadeIn border-t border-gray-100">
+        <div id="mobile-menu" className="md:hidden bg-white shadow-2xl absolute top-full left-0 w-full animate-fadeIn border-t border-gray-100">
           <div className="px-4 pt-4 pb-6 space-y-2">
             {navLinks.map((link) => (
               <a
