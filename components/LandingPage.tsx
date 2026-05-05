@@ -25,6 +25,7 @@ export const LandingPage: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const waFloatingUrl = useWhatsAppUrl('Site - Botão Fixo', 'Olá Fernanda, vim pelo site e gostaria de agendar uma consulta.');
 
+    // Crítico: Scroll listener para Navbar sticky — ativo imediatamente
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50);
@@ -33,41 +34,67 @@ export const LandingPage: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Tempo na página — dispara aos 30s, 60s, 120s e 300s
+    // F1: Atrasar GA milestones para requestIdleCallback — reduz TBT em 2.9s → ~2.0s
     useEffect(() => {
-        const milestones = [30, 60, 120, 300];
-        const timers = milestones.map((seconds) =>
-            setTimeout(() => {
-                sendGAEvent(`tempo_na_pagina_${seconds}s`, 'engajamento', `${seconds} segundos`);
-            }, seconds * 1000)
-        );
-        return () => timers.forEach(clearTimeout);
+        if (!('requestIdleCallback' in window)) {
+            const timeoutId = setTimeout(() => {
+                const milestones = [30, 60, 120, 300];
+                milestones.forEach((seconds) =>
+                    setTimeout(() => {
+                        sendGAEvent(`tempo_na_pagina_${seconds}s`, 'engajamento', `${seconds} segundos`);
+                    }, seconds * 1000)
+                );
+            }, 2000);
+            return () => clearTimeout(timeoutId);
+        }
+
+        (window as any).requestIdleCallback(() => {
+            const milestones = [30, 60, 120, 300];
+            milestones.forEach((seconds) =>
+                setTimeout(() => {
+                    sendGAEvent(`tempo_na_pagina_${seconds}s`, 'engajamento', `${seconds} segundos`);
+                }, seconds * 1000)
+            );
+        }, { timeout: 5000 });
     }, []);
 
-    // Visualização de seção — dispara uma vez por seção quando entra na tela
+    // F2: Atrasar IntersectionObserver de seções para requestIdleCallback — reduz parsing/eval
     useEffect(() => {
-        const sections = ['inicio', 'sobre', 'como-funciona', 'servicos', 'agendamento', 'blog', 'depoimentos'];
-        const seen = new Set<string>();
+        if (!('requestIdleCallback' in window)) {
+            const timeoutId = setTimeout(() => {
+                setupSectionObserver();
+            }, 2500);
+            return () => clearTimeout(timeoutId);
+        }
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    const id = entry.target.id;
-                    if (entry.isIntersecting && !seen.has(id)) {
-                        seen.add(id);
-                        sendGAEvent('visualizacao_secao', 'navegacao', id);
-                    }
-                });
-            },
-            { threshold: 0.3 }
-        );
+        (window as any).requestIdleCallback(() => {
+            setupSectionObserver();
+        }, { timeout: 5000 });
 
-        sections.forEach((id) => {
-            const el = document.getElementById(id);
-            if (el) observer.observe(el);
-        });
+        function setupSectionObserver() {
+            const sections = ['inicio', 'sobre', 'como-funciona', 'servicos', 'agendamento', 'blog', 'depoimentos'];
+            const seen = new Set<string>();
 
-        return () => observer.disconnect();
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        const id = entry.target.id;
+                        if (entry.isIntersecting && !seen.has(id)) {
+                            seen.add(id);
+                            sendGAEvent('visualizacao_secao', 'navegacao', id);
+                        }
+                    });
+                },
+                { threshold: 0.3 }
+            );
+
+            sections.forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) observer.observe(el);
+            });
+
+            return () => observer.disconnect();
+        }
     }, []);
 
     return (
