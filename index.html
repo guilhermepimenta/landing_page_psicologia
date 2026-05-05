@@ -94,11 +94,13 @@
     }
   }
   </script>
-  <!-- A2: Preconnect + Preload para fontes críticas (LCP) -->
+  <!-- A2: Preconnect para fontes e Firebase (D3: crossorigin removido das origens não-CORS) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://fernanda-psicologia.firebaseapp.com" crossorigin />
-  <link rel="preconnect" href="https://firebaseinstallations.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fernanda-psicologia.firebaseapp.com" />
+  <link rel="preconnect" href="https://firebaseinstallations.googleapis.com" />
+  <link rel="preconnect" href="https://firebase.googleapis.com" />
+  <link rel="preconnect" href="https://apis.google.com" />
   <!-- A4: Preload da variante Playfair Display usada no H1 (elemento LCP) -->
   <link
     rel="preload"
@@ -164,32 +166,43 @@
   }
   </script>
 
-  <!-- Google tag (GA4 + Google Ads) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17262838643"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-8Z7G9LJDC2');
-    gtag('config', 'AW-17262838643');
-  </script>
-  <!-- index.css importa @tailwind base/components/utilities — processado pelo Vite -->
-  <link rel="stylesheet" href="/index.css">
+  <!-- D1: GA4+Ads movidos para body — carregados via requestIdleCallback (ver script no body) -->
+  <!-- D2: CSS não-bloqueante — preload dispara o download sem bloquear render -->
+  <link rel="preload" as="style" href="/index.css" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="/index.css" /></noscript>
 </head>
 
 <body>
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 
-  <!-- A3: GTM movido para o final do body — não bloqueia FCP/LCP -->
+  <!-- D1: GTM + GA4 carregados após idle — não bloqueiam FCP/LCP/TBT -->
   <script>
-    (function(w,d,s,l,i){
-      w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-      var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-      j.defer=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-      f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-WQPJPQW8');
+    function loadAnalytics() {
+      // GTM
+      (function(w,d,s,l,i){
+        w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+        j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+        f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-WQPJPQW8');
+      // GA4 + Google Ads
+      var s=document.createElement('script');
+      s.async=true;
+      s.src='https://www.googletagmanager.com/gtag/js?id=AW-17262838643';
+      document.head.appendChild(s);
+      window.dataLayer=window.dataLayer||[];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag=gtag;
+      gtag('js',new Date());
+      gtag('config','G-8Z7G9LJDC2');
+      gtag('config','AW-17262838643');
+    }
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadAnalytics, { timeout: 4000 });
+    } else {
+      window.addEventListener('load', loadAnalytics);
+    }
   </script>
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQPJPQW8"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
