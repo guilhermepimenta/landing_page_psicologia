@@ -100,15 +100,6 @@
   <link rel="preconnect" href="https://fernanda-psicologia.firebaseapp.com" />
   <link rel="dns-prefetch" href="https://firebaseinstallations.googleapis.com" />
   <link rel="dns-prefetch" href="https://firebase.googleapis.com" />
-  <!--
-    Preload da foto de Fernanda — elemento LCP real da landing page.
-    Sem esse hint o browser só descobre a imagem depois que o JS executa
-    e React renderiza Bio.tsx (~1-2s em 4G). Com o preload o download
-    começa junto com o HTML, reduzindo o LCP de ~10s para ~3s em mobile.
-    type="image/webp" garante que browsers sem suporte a WebP ignoram
-    esse preload e usam o fallback PNG normalmente.
-  -->
-  <link rel="preload" as="image" href="/assets/image.webp" type="image/webp" />
   <!-- A4: Preload da variante Playfair Display usada no H1 (elemento LCP) -->
   <link
     rel="preload"
