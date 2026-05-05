@@ -130,122 +130,153 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
     <div className="bg-white min-h-screen font-sans">
 
       {/* ── HEADER MÍNIMO ── */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-        <div>
-          <p className="text-[13px] font-bold text-[#4A5D4A] leading-tight">Fernanda Mangia</p>
-          <p className="text-[11px] text-gray-500">Psicóloga · CRP 05/31299</p>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          <div>
+            <p className="text-[13px] sm:text-sm font-bold text-[#4A5D4A] leading-tight">Fernanda Mangia</p>
+            <p className="text-[11px] sm:text-xs text-gray-500">Psicóloga · CRP 05/31299</p>
+          </div>
+          <a
+            href={waGeral}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => sendGAEvent('cta_header_whatsapp', 'avaliacao_landing', 'header')}
+            className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-[13px] sm:text-sm font-semibold px-3 sm:px-5 py-2 rounded-full transition-colors"
+          >
+            <Phone size={14} />
+            <span>WhatsApp</span>
+          </a>
         </div>
-        <a
-          href={waGeral}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => sendGAEvent('cta_header_whatsapp', 'avaliacao_landing', 'header')}
-          className="flex items-center gap-1.5 bg-green-500 hover:bg-green-600 text-white text-[13px] font-semibold px-3 py-2 rounded-full transition-colors"
-        >
-          <Phone size={14} />
-          WhatsApp
-        </a>
       </header>
 
       {/* espaço do header fixo */}
       <div className="h-[56px]" />
 
       {/* ── HERO ── */}
-      <section className="bg-gradient-to-br from-[#4A5D4A] to-[#3A4A3A] text-white px-4 pt-8 pb-10">
-        {/* Badge prova social */}
-        <div className="flex flex-wrap gap-2 mb-5">
-          <span className="inline-flex items-center gap-1 bg-white/15 border border-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-            <Star size={12} className="text-yellow-400 fill-yellow-400" />
-            5,0 · 153 avaliações Doctoralia
-          </span>
-          <span className="inline-flex items-center gap-1 bg-white/15 border border-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-            <Star size={12} className="text-yellow-400 fill-yellow-400" />
-            5,0 · 23 avaliações Google
-          </span>
+      <section className="bg-gradient-to-br from-[#4A5D4A] to-[#3A4A3A] text-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-10 pb-12 md:pt-16 md:pb-20">
+          {/* Badges */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            <span className="inline-flex items-center gap-1 bg-white/15 border border-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+              <Star size={12} className="text-yellow-400 fill-yellow-400" />
+              5,0 · 153 avaliações Doctoralia
+            </span>
+            <span className="inline-flex items-center gap-1 bg-white/15 border border-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+              <Star size={12} className="text-yellow-400 fill-yellow-400" />
+              5,0 · 23 avaliações Google
+            </span>
+          </div>
+
+          <div className="md:grid md:grid-cols-[1fr_auto] md:gap-12 md:items-center">
+            <div>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold leading-tight mb-4">
+                Avaliação Psicológica para crianças e adultos
+              </h1>
+              <p className="text-white/85 text-base md:text-lg leading-relaxed mb-2">
+                TEA · TDAH · Dificuldades de aprendizagem e outras avaliações
+              </p>
+              <p className="text-white/70 text-sm md:text-base mb-8">
+                Presencial em Niterói e Nova Friburgo · Laudo completo
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href={waGeral}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => sendGAEvent('cta_hero_whatsapp', 'avaliacao_landing', 'hero')}
+                  className="flex-1 sm:flex-none bg-green-500 hover:bg-green-600 active:scale-[0.98] text-white text-center font-bold text-base px-8 py-4 rounded-2xl shadow-lg transition-all"
+                >
+                  Agendar pelo WhatsApp
+                </a>
+                <a
+                  href="#triagem"
+                  className="flex-1 sm:flex-none text-center border border-white/30 hover:border-white/60 text-white/85 hover:text-white text-sm sm:text-base font-medium px-6 py-4 rounded-2xl transition-colors"
+                  onClick={() => sendGAEvent('cta_hero_triagem', 'avaliacao_landing', 'hero')}
+                >
+                  Fazer triagem gratuita →
+                </a>
+              </div>
+            </div>
+
+            {/* Credenciais — visível só em desktop */}
+            <div className="hidden md:flex flex-col gap-3 min-w-[220px]">
+              {[
+                'Mestre em Saúde Coletiva — UFF',
+                'Especialista em TCC e Terapia do Esquema',
+                'Avaliação de crianças e adultos',
+                'Niterói e Nova Friburgo',
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-2 text-white/80">
+                  <CheckCircle size={15} className="text-green-400 mt-0.5 shrink-0" />
+                  <span className="text-sm">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-
-        <h1 className="text-[28px] font-serif font-bold leading-tight mb-3">
-          Avaliação Psicológica para crianças e adultos
-        </h1>
-        <p className="text-white/85 text-base leading-relaxed mb-2">
-          TEA · TDAH · Dificuldades de aprendizagem e outras avaliações
-        </p>
-        <p className="text-white/70 text-sm mb-7">
-          Presencial em Niterói e Nova Friburgo · Laudo completo
-        </p>
-
-        <a
-          href={waGeral}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => sendGAEvent('cta_hero_whatsapp', 'avaliacao_landing', 'hero')}
-          className="block w-full bg-green-500 hover:bg-green-600 active:scale-[0.98] text-white text-center font-bold text-base py-4 rounded-2xl shadow-lg transition-all mb-3"
-        >
-          Agendar pelo WhatsApp
-        </a>
-        <a
-          href="#triagem"
-          className="block w-full text-center text-white/80 text-sm py-2"
-          onClick={() => sendGAEvent('cta_hero_triagem', 'avaliacao_landing', 'hero')}
-        >
-          Fazer triagem gratuita →
-        </a>
       </section>
 
       {/* ── O QUE AVALIAMOS ── */}
-      <section className="px-4 py-10 bg-gray-50">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">O que avaliamos</h2>
-        <p className="text-sm text-gray-500 mb-6">Avaliação completa com laudo técnico para cada caso</p>
+      <section className="bg-gray-50 py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">O que avaliamos</h2>
+          <p className="text-sm md:text-base text-gray-500 mb-8">Avaliação completa com laudo técnico para cada caso</p>
 
-        <div className="space-y-3">
-          {AVALIACOES.map((av, i) => (
-            <div key={i} className="bg-white rounded-2xl p-4 flex gap-3 items-start shadow-sm border border-gray-100">
-              <div className="w-10 h-10 rounded-xl bg-[#4A5D4A]/10 flex items-center justify-center text-[#4A5D4A] shrink-0">
-                {av.icon}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {AVALIACOES.map((av, i) => (
+              <div key={i} className="bg-white rounded-2xl p-5 flex gap-3 items-start shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="w-11 h-11 rounded-xl bg-[#4A5D4A]/10 flex items-center justify-center text-[#4A5D4A] shrink-0">
+                  {av.icon}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 leading-tight mb-1">{av.titulo}</p>
+                  <p className="text-xs text-gray-500 leading-relaxed">{av.desc}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-900 leading-tight mb-1">{av.titulo}</p>
-                <p className="text-xs text-gray-500 leading-relaxed">{av.desc}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <a
+              href={waGeral}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => sendGAEvent('cta_servicos_whatsapp', 'avaliacao_landing', 'servicos')}
+              className="inline-block bg-[#4A5D4A] hover:bg-[#3A4A3A] text-white text-center font-semibold text-sm md:text-base px-10 py-4 rounded-2xl transition-colors shadow-md"
+            >
+              Agendar minha avaliação
+            </a>
+          </div>
         </div>
-
-        <a
-          href={waGeral}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => sendGAEvent('cta_servicos_whatsapp', 'avaliacao_landing', 'servicos')}
-          className="block w-full mt-6 bg-[#4A5D4A] text-white text-center font-semibold text-sm py-4 rounded-2xl"
-        >
-          Agendar minha avaliação
-        </a>
       </section>
 
       {/* ── TRIAGEM ONLINE ── */}
-      <section id="triagem" className="px-4 py-10 bg-white">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Não sabe se precisa de avaliação?</h2>
-        <p className="text-sm text-gray-500 mb-6">
-          Faça a triagem gratuita — leva 3 minutos e você recebe uma orientação
-        </p>
+      <section id="triagem" className="bg-white py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Não sabe se precisa de avaliação?</h2>
+          <p className="text-sm md:text-base text-gray-500 mb-8">
+            Faça a triagem gratuita — leva 3 minutos e você recebe uma orientação
+          </p>
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {TRIAGENS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => { setTriagem(t.id); sendGAEvent('triagem_iniciada', 'avaliacao_landing', t.id); }}
-              className="flex flex-col items-center gap-2 bg-gray-50 border border-gray-200 hover:border-[#4A5D4A] hover:bg-[#4A5D4A]/5 active:scale-[0.97] rounded-2xl p-4 transition-all"
-            >
-              <span className="text-2xl">{t.emoji}</span>
-              <span className="text-xs font-semibold text-gray-800 text-center leading-tight">{t.label}</span>
-              <span className="text-[11px] text-[#4A5D4A] font-medium">Iniciar →</span>
-            </button>
-          ))}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            {TRIAGENS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => { setTriagem(t.id); sendGAEvent('triagem_iniciada', 'avaliacao_landing', t.id); }}
+                className="flex flex-col items-center gap-2 bg-gray-50 border border-gray-200 hover:border-[#4A5D4A] hover:bg-[#4A5D4A]/5 active:scale-[0.97] rounded-2xl p-5 transition-all group cursor-pointer"
+              >
+                <span className="text-3xl">{t.emoji}</span>
+                <span className="text-xs md:text-sm font-semibold text-gray-800 text-center leading-tight">{t.label}</span>
+                <span className="text-[11px] md:text-xs text-[#4A5D4A] font-medium">Iniciar →</span>
+              </button>
+            ))}
+          </div>
+
+          <p className="text-[11px] md:text-xs text-gray-400 text-center">
+            A triagem é orientativa e não substitui avaliação profissional
+          </p>
         </div>
-
-        <p className="text-[11px] text-gray-400 text-center">
-          A triagem é orientativa e não substitui avaliação profissional
-        </p>
       </section>
 
       {/* Modal de triagem */}
@@ -259,131 +290,154 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       )}
 
       {/* ── COMO FUNCIONA ── */}
-      <section className="px-4 py-10 bg-[#4A5D4A]/5">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Como funciona a avaliação</h2>
+      <section className="bg-[#4A5D4A]/5 py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Como funciona a avaliação</h2>
 
-        <div className="space-y-4">
-          {PASSOS.map((p) => (
-            <div key={p.n} className="flex gap-4 items-start">
-              <div className="w-9 h-9 rounded-full bg-[#4A5D4A] text-white font-bold text-sm flex items-center justify-center shrink-0">
-                {p.n}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {PASSOS.map((p) => (
+              <div key={p.n} className="flex md:flex-col gap-4 md:gap-3 items-start md:items-start">
+                <div className="w-10 h-10 rounded-full bg-[#4A5D4A] text-white font-bold text-base flex items-center justify-center shrink-0">
+                  {p.n}
+                </div>
+                <div>
+                  <p className="text-sm md:text-base font-semibold text-gray-900 mb-1">{p.titulo}</p>
+                  <p className="text-xs md:text-sm text-gray-600 leading-relaxed">{p.desc}</p>
+                </div>
               </div>
-              <div className="pt-1">
-                <p className="text-sm font-semibold text-gray-900 mb-0.5">{p.titulo}</p>
-                <p className="text-xs text-gray-600 leading-relaxed">{p.desc}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── ONDE ATENDEMOS ── */}
-      <section className="px-4 py-10 bg-white">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Onde atendemos</h2>
-        <p className="text-sm text-gray-500 mb-6">A avaliação é sempre presencial</p>
+      <section className="bg-white py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Onde atendemos</h2>
+          <p className="text-sm md:text-base text-gray-500 mb-8">A avaliação é sempre presencial</p>
 
-        <div className="space-y-4">
-          {UNIDADES.map((u, i) => (
-            <div key={i} className="border border-gray-200 rounded-2xl overflow-hidden">
-              <div className="bg-[#4A5D4A] px-4 py-2.5">
-                <p className="text-white font-semibold text-sm">📍 {u.cidade}</p>
-              </div>
-              <div className="p-4 space-y-2">
-                <div className="flex gap-2 items-start">
-                  <MapPin size={14} className="text-[#4A5D4A] mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{u.endereco}</p>
-                    <p className="text-xs text-gray-500">{u.bairro}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {UNIDADES.map((u, i) => (
+              <div key={i} className="border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
+                <div className="bg-[#4A5D4A] px-5 py-3">
+                  <p className="text-white font-semibold text-sm md:text-base">📍 {u.cidade}</p>
+                </div>
+                <div className="p-5 space-y-3">
+                  <div className="flex gap-2 items-start">
+                    <MapPin size={16} className="text-[#4A5D4A] mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm md:text-base font-medium text-gray-900">{u.endereco}</p>
+                      <p className="text-xs md:text-sm text-gray-500">{u.bairro}</p>
+                    </div>
                   </div>
+                  <div className="flex gap-2 items-center">
+                    <Clock size={16} className="text-[#4A5D4A] shrink-0" />
+                    <p className="text-xs md:text-sm text-gray-600">{u.horario}</p>
+                  </div>
+                  <a
+                    href={u.maps}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => sendGAEvent('maps_click', 'avaliacao_landing', u.cidade)}
+                    className="inline-flex items-center gap-1.5 mt-1 text-[#4A5D4A] hover:text-[#3A4A3A] text-xs md:text-sm font-semibold transition-colors"
+                  >
+                    <ExternalLink size={13} />
+                    Ver no Google Maps
+                  </a>
                 </div>
-                <div className="flex gap-2 items-center">
-                  <Clock size={14} className="text-[#4A5D4A] shrink-0" />
-                  <p className="text-xs text-gray-600">{u.horario}</p>
-                </div>
-                <a
-                  href={u.maps}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => sendGAEvent('maps_click', 'avaliacao_landing', u.cidade)}
-                  className="inline-flex items-center gap-1.5 mt-1 text-[#4A5D4A] text-xs font-semibold"
-                >
-                  <ExternalLink size={12} />
-                  Ver no Google Maps
-                </a>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-          <p className="text-xs text-amber-800 leading-relaxed">
-            ⚠️ A avaliação psicológica exige encontros presenciais para garantir a validade científica e ética do laudo.
-          </p>
+          <div className="mt-5 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3.5">
+            <p className="text-xs md:text-sm text-amber-800 leading-relaxed">
+              ⚠️ A avaliação psicológica exige encontros presenciais para garantir a validade científica e ética do laudo.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* ── INVESTIMENTO ── */}
-      <section className="px-4 py-10 bg-gray-50">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Investimento</h2>
+      <section className="bg-gray-50 py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Investimento</h2>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-3 shadow-sm">
-          <div className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-[#4A5D4A]" />
-            <p className="text-sm text-gray-800">Atendimento particular</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-[#4A5D4A]" />
-            <p className="text-sm text-gray-800">Nota fiscal emitida</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-[#4A5D4A]" />
-            <p className="text-sm text-gray-800">Possibilidade de reembolso pelo plano de saúde</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle size={16} className="text-red-400" />
-            <p className="text-sm text-gray-800">Não aceita convênio diretamente</p>
+          <div className="md:grid md:grid-cols-[1fr_auto] md:gap-8 md:items-start">
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4 shadow-sm mb-5 md:mb-0">
+              {[
+                { ok: true,  text: 'Atendimento particular' },
+                { ok: true,  text: 'Nota fiscal emitida' },
+                { ok: true,  text: 'Possibilidade de reembolso pelo plano de saúde' },
+                { ok: false, text: 'Não aceita convênio diretamente' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <CheckCircle size={18} className={item.ok ? 'text-[#4A5D4A]' : 'text-red-400'} />
+                  <p className="text-sm md:text-base text-gray-800">{item.text}</p>
+                </div>
+              ))}
+              <p className="text-xs md:text-sm text-gray-500 pt-1">
+                O valor varia conforme o tipo de avaliação e número de sessões.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 md:min-w-[260px]">
+              <a
+                href={waValores}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => sendGAEvent('cta_valores_whatsapp', 'avaliacao_landing', 'investimento')}
+                className="block text-center border-2 border-[#4A5D4A] text-[#4A5D4A] hover:bg-[#4A5D4A] hover:text-white font-semibold text-sm md:text-base px-6 py-4 rounded-2xl transition-colors"
+              >
+                Consultar valores pelo WhatsApp
+              </a>
+              <a
+                href={waGeral}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => sendGAEvent('cta_agendar_investimento', 'avaliacao_landing', 'investimento')}
+                className="block text-center bg-[#4A5D4A] hover:bg-[#3A4A3A] text-white font-semibold text-sm md:text-base px-6 py-4 rounded-2xl transition-colors"
+              >
+                Agendar minha avaliação
+              </a>
+            </div>
           </div>
         </div>
-
-        <p className="text-xs text-gray-500 mt-3 text-center">
-          O valor varia conforme o tipo de avaliação e número de sessões.
-        </p>
-
-        <a
-          href={waValores}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => sendGAEvent('cta_valores_whatsapp', 'avaliacao_landing', 'investimento')}
-          className="block w-full mt-4 border-2 border-[#4A5D4A] text-[#4A5D4A] text-center font-semibold text-sm py-4 rounded-2xl"
-        >
-          Consultar valores pelo WhatsApp
-        </a>
       </section>
 
       {/* ── PROVA SOCIAL ── */}
-      <section className="px-4 py-10 bg-white">
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1 bg-gray-50 rounded-2xl p-3 text-center border border-gray-100">
-            <p className="text-2xl font-bold text-[#4A5D4A]">5,0</p>
-            <p className="text-[10px] text-yellow-500 font-bold">★★★★★</p>
-            <p className="text-[10px] text-gray-500 mt-0.5">153 avaliações</p>
-            <p className="text-[10px] text-gray-400">Doctoralia</p>
+      <section className="bg-white py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          {/* Notas */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+              <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">5,0</p>
+              <p className="text-sm text-yellow-500 font-bold mt-0.5">★★★★★</p>
+              <p className="text-xs text-gray-500 mt-0.5">153 avaliações</p>
+              <p className="text-xs text-gray-400">Doctoralia</p>
+            </div>
+            <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+              <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">5,0</p>
+              <p className="text-sm text-yellow-500 font-bold mt-0.5">★★★★★</p>
+              <p className="text-xs text-gray-500 mt-0.5">23 avaliações</p>
+              <p className="text-xs text-gray-400">Google</p>
+            </div>
+            <div className="hidden md:block bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+              <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">+10</p>
+              <p className="text-xs text-gray-500 mt-1">anos de experiência</p>
+            </div>
+            <div className="hidden md:block bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+              <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">NIT<br/>+FRI</p>
+              <p className="text-xs text-gray-500 mt-1">duas unidades</p>
+            </div>
           </div>
-          <div className="flex-1 bg-gray-50 rounded-2xl p-3 text-center border border-gray-100">
-            <p className="text-2xl font-bold text-[#4A5D4A]">5,0</p>
-            <p className="text-[10px] text-yellow-500 font-bold">★★★★★</p>
-            <p className="text-[10px] text-gray-500 mt-0.5">23 avaliações</p>
-            <p className="text-[10px] text-gray-400">Google</p>
-          </div>
-        </div>
 
-        <div className="overflow-x-auto -mx-4 px-4">
-          <div className="flex gap-3 w-max pb-2">
+          {/* Depoimentos */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {DEPOIMENTOS.map((d, i) => (
-              <div key={i} className="w-[280px] shrink-0 bg-gray-50 rounded-2xl p-4 border border-gray-100">
+              <div key={i} className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
                 <p className="text-yellow-400 text-sm mb-2">★★★★★</p>
-                <p className="text-xs text-gray-700 leading-relaxed mb-3 italic">"{d.texto}"</p>
-                <p className="text-[11px] text-gray-500 font-medium">— {d.autor}</p>
+                <p className="text-sm text-gray-700 leading-relaxed mb-3 italic">"{d.texto}"</p>
+                <p className="text-xs text-gray-500 font-medium">— {d.autor}</p>
               </div>
             ))}
           </div>
@@ -391,156 +445,194 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       </section>
 
       {/* ── QUEM É FERNANDA ── */}
-      <section className="px-4 py-10 bg-[#4A5D4A]/5">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Quem é Fernanda Mangia</h2>
+      <section className="bg-[#4A5D4A]/5 py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Quem é Fernanda Mangia</h2>
 
-        <div className="flex gap-4 items-start mb-5">
-          <picture>
-            <source srcSet="/assets/image.webp" type="image/webp" />
-            <source srcSet="/assets/image.jpg"  type="image/jpeg" />
-            <img
-              src="/assets/image.jpg"
-              alt="Fernanda Abreu Mangia — Psicóloga"
-              width="80"
-              height="80"
-              className="w-20 h-20 rounded-2xl object-cover shrink-0"
-              loading="lazy"
-            />
-          </picture>
-          <div>
-            <p className="text-base font-bold text-gray-900">Fernanda Abreu Mangia</p>
-            <p className="text-sm text-[#4A5D4A] font-medium">Psicóloga · CRP 05/31299</p>
-          </div>
-        </div>
-
-        <div className="space-y-2.5">
-          {[
-            'Mestre em Saúde Coletiva — UFF',
-            'Especialista em TCC e Terapia do Esquema',
-            'Avaliação psicológica de crianças e adultos',
-            'Atendimento em Niterói (Icaraí) e Nova Friburgo',
-          ].map((item, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <CheckCircle size={15} className="text-[#4A5D4A] mt-0.5 shrink-0" />
-              <p className="text-sm text-gray-700">{item}</p>
+          <div className="md:flex md:gap-10 md:items-start">
+            {/* Foto */}
+            <div className="flex gap-4 items-start mb-6 md:mb-0 md:flex-col md:items-center md:min-w-[160px]">
+              <picture>
+                <source srcSet="/assets/image.webp" type="image/webp" />
+                <source srcSet="/assets/image.jpg"  type="image/jpeg" />
+                <img
+                  src="/assets/image.jpg"
+                  alt="Fernanda Abreu Mangia — Psicóloga"
+                  width="120"
+                  height="150"
+                  className="w-24 h-24 md:w-36 md:h-36 rounded-2xl object-cover shrink-0 shadow-md"
+                  loading="lazy"
+                />
+              </picture>
+              <div className="md:text-center">
+                <p className="text-base font-bold text-gray-900">Fernanda Abreu Mangia</p>
+                <p className="text-sm text-[#4A5D4A] font-medium">Psicóloga · CRP 05/31299</p>
+              </div>
             </div>
-          ))}
+
+            {/* Credenciais */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+              {[
+                'Mestre em Saúde Coletiva — UFF',
+                'Especialista em TCC e Terapia do Esquema',
+                'Avaliação psicológica de crianças e adultos',
+                'Atendimento em Niterói (Icaraí) e Nova Friburgo',
+                'Processos de avaliação criteriosos com laudo completo',
+                'Devolutiva pessoal e humanizada para famílias e pacientes',
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <CheckCircle size={15} className="text-[#4A5D4A] mt-0.5 shrink-0" />
+                  <p className="text-sm md:text-base text-gray-700">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── FORMULÁRIO ── */}
-      <section className="px-4 py-10 bg-white">
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Agende sua avaliação</h2>
-        <p className="text-sm text-gray-500 mb-6">Resposta em até 24h pelo WhatsApp</p>
+      <section className="bg-white py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="md:grid md:grid-cols-2 md:gap-12 md:items-start">
+            {/* Texto de apoio — visível apenas no desktop */}
+            <div className="hidden md:block">
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">Agende sua avaliação</h2>
+              <p className="text-gray-500 mb-6">Resposta em até 24h pelo WhatsApp</p>
+              <div className="space-y-4">
+                {[
+                  'Laudo técnico completo e reconhecido',
+                  'Devolutiva pessoal com orientações',
+                  'Presencial em Niterói e Nova Friburgo',
+                  'Nota fiscal emitida',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <CheckCircle size={18} className="text-[#4A5D4A] mt-0.5 shrink-0" />
+                    <p className="text-base text-gray-700">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-        {enviado ? (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-            <CheckCircle size={32} className="text-green-500 mx-auto mb-3" />
-            <p className="font-semibold text-green-800 mb-1">Mensagem recebida!</p>
-            <p className="text-sm text-green-700">Entraremos em contato em breve pelo WhatsApp.</p>
+            {/* Formulário */}
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-1 md:hidden">Agende sua avaliação</h2>
+              <p className="text-sm text-gray-500 mb-6 md:hidden">Resposta em até 24h pelo WhatsApp</p>
+
+              {enviado ? (
+                <div className="bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
+                  <CheckCircle size={36} className="text-green-500 mx-auto mb-3" />
+                  <p className="font-semibold text-green-800 mb-1">Mensagem recebida!</p>
+                  <p className="text-sm text-green-700">Entraremos em contato em breve pelo WhatsApp.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Seu nome"
+                    value={form.nome}
+                    onChange={e => setForm(f => ({ ...f, nome: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50"
+                  />
+                  <input
+                    type="tel"
+                    required
+                    placeholder="WhatsApp (com DDD)"
+                    value={form.whatsapp}
+                    onChange={e => setForm(f => ({ ...f, whatsapp: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50"
+                  />
+                  <select
+                    required
+                    value={form.paraQuem}
+                    onChange={e => setForm(f => ({ ...f, paraQuem: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50 text-gray-700"
+                  >
+                    <option value="">Para quem é a avaliação?</option>
+                    <option value="filho_crianca">Para meu filho(a) — criança</option>
+                    <option value="filho_adolescente">Para meu filho(a) — adolescente</option>
+                    <option value="adulto_eu">Para mim (adulto)</option>
+                    <option value="familiar_adulto">Para outro familiar adulto</option>
+                  </select>
+
+                  <button
+                    type="submit"
+                    disabled={enviando}
+                    className="w-full bg-[#4A5D4A] hover:bg-[#3A4A3A] disabled:opacity-60 text-white font-bold text-base py-4 rounded-2xl transition-colors shadow-md"
+                  >
+                    {enviando ? 'Enviando...' : 'Quero agendar minha avaliação'}
+                  </button>
+                </form>
+              )}
+
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-xs text-gray-400">ou</span>
+                <div className="flex-1 h-px bg-gray-200" />
+              </div>
+
+              <a
+                href={waGeral}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => sendGAEvent('cta_formulario_whatsapp', 'avaliacao_landing', 'formulario')}
+                className="block w-full bg-green-500 hover:bg-green-600 text-white text-center font-semibold text-sm md:text-base py-4 rounded-2xl transition-colors"
+              >
+                💬 Falar pelo WhatsApp agora
+              </a>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <input
-              type="text"
-              required
-              placeholder="Seu nome"
-              value={form.nome}
-              onChange={e => setForm(f => ({ ...f, nome: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50"
-            />
-            <input
-              type="tel"
-              required
-              placeholder="WhatsApp (com DDD)"
-              value={form.whatsapp}
-              onChange={e => setForm(f => ({ ...f, whatsapp: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50"
-            />
-            <select
-              required
-              value={form.paraQuem}
-              onChange={e => setForm(f => ({ ...f, paraQuem: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50 text-gray-700"
-            >
-              <option value="">Para quem é a avaliação?</option>
-              <option value="filho_crianca">Para meu filho(a) — criança</option>
-              <option value="filho_adolescente">Para meu filho(a) — adolescente</option>
-              <option value="adulto_eu">Para mim (adulto)</option>
-              <option value="familiar_adulto">Para outro familiar adulto</option>
-            </select>
-
-            <button
-              type="submit"
-              disabled={enviando}
-              className="w-full bg-[#4A5D4A] hover:bg-[#3A4A3A] disabled:opacity-60 text-white font-bold text-base py-4 rounded-2xl transition-colors shadow-md"
-            >
-              {enviando ? 'Enviando...' : 'Quero agendar minha avaliação'}
-            </button>
-          </form>
-        )}
-
-        <div className="flex items-center gap-3 my-4">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">ou</span>
-          <div className="flex-1 h-px bg-gray-200" />
         </div>
-
-        <a
-          href={waGeral}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => sendGAEvent('cta_formulario_whatsapp', 'avaliacao_landing', 'formulario')}
-          className="block w-full bg-green-500 hover:bg-green-600 text-white text-center font-semibold text-sm py-4 rounded-2xl"
-        >
-          💬 Falar pelo WhatsApp agora
-        </a>
       </section>
 
       {/* ── FAQ ── */}
-      <section className="px-4 py-10 bg-gray-50">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Perguntas frequentes</h2>
+      <section className="bg-gray-50 py-12 md:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Perguntas frequentes</h2>
 
-        <div className="space-y-2">
-          {FAQS.map((faq, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <button
-                className="w-full flex items-center justify-between px-4 py-4 text-left"
-                onClick={() => setFaqAberto(faqAberto === i ? null : i)}
-              >
-                <span className="text-sm font-semibold text-gray-900 pr-3 leading-snug">{faq.p}</span>
-                {faqAberto === i
-                  ? <ChevronUp size={16} className="text-[#4A5D4A] shrink-0" />
-                  : <ChevronDown size={16} className="text-gray-400 shrink-0" />
-                }
-              </button>
-              {faqAberto === i && (
-                <div className="px-4 pb-4">
-                  <p className="text-sm text-gray-600 leading-relaxed">{faq.r}</p>
-                </div>
-              )}
-            </div>
-          ))}
+          <div className="md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-2">
+            {FAQS.map((faq, i) => (
+              <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-2 md:mb-0">
+                <button
+                  className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+                  onClick={() => setFaqAberto(faqAberto === i ? null : i)}
+                >
+                  <span className="text-sm md:text-base font-semibold text-gray-900 pr-3 leading-snug">{faq.p}</span>
+                  {faqAberto === i
+                    ? <ChevronUp size={16} className="text-[#4A5D4A] shrink-0" />
+                    : <ChevronDown size={16} className="text-gray-400 shrink-0" />
+                  }
+                </button>
+                {faqAberto === i && (
+                  <div className="px-5 pb-4">
+                    <p className="text-sm md:text-base text-gray-600 leading-relaxed">{faq.r}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── CTA FINAL ── */}
-      <section className="px-4 py-10 bg-[#4A5D4A] text-white text-center">
-        <h2 className="text-xl font-bold mb-2">Pronto para agendar?</h2>
-        <p className="text-white/80 text-sm mb-6 leading-relaxed">
-          Entre em contato pelo WhatsApp e tire todas as suas dúvidas antes de agendar.
-        </p>
-        <a
-          href={waGeral}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => sendGAEvent('cta_final_whatsapp', 'avaliacao_landing', 'footer_cta')}
-          className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold text-base py-4 rounded-2xl shadow-lg mb-4"
-        >
-          Agendar pelo WhatsApp
-        </a>
-        <p className="text-white/60 text-xs">Fernanda Mangia · Psicóloga · CRP 05/31299</p>
-        <p className="text-white/60 text-xs">Niterói e Nova Friburgo · RJ</p>
+      <section className="bg-[#4A5D4A] text-white py-14 md:py-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-2xl md:text-4xl font-bold mb-3">Pronto para agendar?</h2>
+          <p className="text-white/80 text-sm md:text-lg mb-8 leading-relaxed max-w-xl mx-auto">
+            Entre em contato pelo WhatsApp e tire todas as suas dúvidas antes de agendar.
+          </p>
+          <a
+            href={waGeral}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => sendGAEvent('cta_final_whatsapp', 'avaliacao_landing', 'footer_cta')}
+            className="inline-block bg-green-500 hover:bg-green-600 text-white font-bold text-base md:text-lg px-12 py-4 rounded-2xl shadow-lg transition-colors mb-6"
+          >
+            Agendar pelo WhatsApp
+          </a>
+          <p className="text-white/60 text-sm">Fernanda Mangia · Psicóloga · CRP 05/31299</p>
+          <p className="text-white/60 text-sm">Niterói e Nova Friburgo · RJ</p>
+        </div>
       </section>
 
       {/* ── WHATSAPP FLUTUANTE ── */}
@@ -550,7 +642,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
         rel="noopener noreferrer"
         onClick={() => sendGAEvent('cta_flutuante_whatsapp', 'avaliacao_landing', 'floating')}
         aria-label="Agendar pelo WhatsApp"
-        className="fixed bottom-5 right-4 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 active:scale-95 rounded-full shadow-xl flex items-center justify-center transition-all"
+        className="fixed bottom-6 right-5 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 active:scale-95 rounded-full shadow-xl flex items-center justify-center transition-all"
       >
         <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
