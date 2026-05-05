@@ -233,10 +233,10 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       </section>
 
       {/* ── O QUE AVALIAMOS ── */}
-      <section className="bg-gray-50 py-12 md:py-16">
+      <section className="bg-[#EDE8DF] py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">O que avaliamos</h2>
-          <p className="text-sm md:text-base text-gray-500 mb-8">Avaliação completa com laudo técnico para cada caso</p>
+          <p className="text-sm md:text-base text-gray-600 mb-8">Avaliação completa com laudo técnico para cada caso</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {AVALIACOES.map((av, i) => (
@@ -352,19 +352,19 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       )}
 
       {/* ── COMO FUNCIONA ── */}
-      <section className="bg-[#4A5D4A]/5 py-12 md:py-16">
+      <section className="bg-[#4A5D4A] py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Como funciona a avaliação</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">Como funciona a avaliação</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {PASSOS.map((p) => (
               <div key={p.n} className="flex md:flex-col gap-4 md:gap-3 items-start md:items-start">
-                <div className="w-10 h-10 rounded-full bg-[#4A5D4A] text-white font-bold text-base flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-full bg-white text-[#4A5D4A] font-bold text-base flex items-center justify-center shrink-0">
                   {p.n}
                 </div>
                 <div>
-                  <p className="text-sm md:text-base font-semibold text-gray-900 mb-1">{p.titulo}</p>
-                  <p className="text-xs md:text-sm text-gray-600 leading-relaxed">{p.desc}</p>
+                  <p className="text-sm md:text-base font-semibold text-white mb-1">{p.titulo}</p>
+                  <p className="text-xs md:text-sm text-white/70 leading-relaxed">{p.desc}</p>
                 </div>
               </div>
             ))}
@@ -417,7 +417,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       </section>
 
       {/* ── INVESTIMENTO ── */}
-      <section className="bg-gray-50 py-12 md:py-16">
+      <section className="bg-[#EDE8DF] py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Investimento</h2>
 
@@ -464,41 +464,41 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       </section>
 
       {/* ── PROVA SOCIAL ── */}
-      <section className="bg-[#F0EFEB] py-12 md:py-16">
+      <section className="bg-[#3A4A3A] py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* Notas */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white rounded-2xl p-4 text-center border border-gray-200 shadow-sm">
-              <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">5,0</p>
-              <p className="text-sm text-yellow-500 font-bold mt-0.5">★★★★★</p>
-              <p className="text-xs text-gray-500 mt-0.5">153 avaliações</p>
-              <p className="text-xs text-gray-400">Doctoralia</p>
+            <div className="bg-white/10 rounded-2xl p-4 text-center border border-white/15">
+              <p className="text-3xl md:text-4xl font-bold text-white">5,0</p>
+              <p className="text-sm text-yellow-400 font-bold mt-0.5">★★★★★</p>
+              <p className="text-xs text-white/60 mt-0.5">153 avaliações</p>
+              <p className="text-xs text-white/40">Doctoralia</p>
             </div>
-            <div className="bg-white rounded-2xl p-4 text-center border border-gray-200 shadow-sm">
-              <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">5,0</p>
-              <p className="text-sm text-yellow-500 font-bold mt-0.5">★★★★★</p>
-              <p className="text-xs text-gray-500 mt-0.5">23 avaliações</p>
-              <p className="text-xs text-gray-400">Google</p>
+            <div className="bg-white/10 rounded-2xl p-4 text-center border border-white/15">
+              <p className="text-3xl md:text-4xl font-bold text-white">5,0</p>
+              <p className="text-sm text-yellow-400 font-bold mt-0.5">★★★★★</p>
+              <p className="text-xs text-white/60 mt-0.5">23 avaliações</p>
+              <p className="text-xs text-white/40">Google</p>
             </div>
-            <div className="hidden md:block bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
-              <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">+10</p>
-              <p className="text-xs text-gray-500 mt-1">anos de experiência</p>
+            <div className="hidden md:block bg-white/10 rounded-2xl p-4 text-center border border-white/15">
+              <p className="text-3xl md:text-4xl font-bold text-white">+10</p>
+              <p className="text-xs text-white/60 mt-1">anos de experiência</p>
             </div>
-            <div className="hidden md:block bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
-              <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">NIT<br/>+FRI</p>
-              <p className="text-xs text-gray-500 mt-1">duas unidades</p>
+            <div className="hidden md:block bg-white/10 rounded-2xl p-4 text-center border border-white/15">
+              <p className="text-3xl md:text-4xl font-bold text-white">NIT<br/>+FRI</p>
+              <p className="text-xs text-white/60 mt-1">duas unidades</p>
             </div>
           </div>
 
           {/* Depoimentos */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {DEPOIMENTOS.map((d, i) => (
-              <div key={i} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+              <div key={i} className="bg-white/10 rounded-2xl p-5 border border-white/15">
                 <p className="text-yellow-400 text-sm mb-2">★★★★★</p>
-                <p className="text-sm text-gray-700 leading-relaxed mb-4 italic">"{d.texto}"</p>
+                <p className="text-sm text-white/85 leading-relaxed mb-4 italic">"{d.texto}"</p>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-600 font-semibold">— {d.autor}</p>
-                  <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{d.fonte}</span>
+                  <p className="text-xs text-white/60 font-semibold">— {d.autor}</p>
+                  <span className="text-[10px] text-white/40 bg-white/10 px-2 py-0.5 rounded-full">{d.fonte}</span>
                 </div>
               </div>
             ))}
@@ -507,7 +507,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       </section>
 
       {/* ── QUEM É FERNANDA ── */}
-      <section className="bg-[#4A5D4A]/5 py-12 md:py-16">
+      <section className="bg-white py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Quem é Fernanda Mangia</h2>
 
@@ -553,7 +553,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       </section>
 
       {/* ── FORMULÁRIO ── */}
-      <section className="bg-white py-12 md:py-16">
+      <section className="bg-[#EDE8DF] py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="md:grid md:grid-cols-2 md:gap-12 md:items-start">
             {/* Texto de apoio — visível apenas no desktop */}
@@ -594,7 +594,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
                     placeholder="Seu nome"
                     value={form.nome}
                     onChange={e => setForm(f => ({ ...f, nome: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-white"
                   />
                   <input
                     type="tel"
@@ -602,13 +602,13 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
                     placeholder="WhatsApp (com DDD)"
                     value={form.whatsapp}
                     onChange={e => setForm(f => ({ ...f, whatsapp: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-white"
                   />
                   <select
                     required
                     value={form.paraQuem}
                     onChange={e => setForm(f => ({ ...f, paraQuem: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-gray-50 text-gray-700"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-white text-gray-700"
                   >
                     <option value="">Para quem é a avaliação?</option>
                     <option value="filho_crianca">Para meu filho(a) — criança</option>
@@ -648,7 +648,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="bg-gray-50 py-12 md:py-16">
+      <section className="bg-[#EDE8DF] py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">Perguntas frequentes</h2>
 
