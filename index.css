@@ -2,15 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* C4: font-display swap — evita FOIT (Flash of Invisible Text) enquanto fontes carregam */
+/* font-display: optional — não troca fonte após render, elimina CLS de fonte */
 @font-face {
   font-family: 'Playfair Display';
-  font-display: swap;
+  font-display: optional;
 }
 
 @font-face {
   font-family: 'Inter';
-  font-display: swap;
+  font-display: optional;
 }
 
 body {
