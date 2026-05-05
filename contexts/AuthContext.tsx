@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../firebase.config';
+import type { User } from 'firebase/auth';
+import app from '../firebase.config';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -29,22 +29,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
-      if (firebaseUser) {
-        setIsAuthenticated(true);
-        setUser({ email: firebaseUser.email ?? '', name: 'Fernanda Mangia' });
+    let unsubscribe: () => void;
+    // D4: firebase/auth carregado lazy — não bloqueia o bundle principal
+    import('firebase/auth').then(({ getAuth, onAuthStateChanged }) => {
+      const auth = getAuth(app);
+      unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
+        if (firebaseUser) {
+          setIsAuthenticated(true);
+          setUser({ email: firebaseUser.email ?? '', name: 'Fernanda Mangia' });
       } else {
         setIsAuthenticated(false);
-        setUser(null);
-      }
-      setLoading(false);
+          setUser(null);
+        }
+        setLoading(false);
+      });
     });
-    return () => unsubscribe();
+    return () => { if (unsubscribe) unsubscribe(); };
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const { getAuth, signInWithEmailAndPassword } = await import('firebase/auth');
+      await signInWithEmailAndPassword(getAuth(app), email, password);
       return true;
     } catch {
       return false;
@@ -52,7 +58,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
-    await signOut(auth);
+    const { getAuth, signOut } = await import('firebase/auth');
+    await signOut(getAuth(app));
   };
 
   if (loading) return null;
