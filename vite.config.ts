@@ -28,29 +28,19 @@ export default defineConfig(({ mode }) => {
       },
       build: {
         rollupOptions: {
-          // firebase-admin é server-only (api/) — não entra no bundle do browser
+          // B3: firebase-admin é server-only (api/) — não deve entrar no bundle do browser
           external: (id) => id.startsWith('firebase-admin'),
           output: {
+            // B1: Code splitting — chunks separados para vendors pesados
             manualChunks: {
-              // React core — carregado imediatamente em todo render
-              'vendor-react':         ['react', 'react-dom', 'react-router-dom'],
-              // Firebase app + data — inicializado via dynamic import, não entra no bundle crítico
-              'vendor-firebase-core':      ['firebase/app', 'firebase/firestore', 'firebase/storage'],
-              // Analytics separada — carrega após idle via GTM, não bloqueia render
-              'vendor-firebase-analytics': ['firebase/analytics'],
-              // firebase/auth em chunk separado — carregado lazy via AuthContext (dynamic import)
-              // Não faz parte da cadeia crítica de render da landing page
-              'vendor-firebase-auth': ['firebase/auth'],
-              // Charts e ícones — carregados sob demanda no dashboard
-              'vendor-charts':        ['recharts'],
-              'vendor-icons':         ['lucide-react'],
-              // SDK Gemini — carregado lazy pelo ContentStudio
-              'vendor-ai':            ['@google/genai'],
+              'vendor-react':    ['react', 'react-dom', 'react-router-dom'],
+              'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/storage'],
+              'vendor-charts':   ['recharts'],
+              'vendor-icons':    ['lucide-react'],
+              'vendor-ai':       ['@google/genai'],
             },
           },
         },
-        // Avisa quando chunk > 600 KiB (aumentado de 500 para reduzir ruído)
-        chunkSizeWarningLimit: 600,
       },
     };
 });
