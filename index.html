@@ -190,8 +190,9 @@
     /* Esconde o shell quando React montar */
     #root:not(:empty) + #hero-shell{display:none}
   </style>
-  <!-- E1: CSS volta a bloquear (D2 revertida — preload sem bloqueio piorou LCP de 8s → 10.3s) -->
-  <link rel="stylesheet" href="/index.css">
+  <!-- E1+F1: CSS não-bloqueante seguro — critical CSS inline cobre o hero, sem FOUC acima da dobra -->
+  <link rel="preload" as="style" href="/index.css" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="/index.css" /></noscript>
 </head>
 
 <body>
