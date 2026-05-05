@@ -1,5 +1,5 @@
 import React, { useState, lazy, Suspense } from 'react';
-import { MapPin, Clock, ChevronDown, ChevronUp, CheckCircle, Phone, ExternalLink, ClipboardList, Brain, BookOpen, Briefcase, GraduationCap, Search, Star } from 'lucide-react';
+import { MapPin, Clock, ChevronDown, ChevronUp, CheckCircle, Phone, ExternalLink, ClipboardList, Brain, BookOpen, Briefcase, GraduationCap, Search, Star, X } from 'lucide-react';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 import { sendGAEvent } from '../utils/analytics';
 
@@ -68,6 +68,7 @@ const UNIDADES = [
     bairro:   'Icaraí — Niterói / RJ',
     horario:  'Seg a sex · Sábados a combinar',
     maps:     'https://maps.google.com/?q=Rua+Mem+de+Sá,+34,+Icaraí,+Niterói,+RJ',
+    embed:    'https://maps.google.com/maps?q=Rua+Mem+de+Sá+34+Icaraí+Niterói+RJ&output=embed&z=17',
   },
   {
     cidade:   'Nova Friburgo',
@@ -75,17 +76,30 @@ const UNIDADES = [
     bairro:   'Centro — Nova Friburgo / RJ',
     horario:  'Consultar disponibilidade',
     maps:     'https://maps.google.com/?q=Rua+Dr.+Ernesto+Brasilio,+64,+sala+204,+Centro,+Nova+Friburgo,+RJ',
+    embed:    'https://maps.google.com/maps?q=Rua+Dr+Ernesto+Brasilio+64+Centro+Nova+Friburgo+RJ&output=embed&z=17',
   },
 ];
 
 const DEPOIMENTOS = [
-  { texto: 'A Dra. Fernanda foi extremamente cuidadosa em todo o processo de avaliação do meu filho. O laudo foi detalhado e nos ajudou muito a entender como apoiá-lo melhor.', autor: 'Mãe de paciente, Niterói' },
-  { texto: 'Processo acolhedor e muito profissional. Consegui finalmente entender as minhas dificuldades e ter o suporte adequado no trabalho.', autor: 'Paciente adulto, Nova Friburgo' },
-  { texto: 'Recomendo muito. A devolutiva foi clara, humana e transformadora. Mudou a forma como enxergo meu filho.', autor: 'Pai de paciente, Niterói' },
+  {
+    texto:  'Consulta muito boa, local organizado, ótima profissional, testes efetivos e de boa avaliação.',
+    autor:  'R.S.N.',
+    fonte:  'Doctoralia',
+  },
+  {
+    texto:  'Dra Fernanda está atendendo meu filho e ele adora estar com ela. É sempre muito atenciosa e pontual.',
+    autor:  'I.',
+    fonte:  'Doctoralia',
+  },
+  {
+    texto:  'Excelente profissional. Me sinto muito acolhida e hoje suas sessões são determinantes para que eu alcance o equilíbrio. Super indico!!',
+    autor:  'L.M.',
+    fonte:  'Doctoralia',
+  },
 ];
 
 const FAQS = [
-  { p: 'Quantas sessões são necessárias?',                   r: 'Varia conforme o tipo de avaliação e o perfil do paciente. Em média, são 2 a 4 sessões de avaliação, além da entrevista inicial e da devolutiva.' },
+  { p: 'Quantas sessões são necessárias?',                   r: 'O número de sessões é definido caso a caso, conforme a demanda e os testes necessários para cada perfil. Além das sessões de avaliação em si, há a entrevista inicial e a devolutiva.' },
   { p: 'A avaliação é presencial?',                          r: 'Sim, sempre presencial — nas unidades de Niterói (Icaraí) ou Nova Friburgo. A validade científica e ética do laudo exige a presença do paciente.' },
   { p: 'Aceita plano de saúde?',                             r: 'O atendimento é particular. Emitimos nota fiscal, e muitos planos permitem solicitar reembolso parcial — consulte as condições do seu plano.' },
   { p: 'O que está incluído no laudo?',                      r: 'Relatório técnico completo com resultados dos testes, hipóteses diagnósticas, recomendações clínicas e educacionais, e orientações para escola ou trabalho quando necessário.' },
@@ -102,6 +116,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
 
   const [triagem, setTriagem]     = useState<TriagemId | null>(null);
   const [faqAberto, setFaqAberto] = useState<number | null>(null);
+  const [mapAberto, setMapAberto] = useState<number | null>(null);
   const [form, setForm]           = useState({ nome: '', whatsapp: '', paraQuem: '' });
   const [enviando, setEnviando]   = useState(false);
   const [enviado, setEnviado]     = useState(false);
@@ -289,6 +304,53 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
         </Suspense>
       )}
 
+      {/* Modal de mapa */}
+      {mapAberto !== null && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          onClick={() => setMapAberto(null)}
+        >
+          <div
+            className="bg-white rounded-2xl overflow-hidden w-full max-w-lg shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+              <div>
+                <p className="font-bold text-gray-900 text-sm">📍 {UNIDADES[mapAberto].cidade}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{UNIDADES[mapAberto].endereco} · {UNIDADES[mapAberto].bairro}</p>
+              </div>
+              <button
+                onClick={() => setMapAberto(null)}
+                className="text-gray-400 hover:text-gray-600 ml-4 shrink-0"
+                aria-label="Fechar mapa"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <iframe
+              src={UNIDADES[mapAberto].embed}
+              width="100%"
+              height="320"
+              className="border-0 block"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title={`Mapa do consultório em ${UNIDADES[mapAberto].cidade}`}
+            />
+            <div className="px-5 py-3 flex justify-center border-t border-gray-100">
+              <a
+                href={UNIDADES[mapAberto].maps}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-[#4A5D4A] font-semibold hover:text-[#3A4A3A] transition-colors"
+              >
+                <ExternalLink size={12} />
+                Abrir no Google Maps
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── COMO FUNCIONA ── */}
       <section className="bg-[#4A5D4A]/5 py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -334,16 +396,13 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
                     <Clock size={16} className="text-[#4A5D4A] shrink-0" />
                     <p className="text-xs md:text-sm text-gray-600">{u.horario}</p>
                   </div>
-                  <a
-                    href={u.maps}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => sendGAEvent('maps_click', 'avaliacao_landing', u.cidade)}
+                  <button
+                    onClick={() => { setMapAberto(i); sendGAEvent('maps_click', 'avaliacao_landing', u.cidade); }}
                     className="inline-flex items-center gap-1.5 mt-1 text-[#4A5D4A] hover:text-[#3A4A3A] text-xs md:text-sm font-semibold transition-colors"
                   >
-                    <ExternalLink size={13} />
-                    Ver no Google Maps
-                  </a>
+                    <MapPin size={13} />
+                    Ver no mapa
+                  </button>
                 </div>
               </div>
             ))}
@@ -405,17 +464,17 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
       </section>
 
       {/* ── PROVA SOCIAL ── */}
-      <section className="bg-white py-12 md:py-16">
+      <section className="bg-[#F0EFEB] py-12 md:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* Notas */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+            <div className="bg-white rounded-2xl p-4 text-center border border-gray-200 shadow-sm">
               <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">5,0</p>
               <p className="text-sm text-yellow-500 font-bold mt-0.5">★★★★★</p>
               <p className="text-xs text-gray-500 mt-0.5">153 avaliações</p>
               <p className="text-xs text-gray-400">Doctoralia</p>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
+            <div className="bg-white rounded-2xl p-4 text-center border border-gray-200 shadow-sm">
               <p className="text-3xl md:text-4xl font-bold text-[#4A5D4A]">5,0</p>
               <p className="text-sm text-yellow-500 font-bold mt-0.5">★★★★★</p>
               <p className="text-xs text-gray-500 mt-0.5">23 avaliações</p>
@@ -434,10 +493,13 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
           {/* Depoimentos */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {DEPOIMENTOS.map((d, i) => (
-              <div key={i} className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+              <div key={i} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                 <p className="text-yellow-400 text-sm mb-2">★★★★★</p>
-                <p className="text-sm text-gray-700 leading-relaxed mb-3 italic">"{d.texto}"</p>
-                <p className="text-xs text-gray-500 font-medium">— {d.autor}</p>
+                <p className="text-sm text-gray-700 leading-relaxed mb-4 italic">"{d.texto}"</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-600 font-semibold">— {d.autor}</p>
+                  <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{d.fonte}</span>
+                </div>
               </div>
             ))}
           </div>
