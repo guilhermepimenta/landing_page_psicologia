@@ -40,7 +40,7 @@ export const Hero: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => { sendGAEvent('agendar_consulta_hero', 'hero', 'whatsapp'); trackWhatsAppClick('hero'); }}
-            className="w-full sm:w-auto bg-[#B4C2B4] hover:bg-[#9BAB9B] text-white px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
+            className="w-full sm:w-auto bg-[#4A5D4A] hover:bg-[#3A4A3A] text-white px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
           >
             Agendar Consulta
           </a>

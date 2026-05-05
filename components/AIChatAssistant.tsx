@@ -284,6 +284,8 @@ export const AIChatAssistant: React.FC = () => {
       {/* Toggle Button */}
       <button
         onClick={handleToggle}
+        aria-label={isOpen ? 'Fechar assistente virtual' : 'Abrir assistente virtual'}
+        aria-expanded={isOpen}
         className="bg-[#9C6644] text-white border border-white/20 p-4 rounded-full shadow-2xl hover:scale-110 hover:bg-[#7F5539] transition-all active:scale-95 flex items-center justify-center gap-3 z-50"
       >
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}

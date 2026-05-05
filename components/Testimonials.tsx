@@ -157,7 +157,7 @@ export const Testimonials: React.FC = () => {
               </div>
               <div>
                 <span className="font-bold text-[#3A4A3A] text-sm block">{t.name}</span>
-                <span className="text-xs text-gray-400">{t.time}</span>
+                <span className="text-xs text-gray-500">{t.time}</span>
               </div>
             </div>
 
@@ -169,7 +169,7 @@ export const Testimonials: React.FC = () => {
               "{t.text}"
             </p>
 
-            <span className="text-gray-400 text-xs font-bold">VIA GOOGLE</span>
+            <span className="text-gray-500 text-xs font-bold">VIA GOOGLE</span>
           </div>
         ))}
       </div>
