@@ -94,13 +94,12 @@
     }
   }
   </script>
-  <!-- A2: Preconnect para fontes e Firebase (D3: crossorigin removido das origens não-CORS) -->
+  <!-- Preconnect: máximo 4, somente origens do caminho crítico -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://fernanda-psicologia.firebaseapp.com" />
-  <link rel="preconnect" href="https://firebaseinstallations.googleapis.com" />
-  <link rel="preconnect" href="https://firebase.googleapis.com" />
-  <link rel="preconnect" href="https://apis.google.com" />
+  <link rel="dns-prefetch" href="https://firebaseinstallations.googleapis.com" />
+  <link rel="dns-prefetch" href="https://firebase.googleapis.com" />
   <!-- A4: Preload da variante Playfair Display usada no H1 (elemento LCP) -->
   <link
     rel="preload"
