@@ -1,15 +1,10 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { sendGAEvent, trackWhatsAppClick } from '../utils/analytics';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 
 export const Hero: React.FC = () => {
   const waUrl = useWhatsAppUrl('Site - Início', 'Olá Fernanda, vim pelo site e gostaria de agendar uma consulta.');
-
-  useEffect(() => {
-    const shell = document.getElementById('hero-shell');
-    if (shell) shell.style.display = 'none';
-  }, []);
 
   return (
     <div className="relative min-h-[70vh] md:min-h-[85vh] flex items-start justify-center overflow-hidden">

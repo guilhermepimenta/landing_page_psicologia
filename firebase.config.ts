@@ -1,6 +1,5 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
 import { getStorage } from 'firebase/storage';
 
@@ -27,7 +26,7 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize services
 export const db = getFirestore(app);
-export const auth = getAuth(app);
+// auth é inicializado lazy em AuthContext para não bloquear o bundle principal
 export const storage = getStorage(app);
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 
