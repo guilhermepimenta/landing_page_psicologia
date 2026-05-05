@@ -2,13 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { leadsService, Lead } from '../services/firebaseService';
 
 const SOURCE_LABELS: Record<Lead['source'], string> = {
-  contact_form:    'Formulário',
-  screening_test:  'Teste de Rastreio',
+  contact_form:      'Formulário',
+  screening_test:    'Teste de Rastreio',
+  avaliacao_landing: 'Landing Avaliação',
 };
 
 const SOURCE_COLORS: Record<Lead['source'], string> = {
-  contact_form:   'bg-blue-100 text-blue-700',
-  screening_test: 'bg-purple-100 text-purple-700',
+  contact_form:      'bg-blue-100 text-blue-700',
+  screening_test:    'bg-purple-100 text-purple-700',
+  avaliacao_landing: 'bg-green-100 text-green-700',
 };
 
 const STATUS_LABELS: Record<Lead['status'], string> = {
