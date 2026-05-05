@@ -2,7 +2,10 @@
 import React, { useState } from 'react';
 import { Send, AlertCircle, MapPin, MessageCircle, CheckCircle } from 'lucide-react';
 import { sendGAEvent, trackFormLead } from '../utils/analytics';
-import { messagesService } from '../services/firebaseService';
+
+// messagesService carregado lazy — firebaseService inicializa Firestore/Storage,
+// que não precisam estar no bundle crítico da landing page.
+// O import acontece apenas no primeiro submit do formulário.
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -88,6 +91,7 @@ export const Contact: React.FC = () => {
 
     setSending(true);
     try {
+      const { messagesService } = await import('../services/firebaseService');
       await messagesService.create({
         name: formData.name,
         email: formData.email,
