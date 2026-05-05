@@ -93,7 +93,7 @@ export const Scheduling: React.FC = () => {
               className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-all duration-200
                 ${activeTab === tab.id
                   ? 'text-[#4A5D4A] border-b-2 border-[#4A5D4A] bg-[#4A5D4A]/5'
-                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
             >
               {tab.icon}
@@ -112,7 +112,7 @@ export const Scheduling: React.FC = () => {
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Endereço</p>
+                  <p className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-1">Endereço</p>
                   <p className="text-gray-700 text-sm leading-relaxed">{content.address}</p>
                 </div>
               </div>
@@ -122,13 +122,13 @@ export const Scheduling: React.FC = () => {
                   <Calendar size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Horários</p>
+                  <p className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-1">Horários</p>
                   <p className="text-gray-700 text-sm">{content.schedule}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Serviços disponíveis</p>
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-2">Serviços disponíveis</p>
                 <ul className="space-y-1.5">
                   {content.services.map((s) => (
                     <li key={s} className="flex items-center gap-2 text-sm text-gray-600">
@@ -156,7 +156,7 @@ export const Scheduling: React.FC = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleDoctoraliaClick}
-                  className="text-center text-xs text-gray-400 hover:text-[#4A5D4A] underline underline-offset-2 transition-colors"
+                  className="text-center text-xs text-gray-500 hover:text-[#4A5D4A] underline underline-offset-2 transition-colors"
                 >
                   Prefere agendar pelo Doctoralia?
                 </a>
@@ -166,7 +166,7 @@ export const Scheduling: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handlePsicomanagerClick}
-                    className="text-center text-xs text-gray-400 hover:text-[#4A5D4A] underline underline-offset-2 transition-colors"
+                    className="text-center text-xs text-gray-500 hover:text-[#4A5D4A] underline underline-offset-2 transition-colors"
                   >
                     Ou pelo PsicoManager?
                   </a>
@@ -177,7 +177,7 @@ export const Scheduling: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-8 text-center text-xs text-gray-400">
+      <div className="mt-8 text-center text-xs text-gray-500">
         <p>⚠ O agendamento online está sujeito à confirmação pela psicóloga.</p>
       </div>
     </div>

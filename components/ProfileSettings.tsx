@@ -114,7 +114,7 @@ const ProfileSettings: React.FC = () => {
           <div className="flex items-center gap-6">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center overflow-hidden shrink-0 border-4 border-purple-100">
               {photoURL ? (
-                <img src={photoURL} alt="Foto de perfil" className="w-full h-full object-cover" />
+                <img src={photoURL} alt="Foto de perfil" loading="lazy" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-white font-bold text-2xl">
                   {name ? name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'FM'}

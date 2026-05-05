@@ -10,13 +10,18 @@ export const Bio: React.FC = () => {
         {/* Photo Column */}
         <div className="md:w-1/3 bg-[#F0EFEB] p-8 flex flex-col items-center justify-center">
           <div className="relative group">
-            <img
-              src="/assets/image.png"
-              alt="Fernanda Abreu Mangia — Psicóloga clínica em Niterói e Nova Friburgo"
-              width="400"
-              height="500"
-              className="w-full h-auto rounded-2xl shadow-lg transition-transform duration-500 group-hover:scale-[1.02]"
-            />
+            {/* C1: WebP com fallback PNG — C2: width/height explícitos evitam CLS */}
+            <picture>
+              <source srcSet="/assets/image.webp" type="image/webp" />
+              <img
+                src="/assets/image.png"
+                alt="Fernanda Abreu Mangia — Psicóloga clínica em Niterói e Nova Friburgo"
+                width="400"
+                height="500"
+                fetchPriority="high"
+                className="w-full h-auto rounded-2xl shadow-lg transition-transform duration-500 group-hover:scale-[1.02]"
+              />
+            </picture>
             <div className="absolute inset-0 rounded-2xl border-2 border-[#B4C2B4] transform translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-all"></div>
           </div>
           <a

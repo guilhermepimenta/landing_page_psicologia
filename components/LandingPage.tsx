@@ -1,17 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { sendGAEvent, trackWhatsAppClick } from '../utils/analytics';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
 import { Navbar } from './Navbar';
 import { Hero } from './Hero';
 import { Bio } from './Bio';
 import { Services } from './Services';
-import { Scheduling } from './Scheduling';
-import { Blog } from './Blog';
-import { Testimonials } from './Testimonials';
-import { Footer } from './Footer';
-import { AIChatAssistant } from './AIChatAssistant';
 import { AuthorityBar } from './AuthorityBar';
 import { HowItWorks } from './HowItWorks';
+
+// C2: Lazy load das seções below-fold — não bloqueiam FCP/LCP da landing page
+const Scheduling     = lazy(() => import('./Scheduling').then(m => ({ default: m.Scheduling ?? m.default })));
+const Blog           = lazy(() => import('./Blog').then(m => ({ default: m.Blog ?? m.default })));
+const Testimonials   = lazy(() => import('./Testimonials').then(m => ({ default: m.Testimonials ?? m.default })));
+const Footer         = lazy(() => import('./Footer').then(m => ({ default: m.Footer ?? m.default })));
+const AIChatAssistant = lazy(() => import('./AIChatAssistant').then(m => ({ default: m.AIChatAssistant ?? m.default })));
+
+const SectionLoader: React.FC = () => (
+  <div className="py-20 flex justify-center">
+    <div className="w-6 h-6 border-4 border-[#4A5D4A]/20 border-t-[#4A5D4A] rounded-full animate-spin" />
+  </div>
+);
 
 export const LandingPage: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -88,25 +96,31 @@ export const LandingPage: React.FC = () => {
                 </section>
 
                 <section id="agendamento" aria-label="Agendamento de Consulta" className="py-20 bg-white scroll-mt-20">
-                    <Scheduling />
+                    <Suspense fallback={<SectionLoader />}>
+                        <Scheduling />
+                    </Suspense>
                 </section>
 
                 <section id="blog" aria-label="Blog de Psicologia" className="bg-[#F9F8F6] py-20 scroll-mt-20">
-                    <Blog />
+                    <Suspense fallback={<SectionLoader />}>
+                        <Blog />
+                    </Suspense>
                 </section>
 
                 <section id="depoimentos" aria-label="Depoimentos de Pacientes" className="relative scroll-mt-20 bg-[#F9F8F6]">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#4A5D4A]/80 to-black/30" />
                     <div className="relative z-10 py-24">
-                        <Testimonials />
+                        <Suspense fallback={<SectionLoader />}>
+                            <Testimonials />
+                        </Suspense>
                     </div>
                 </section>
             </main>
 
-            <Footer />
+            <Suspense fallback={null}><Footer /></Suspense>
 
             {/* Floating AI Assistant for potential patient questions */}
-            <AIChatAssistant />
+            <Suspense fallback={null}><AIChatAssistant /></Suspense>
 
             {/* Fixed WhatsApp Button */}
             <a
