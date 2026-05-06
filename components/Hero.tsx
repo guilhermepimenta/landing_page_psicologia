@@ -32,7 +32,7 @@ export const Hero: React.FC = () => {
         </h1>
         <div className="h-1 w-24 bg-[#B4C2B4] mx-auto mb-10 rounded-full shadow-sm"></div>
         <p className="text-lg md:text-2xl text-white/90 font-light max-w-3xl mx-auto mb-12 leading-relaxed">
-          Psicoterapia individual para adultos, adolescentes e famílias — online e presencial em Niterói e Nova Friburgo. Acolhimento, técnica e presença em cada fase da vida.
+          Psicoterapia individual para adultos e adolescentes — online e presencial em Niterói e Nova Friburgo. Acolhimento, técnica e presença em cada fase da vida.
         </p>
         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
           <a

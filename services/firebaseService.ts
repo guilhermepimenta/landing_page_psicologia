@@ -546,9 +546,9 @@ export const weeklyGoalService = {
 export interface Lead {
   id?: string;
   name: string;
-  email: string;
+  email?: string;
   phone?: string;
-  source: 'contact_form' | 'screening_test';
+  source: 'contact_form' | 'screening_test' | 'avaliacao_landing';
   testId?: string;
   testTitle?: string;
   testScore?: number;

@@ -200,9 +200,11 @@
       position:absolute → não empurra #root → sem CLS.
       Quando React monta em #root (z-index:1), cobre o shell naturalmente.
     -->
+    <!-- Shell exibido APENAS na rota raiz "/" — oculto nas demais rotas via script inline -->
     <div id="lcp-shell" aria-hidden="true">
       <h1>Você merece se sentir<br>bem consigo mesmo</h1>
     </div>
+    <script>if(window.location.pathname!=='/')document.getElementById('lcp-shell').style.display='none';</script>
     <div id="root"></div>
   </div>
   <script type="module" src="/index.tsx"></script>
