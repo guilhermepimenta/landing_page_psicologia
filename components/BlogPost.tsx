@@ -149,7 +149,7 @@ export const BlogPost: React.FC = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         if (post) {
-            const pageUrl = `https://fernandamangiapsi.com.br/blog/${id}`;
+            const pageUrl = `https://psicologafernandamangia.com.br/blog/${id}`;
 
             // Dynamic title and meta description per blog post
             document.title = `${post.title} | Fernanda Abreu Mangia — Psicóloga`;
@@ -185,11 +185,11 @@ export const BlogPost: React.FC = () => {
                 headline: post.title,
                 image: post.image,
                 datePublished: post.date,
-                author: { '@type': 'Person', name: 'Fernanda Abreu Mangia', url: 'https://fernandamangiapsi.com.br' },
+                author: { '@type': 'Person', name: 'Fernanda Abreu Mangia', url: 'https://psicologafernandamangia.com.br' },
                 publisher: {
                     '@type': 'Organization',
                     name: 'Psicóloga Fernanda Abreu Mangia',
-                    logo: { '@type': 'ImageObject', url: 'https://fernandamangiapsi.com.br/assets/image.png' }
+                    logo: { '@type': 'ImageObject', url: 'https://psicologafernandamangia.com.br/assets/image.png' }
                 },
                 mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
                 articleSection: post.category,
@@ -202,9 +202,9 @@ export const BlogPost: React.FC = () => {
             const metaDesc = document.querySelector('meta[name="description"]');
             if (metaDesc) metaDesc.setAttribute('content', 'Psicóloga clínica em Niterói e Nova Friburgo, atendimento online. Especialista em TCC, avaliação psicológica, ansiedade, depressão e autoestima. Agende sua consulta.');
             const canonical = document.querySelector('link[rel="canonical"]');
-            if (canonical) canonical.setAttribute('href', 'https://fernandamangiapsi.com.br/');
+            if (canonical) canonical.setAttribute('href', 'https://psicologafernandamangia.com.br/');
             const ogUrl = document.querySelector('meta[property="og:url"]');
-            if (ogUrl) ogUrl.setAttribute('content', 'https://fernandamangiapsi.com.br/');
+            if (ogUrl) ogUrl.setAttribute('content', 'https://psicologafernandamangia.com.br/');
             document.getElementById('article-schema')?.remove();
         };
     }, [post, id]);
