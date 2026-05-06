@@ -604,7 +604,9 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
                     onChange={e => setForm(f => ({ ...f, whatsapp: e.target.value }))}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#4A5D4A]/40 bg-white"
                   />
+                  <label htmlFor="para-quem-select" className="sr-only">Para quem é a avaliação?</label>
                   <select
+                    id="para-quem-select"
                     required
                     value={form.paraQuem}
                     onChange={e => setForm(f => ({ ...f, paraQuem: e.target.value }))}
