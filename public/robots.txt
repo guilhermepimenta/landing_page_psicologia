@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://fernandamangiapsi.com.br/sitemap.xml
+Sitemap: https://psicologafernandamangia.com.br/sitemap.xml
 
 # Block AI training crawlers (optional)
 User-agent: GPTBot
