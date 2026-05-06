@@ -1,7 +1,7 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { MapPin, Clock, ChevronDown, ChevronUp, CheckCircle, Phone, ExternalLink, ClipboardList, Brain, BookOpen, Briefcase, GraduationCap, Search, Star, X } from 'lucide-react';
 import { useWhatsAppUrl } from '../utils/useWhatsAppUrl';
-import { sendGAEvent } from '../utils/analytics';
+import { sendGAEvent, trackFormLead } from '../utils/analytics';
 
 const ScreeningTest = lazy(() =>
   import('./ScreeningTest').then(m => ({ default: m.ScreeningTest }))
@@ -133,6 +133,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
         message: form.paraQuem,
       });
       sendGAEvent('lead_avaliacao', 'avaliacao_landing', 'formulario');
+      trackFormLead(); // Google Ads conversion tracking
       setEnviado(true);
     } catch {
       // silently fail — WhatsApp é o canal principal
