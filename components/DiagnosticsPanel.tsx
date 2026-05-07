@@ -43,7 +43,7 @@ const DiagnosticsPanel: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/health');
+      const res = await fetch('/api/analytics?mode=health');
       if (!res.ok && res.status !== 207) {
         throw new Error(`HTTP ${res.status}`);
       }
