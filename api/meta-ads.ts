@@ -30,6 +30,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     : `act_${META_ADS_AD_ACCOUNT_ID}`;
 
   try {
+    // Validar token antes de fazer consultas de dados
+    const meRes = await fetch(
+      `https://graph.facebook.com/v21.0/me?fields=id,name&access_token=${META_ADS_ACCESS_TOKEN}`,
+    );
+    const meData = await meRes.json() as { id?: string; name?: string; error?: { message: string; code: number } };
+
+    if (meData.error) {
+      const isExpired = meData.error.code === 190;
+      return res.status(401).json({
+        error: `Token Meta Ads inválido: ${meData.error.message}`,
+        hint: isExpired
+          ? 'Token expirado. Gere um novo System User Token no Meta Business Manager com permissão ads_read.'
+          : 'Verifique META_ADS_ACCESS_TOKEN no Vercel. Use um System User Token de longa duração.',
+        configured: false,
+      });
+    }
+
     // Buscar insights da conta — nível conta agrega todas as campanhas
     const params = new URLSearchParams({
       fields: 'spend,campaign_name',
@@ -45,7 +62,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!insightsRes.ok || insightsData.error) {
       const msg = insightsData.error?.message ?? 'Erro na Meta Ads API';
-      return res.status(400).json({ error: msg });
+      const isPermission = insightsData.error?.code === 200 || insightsData.error?.code === 273;
+      return res.status(400).json({
+        error: msg,
+        hint: isPermission
+          ? `O System User não tem acesso à conta ${accountId}. Verifique META_ADS_AD_ACCOUNT_ID e permissões no Meta Business Manager.`
+          : 'Verifique META_ADS_ACCESS_TOKEN e META_ADS_AD_ACCOUNT_ID no Vercel.',
+      });
     }
 
     const spend = parseFloat(insightsData.data?.[0]?.spend ?? '0');
@@ -68,7 +91,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       spend: parseFloat(c.spend ?? '0'),
     }));
 
-    return res.json({ spend, month, currency: 'BRL', campaigns });
+    const noData = (insightsData.data ?? []).length === 0;
+
+    return res.json({
+      spend,
+      month,
+      currency: 'BRL',
+      campaigns,
+      hint: noData
+        ? 'Nenhuma campanha encontrada no período. Verifique se há campanhas ativas no Meta Ads Manager para o mês selecionado.'
+        : undefined,
+    });
   } catch (err: any) {
     console.error('[meta-ads]', err);
     return res.status(500).json({ error: err.message ?? 'Erro interno' });
