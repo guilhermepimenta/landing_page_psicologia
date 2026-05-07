@@ -67,6 +67,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     });
 
+    // Se não houve linhas, o Google Ads pode não estar vinculado OU não há campanhas no período.
+    // Retornamos um hint para ajudar a diagnosticar.
+    const noRows = (response.rows ?? []).length === 0;
+
     return res.json({
       spend: totalCost,
       clicks: totalClicks,
@@ -75,16 +79,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       currency: 'BRL',
       campaigns,
       source: 'ga4',
+      hint: noRows
+        ? 'Nenhuma campanha encontrada no período. Se você tem campanhas ativas, verifique se o Google Ads está vinculado à propriedade GA4.'
+        : undefined,
     });
   } catch (err: any) {
-    // Se a métrica não está disponível, provavelmente o Google Ads ainda não foi vinculado
-    const msg: string = err.message ?? '';
-    if (msg.includes('INVALID_ARGUMENT') || msg.includes('advertiserAdCost')) {
+    const msg: string = err?.message ?? '';
+    const code: number = err?.code ?? 0;
+
+    // Métrica advertiserAdCost indisponível = Google Ads não vinculado ao GA4
+    if (
+      msg.includes('INVALID_ARGUMENT') ||
+      msg.includes('advertiserAdCost') ||
+      msg.includes('unknown metric') ||
+      msg.includes('metric not found')
+    ) {
       return res.status(503).json({
-        error: 'Vincule o Google Ads ao GA4 primeiro: GA4 → Admin → Integrações → Google Ads',
+        error: 'Métrica de Google Ads indisponível nesta propriedade GA4.',
+        hint: 'Vincule o Google Ads à propriedade GA4: GA4 → Admin → Integrações de produtos → Google Ads → Vincular conta.',
         configured: false,
       });
     }
+
+    if (code === 7 || msg.includes('PERMISSION_DENIED')) {
+      return res.status(403).json({
+        error: 'Permissão negada.',
+        hint: 'Adicione a service account como Viewer na propriedade GA4.',
+        configured: false,
+      });
+    }
+
+    if (code === 16 || msg.includes('UNAUTHENTICATED') || msg.includes('invalid_grant')) {
+      return res.status(401).json({
+        error: 'Credenciais GA4 inválidas.',
+        hint: 'Verifique GA4_CLIENT_EMAIL e GA4_PRIVATE_KEY no Vercel.',
+        configured: false,
+      });
+    }
+
     console.error('[google-ads via ga4]', err);
     return res.status(500).json({ error: msg || 'Erro interno' });
   }

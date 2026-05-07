@@ -467,6 +467,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (error: any) {
     console.error('GA4 API error:', error);
-    return res.status(500).json({ error: error?.message ?? 'Erro ao consultar GA4' });
+    const msg: string = error?.message ?? '';
+    const code: number = error?.code ?? 0;
+
+    if (code === 7 || msg.includes('PERMISSION_DENIED')) {
+      return res.status(403).json({
+        error: 'Permissão negada pela GA4 Data API.',
+        hint: 'Adicione a service account como Viewer na propriedade GA4: GA4 → Admin → Gerenciamento de acesso à propriedade → Adicionar usuários.',
+      });
+    }
+    if (code === 16 || msg.includes('UNAUTHENTICATED') || msg.includes('invalid_grant')) {
+      return res.status(401).json({
+        error: 'Credenciais GA4 inválidas ou expiradas.',
+        hint: 'Verifique GA4_CLIENT_EMAIL e GA4_PRIVATE_KEY no Vercel. A chave privada deve estar com \\n literais (não quebras de linha reais).',
+      });
+    }
+    if (code === 5 || msg.includes('NOT_FOUND')) {
+      return res.status(404).json({
+        error: `Propriedade GA4 não encontrada: ${propertyId}`,
+        hint: 'Confirme GA4_PROPERTY_ID no Vercel. Use apenas o número (ex: "123456789"), sem o prefixo "properties/".',
+      });
+    }
+
+    return res.status(500).json({ error: msg || 'Erro ao consultar GA4' });
   }
 }
