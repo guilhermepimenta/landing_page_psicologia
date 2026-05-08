@@ -1,7 +1,25 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { google } from 'googleapis';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
-import { getAdminDb } from './_lib/firebaseAdmin';
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
+
+// Inlined Firebase Admin — avoids ERR_MODULE_NOT_FOUND com _lib em funções raiz do Vercel
+let _db: Firestore | null = null;
+function getAdminDb(): Firestore {
+  if (_db) return _db;
+  const app = getApps().length > 0
+    ? getApps()[0]
+    : initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID!,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        }),
+      });
+  _db = getFirestore(app);
+  return _db;
+}
 
 /**
  * Unified Google Ads handler — replaces api/google-ads.ts, api/gads-auth.ts
