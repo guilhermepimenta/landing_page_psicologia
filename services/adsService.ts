@@ -18,7 +18,7 @@ export interface AdsSpendResult {
 export const adsService = {
   async getGoogleAdsSpend(month: string): Promise<AdsSpendResult> {
     try {
-      const res = await fetch(`/api/google-ads?month=${month}`);
+      const res = await fetch(`/api/gads-campaigns?action=spend&month=${month}`);
       const data = await res.json();
       if (data.configured === false) return { spend: 0, clicks: 0, impressions: 0, month, currency: 'BRL', campaigns: [], configured: false };
       if (!res.ok) return { spend: 0, clicks: 0, impressions: 0, month, currency: 'BRL', campaigns: [], configured: true, error: data.error };
