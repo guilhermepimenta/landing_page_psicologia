@@ -44,6 +44,14 @@
     ],
     "rewrites": [
         {
+            "source": "/api/google-ads-oauth/callback",
+            "destination": "/api/gads-campaigns?action=callback"
+        },
+        {
+            "source": "/api/google-ads",
+            "destination": "/api/gads-campaigns?action=spend"
+        },
+        {
             "source": "/api/instagram/publish",
             "destination": "/api/instagram"
         },
