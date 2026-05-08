@@ -71,6 +71,8 @@ const ROIPanel: React.FC = () => {
     await roiAdsSyncService.save({
       month: selectedMonth,
       googleAds: google.spend,
+      googleClicks: google.clicks,
+      googleImpressions: google.impressions,
       metaAds: meta.spend,
       googleCampaigns: google.campaigns,
       metaCampaigns: meta.campaigns,
@@ -189,7 +191,7 @@ const ROIPanel: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Google Ads */}
           <div className="border border-blue-100 bg-blue-50 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-3">
               <span className="text-xl">🔵</span>
               <p className="text-sm font-bold text-blue-800">Google Ads</p>
               {syncStatus?.google && (
@@ -198,28 +200,61 @@ const ROIPanel: React.FC = () => {
                 </span>
               )}
             </div>
-            <p className="text-2xl font-bold text-blue-900">
-              {adsSync ? formatBRL(adsSync.googleAds) : '—'}
-            </p>
-            {adsSync?.syncedAt && (
-              <p className="text-xs text-blue-400 mt-1">
-                Sincronizado em {adsSync.syncedAt.toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-              </p>
-            )}
-            {adsSync?.googleCampaigns && adsSync.googleCampaigns.length > 0 && (
-              <div className="mt-3 space-y-1">
-                <p className="text-[10px] font-bold uppercase text-blue-500 tracking-wide">Campanhas</p>
-                {adsSync.googleCampaigns.map((c, i) => (
-                  <div key={i} className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600 truncate max-w-[180px]">{c.name}</span>
-                    <span className="text-blue-700 font-medium shrink-0 ml-2">{formatBRL(c.spend)}</span>
+
+            {adsSync ? (
+              <>
+                {/* Métricas principais em grid */}
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  <div className="bg-white rounded-lg p-2.5 border border-blue-100">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-400 mb-0.5">Custo</p>
+                    <p className="text-lg font-bold text-blue-900">{formatBRL(adsSync.googleAds)}</p>
                   </div>
-                ))}
-              </div>
+                  <div className="bg-white rounded-lg p-2.5 border border-blue-100">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-400 mb-0.5">CPC Médio</p>
+                    <p className="text-lg font-bold text-blue-900">
+                      {adsSync.googleClicks > 0 ? formatBRL(adsSync.googleAds / adsSync.googleClicks) : '—'}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-2.5 border border-blue-100">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-400 mb-0.5">Cliques</p>
+                    <p className="text-lg font-bold text-blue-900">{adsSync.googleClicks.toLocaleString('pt-BR')}</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-2.5 border border-blue-100">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-400 mb-0.5">CTR</p>
+                    <p className="text-lg font-bold text-blue-900">
+                      {adsSync.googleImpressions > 0
+                        ? `${((adsSync.googleClicks / adsSync.googleImpressions) * 100).toFixed(2)}%`
+                        : '—'}
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-white rounded-lg p-2.5 border border-blue-100 mb-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-400 mb-0.5">Impressões</p>
+                  <p className="text-base font-bold text-blue-900">{adsSync.googleImpressions.toLocaleString('pt-BR')}</p>
+                </div>
+
+                {adsSync.syncedAt && (
+                  <p className="text-xs text-blue-400 mb-2">
+                    Sincronizado em {adsSync.syncedAt.toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                )}
+
+                {adsSync.googleCampaigns && adsSync.googleCampaigns.length > 0 && (
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase text-blue-500 tracking-wide">Campanhas</p>
+                    {adsSync.googleCampaigns.map((c, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs">
+                        <span className="text-gray-600 truncate max-w-[180px]">{c.name}</span>
+                        <span className="text-blue-700 font-medium shrink-0 ml-2">{formatBRL(c.spend)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-blue-400 py-2">Clique em "Sincronizar Agora" para importar</p>
             )}
-            {!adsSync && !syncing && (
-              <p className="text-xs text-blue-400 mt-2">Clique em "Sincronizar Agora" para importar</p>
-            )}
+
             <div className="mt-3 pt-3 border-t border-blue-100">
               <p className="text-[10px] text-blue-400">
                 Vars: <code className="bg-blue-100 px-1 rounded">GA4_PROPERTY_ID</code> · <code className="bg-blue-100 px-1 rounded">GA4_CLIENT_EMAIL</code> · <code className="bg-blue-100 px-1 rounded">GA4_PRIVATE_KEY</code>

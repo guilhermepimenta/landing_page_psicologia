@@ -694,6 +694,8 @@ export const hashtagsService = {
 export interface ROIAdsSync {
   month: string;
   googleAds: number;
+  googleClicks: number;
+  googleImpressions: number;
   metaAds: number;
   googleCampaigns?: { name: string; spend: number }[];
   metaCampaigns?: { name: string; spend: number }[];
@@ -722,6 +724,8 @@ export const roiAdsSyncService = {
       return {
         month: d.month,
         googleAds: d.googleAds ?? 0,
+        googleClicks: d.googleClicks ?? 0,
+        googleImpressions: d.googleImpressions ?? 0,
         metaAds: d.metaAds ?? 0,
         googleCampaigns: d.googleCampaigns ?? [],
         metaCampaigns: d.metaCampaigns ?? [],
