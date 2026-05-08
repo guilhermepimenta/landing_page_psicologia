@@ -39,7 +39,7 @@ const NAV_GROUPS = [
     label: 'Relacionamento',
     items: [
       { icon: '🎯', label: 'Leads', tab: 'leads' as TabId },
-      { icon: '🔄', label: 'Funil de Leads', tab: 'leads-funnel' as TabId },
+      { icon: '📉', label: 'Funil de Campanha', tab: 'leads-funnel' as TabId },
       { icon: '💰', label: 'ROI', tab: 'roi' as TabId },
       { icon: '✉️', label: 'Mensagens', tab: 'messages' as TabId },
       { icon: '🔍', label: 'Diagnóstico', tab: 'diagnostics' as TabId },

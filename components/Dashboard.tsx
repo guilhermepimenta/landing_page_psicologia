@@ -17,6 +17,7 @@ import ROIPanel from './ROIPanel';
 import MessagesInbox from './MessagesInbox';
 import HashtagBank from './HashtagBank';
 import DiagnosticsPanel from './DiagnosticsPanel';
+import CampaignFunnel from './CampaignFunnel';
 import { getAISuggestion, AISuggestion } from '../services/aiSuggestionService';
 
 interface Metric {
@@ -490,7 +491,7 @@ const Dashboard: React.FC = () => {
       {activeTab === 'instagram-metrics' && <InstagramMetrics />}
       {activeTab === 'facebook-metrics' && <FacebookMetrics />}
       {activeTab === 'leads' && <LeadsPanel />}
-      {activeTab === 'leads-funnel' && <LeadsFunnel />}
+      {activeTab === 'leads-funnel' && <CampaignFunnel />}
       {activeTab === 'roi' && <ROIPanel />}
       {activeTab === 'diagnostics' && <DiagnosticsPanel />}
 

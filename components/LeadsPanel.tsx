@@ -97,6 +97,21 @@ const LeadsPanel: React.FC = () => {
   return (
     <div className="space-y-6">
 
+      {/* Contexto: CRM vs GA4 */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row items-start gap-3">
+        <span className="text-2xl">🎯</span>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-blue-800">O que é um Lead aqui?</p>
+          <p className="text-sm text-blue-700 mt-1">
+            Leads são contatos reais com nome e telefone, captados via <strong>formulário de contato</strong> ou <strong>teste de rastreio</strong> do site.
+            São diferentes das "conversões" do Google Ads/GA4, que rastreiam cliques no WhatsApp e visitas a páginas.
+          </p>
+          <p className="text-xs text-blue-500 mt-2">
+            Para ver o funil completo — Impressões → Cliques → Sessões → Conversões → Leads — acesse <strong>Funil de Campanha</strong> no menu lateral.
+          </p>
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
