@@ -117,6 +117,20 @@ const MONTHS_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set'
 const DAY_NAMES = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado'];
 const DEVICE_LABELS: Record<string, string> = { mobile: 'Celular', desktop: 'Desktop', tablet: 'Tablet' };
 
+// Mapeamento dos channel groups do GA4 para rótulos em português
+const GA4_CHANNEL_MAP: Record<string, string> = {
+  'Paid Search':     'Busca Paga',
+  'Organic Search':  'Busca Orgânica',
+  'Direct':          'Direto',
+  'Organic Social':  'Redes Sociais',
+  'Referral':        'Referência',
+  'Email':           'E-mail',
+  'Display':         'Display',
+  'Cross-network':   'Multi-canal',
+  'Unassigned':      'Outros',
+  '(not set)':       'Outros',
+};
+
 type Channel = 'Instagram' | 'GMB' | 'Blog' | 'Email';
 
 interface SuggestionPayload {
@@ -469,26 +483,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }),
     ]);
 
-    // --- Processar engajamento semanal ---
-    const weekMap: Record<string, { Instagram: number; GMB: number; Blog: number; Email: number }> = {};
+    // --- Processar engajamento semanal por fonte de tráfego real do GA4 ---
+    const weekMap: Record<string, Record<string, number>> = {};
+    const channelsFound = new Set<string>();
+
     for (const row of weeklyResponse.rows ?? []) {
-      const dateStr = row.dimensionValues?.[0]?.value ?? '';
-      const channel = row.dimensionValues?.[1]?.value ?? '';
+      const dateStr  = row.dimensionValues?.[0]?.value ?? '';
+      const channelRaw = row.dimensionValues?.[1]?.value ?? '';
       const sessions = Number(row.metricValues?.[0]?.value ?? 0);
+      if (sessions === 0) continue;
 
       const d = new Date(`${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`);
       const dia = DAYS_PT[d.getDay()];
+      if (!weekMap[dia]) weekMap[dia] = {};
 
-      if (!weekMap[dia]) weekMap[dia] = { Instagram: 0, GMB: 0, Blog: 0, Email: 0 };
-
-      const ch = channel.toLowerCase();
-      if (ch.includes('organic social') || ch.includes('instagram')) weekMap[dia].Instagram += sessions;
-      else if (ch.includes('organic search') || ch.includes('gmb')) weekMap[dia].GMB += sessions;
-      else if (ch.includes('organic') || ch.includes('referral')) weekMap[dia].Blog += sessions;
-      else if (ch.includes('email')) weekMap[dia].Email += sessions;
-      else weekMap[dia].Blog += sessions;
+      const label = GA4_CHANNEL_MAP[channelRaw] ?? channelRaw ?? 'Outros';
+      weekMap[dia][label] = (weekMap[dia][label] ?? 0) + sessions;
+      channelsFound.add(label);
     }
-    const weeklyEngagement = Object.entries(weekMap).map(([dia, vals]) => ({ dia, ...vals }));
+
+    const weeklyEngagement = Object.entries(weekMap).map(([dia, channels]) => ({ dia, ...channels }));
 
     // --- Processar tendência mensal ---
     const monthlyTrend = (monthlyResponse.rows ?? []).slice(-6).map(row => {

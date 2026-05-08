@@ -5,10 +5,8 @@
 
 export interface WeeklyRow {
   dia: string;
-  Instagram: number;
-  GMB: number;
-  Blog: number;
-  Email: number;
+  // canais dinâmicos retornados pelo GA4 (ex: "Busca Paga", "Direto", "Redes Sociais")
+  [channel: string]: number | string;
 }
 
 export interface MonthlyRow {

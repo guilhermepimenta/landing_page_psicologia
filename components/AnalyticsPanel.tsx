@@ -30,13 +30,13 @@ const SOURCE_LABELS: Record<string, string> = {
 // ---- Dados de fallback (desenvolvimento / erro) ----
 
 const FALLBACK_WEEKLY: WeeklyRow[] = [
-  { dia: 'Seg', Instagram: 180, GMB: 45, Blog: 12, Email: 8 },
-  { dia: 'Ter', Instagram: 220, GMB: 52, Blog: 18, Email: 11 },
-  { dia: 'Qua', Instagram: 195, GMB: 48, Blog: 15, Email: 9 },
-  { dia: 'Qui', Instagram: 310, GMB: 61, Blog: 22, Email: 14 },
-  { dia: 'Sex', Instagram: 280, GMB: 58, Blog: 19, Email: 12 },
-  { dia: 'Sáb', Instagram: 390, GMB: 42, Blog: 8,  Email: 5 },
-  { dia: 'Dom', Instagram: 340, GMB: 36, Blog: 6,  Email: 3 },
+  { dia: 'Seg', 'Busca Paga': 18, 'Busca Orgânica': 12, 'Direto': 8,  'Redes Sociais': 4 },
+  { dia: 'Ter', 'Busca Paga': 22, 'Busca Orgânica': 15, 'Direto': 10, 'Redes Sociais': 5 },
+  { dia: 'Qua', 'Busca Paga': 19, 'Busca Orgânica': 11, 'Direto': 7,  'Redes Sociais': 3 },
+  { dia: 'Qui', 'Busca Paga': 31, 'Busca Orgânica': 18, 'Direto': 12, 'Redes Sociais': 6 },
+  { dia: 'Sex', 'Busca Paga': 28, 'Busca Orgânica': 14, 'Direto': 9,  'Redes Sociais': 5 },
+  { dia: 'Sáb', 'Busca Paga': 14, 'Busca Orgânica': 8,  'Direto': 5,  'Redes Sociais': 9 },
+  { dia: 'Dom', 'Busca Paga': 10, 'Busca Orgânica': 6,  'Direto': 4,  'Redes Sociais': 8 },
 ];
 
 const FALLBACK_MONTHLY: MonthlyRow[] = [
@@ -79,6 +79,20 @@ const FALLBACK_SOURCES: SourceRow[] = [
   { source: 'Organic Social',  sessions: 98,  conversions: 4 },
   { source: 'Referral',        sessions: 42,  conversions: 2 },
 ];
+
+// Cores por canal de tráfego GA4
+const CHANNEL_COLORS: Record<string, string> = {
+  'Busca Paga':      '#3b82f6', // blue  — Google Ads
+  'Busca Orgânica':  '#10b981', // green — SEO
+  'Direto':          '#8b5cf6', // purple — direct
+  'Redes Sociais':   '#ec4899', // pink  — Instagram/Facebook
+  'Referência':      '#f59e0b', // amber — referral
+  'E-mail':          '#06b6d4', // cyan  — email
+  'Display':         '#f97316', // orange
+  'Multi-canal':     '#6366f1', // indigo
+  'Outros':          '#9ca3af', // gray
+};
+const CHART_COLORS = ['#3b82f6','#10b981','#8b5cf6','#ec4899','#f59e0b','#06b6d4','#f97316','#6366f1','#9ca3af'];
 
 // ---- Helpers ----
 
@@ -204,10 +218,11 @@ const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ metrics }) => {
   const pieData = metrics.length > 0
     ? metrics.map(m => ({ name: m.channel, value: m.value || 1 }))
     : [
-        { name: 'Instagram', value: 60 },
-        { name: 'GMB',       value: 20 },
-        { name: 'Blog',      value: 12 },
-        { name: 'Email',     value: 8 },
+        { name: 'Busca Paga',     value: 53 },
+        { name: 'Direto',         value: 17 },
+        { name: 'Referência',     value: 14 },
+        { name: 'Busca Orgânica', value: 8  },
+        { name: 'Redes Sociais',  value: 4  },
       ];
 
   const sourcesChartData = trafficSources.map(s => ({
@@ -302,9 +317,12 @@ const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ metrics }) => {
         ))}
       </div>
 
-      {/* Gráfico de barras: Engajamento semanal por canal */}
+      {/* Gráfico de barras: Sessões semanais por fonte de tráfego */}
       <div className="bg-white rounded-xl shadow-md p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">📊 Engajamento Semanal por Canal</h3>
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-lg font-semibold text-gray-900">📊 Sessões Semanais por Fonte de Tráfego</h3>
+        </div>
+        <p className="text-xs text-gray-400 mb-5">Canais reais do GA4 — últimos 7 dias</p>
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={weeklyData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -312,10 +330,17 @@ const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({ metrics }) => {
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="Instagram" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="GMB"       fill="#3b82f6" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Blog"      fill="#10b981" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Email"     fill="#f59e0b" radius={[4, 4, 0, 0]} />
+            {Array.from(
+              new Set(weeklyData.flatMap(row => Object.keys(row).filter(k => k !== 'dia')))
+            ).map((channel, i) => (
+              <Bar
+                key={channel}
+                dataKey={channel}
+                fill={CHANNEL_COLORS[channel] ?? CHART_COLORS[i % CHART_COLORS.length]}
+                radius={[4, 4, 0, 0]}
+                stackId={undefined}
+              />
+            ))}
           </BarChart>
         </ResponsiveContainer>
       </div>
