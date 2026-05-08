@@ -14,7 +14,7 @@ export interface GAdsCampaignsResult {
 
 export const googleAdsService = {
   async getAuthUrl(): Promise<string> {
-    const res = await fetch('/api/gads-auth');
+    const res = await fetch('/api/gads-campaigns?action=auth');
     if (!res.ok) throw new Error('Falha ao obter URL de autenticação.');
     const data = await res.json();
     return data.url as string;
