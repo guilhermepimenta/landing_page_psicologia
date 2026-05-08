@@ -32,7 +32,7 @@ const NAV_GROUPS = [
       { icon: '📈', label: 'Analytics Geral', tab: 'analytics' as TabId },
       { icon: '📊', label: 'Instagram Insights', tab: 'instagram-metrics' as TabId },
       { icon: '📘', label: 'Facebook Insights', tab: 'facebook-metrics' as TabId },
-      { icon: '🔍', label: 'Google Search', tab: 'google' as TabId },
+      { icon: '🟢', label: 'Google Ads', tab: 'google' as TabId },
     ],
   },
   {
