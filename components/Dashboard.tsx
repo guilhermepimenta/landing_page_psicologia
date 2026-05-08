@@ -12,12 +12,12 @@ import SearchConsoleGMBPanel from './SearchConsoleGMBPanel';
 import InstagramMetrics from './InstagramMetrics';
 import FacebookMetrics from './FacebookMetrics';
 import LeadsPanel from './LeadsPanel';
-import LeadsFunnel from './LeadsFunnel';
 import ROIPanel from './ROIPanel';
 import MessagesInbox from './MessagesInbox';
 import HashtagBank from './HashtagBank';
 import DiagnosticsPanel from './DiagnosticsPanel';
 import CampaignFunnel from './CampaignFunnel';
+import GoogleAdsCampaigns from './GoogleAdsCampaigns';
 import { getAISuggestion, AISuggestion } from '../services/aiSuggestionService';
 
 interface Metric {
@@ -495,7 +495,17 @@ const Dashboard: React.FC = () => {
       {activeTab === 'roi' && <ROIPanel />}
       {activeTab === 'diagnostics' && <DiagnosticsPanel />}
 
-      {activeTab === 'google' && <SearchConsoleGMBPanel />}
+      {activeTab === 'google' && (
+        <div className="space-y-8">
+          <SearchConsoleGMBPanel />
+          <div>
+            <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span>📢</span> Campanhas Google Ads
+            </h2>
+            <GoogleAdsCampaigns />
+          </div>
+        </div>
+      )}
 
       {activeTab === 'messages' && (
         <MessagesInbox />
