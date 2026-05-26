@@ -186,7 +186,7 @@ const AvaliacaoNeuropsicologica: React.FC = () => {
           <div className="md:grid md:grid-cols-[1fr_auto] md:gap-12 md:items-center">
             <div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold leading-tight mb-4">
-                Avaliação Psicológica para crianças e adultos
+                Avaliação Neuropsicológica para crianças e adultos
               </h1>
               <p className="text-white/85 text-base md:text-lg leading-relaxed mb-2">
                 TEA · TDAH · Dificuldades de aprendizagem e outras avaliações
