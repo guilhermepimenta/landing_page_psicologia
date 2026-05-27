@@ -174,9 +174,9 @@
     #app-wrapper{position:relative;min-height:100vh}
     /* #root cobre o loader quando React monta — fundo opaco evita sangramento */
     #root{position:relative;z-index:1;min-height:100vh;background:#FDFCFB}
-    /* Loader: cobre a tela inteira enquanto o JS não carrega */
+    /* Loader: z-index:100 garante que fica acima do #root durante o carregamento */
     #page-loader{
-      position:fixed;inset:0;z-index:0;
+      position:fixed;inset:0;z-index:100;
       display:flex;align-items:center;justify-content:center;
       background:#FDFCFB;
     }
