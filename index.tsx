@@ -14,3 +14,10 @@ root.render(
     <App />
   </React.StrictMode>
 );
+
+// Remove o page-loader após o React pintar o primeiro frame
+requestAnimationFrame(() =>
+  requestAnimationFrame(() => {
+    document.getElementById('page-loader')?.remove();
+  })
+);
